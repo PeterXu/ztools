@@ -1,4 +1,4 @@
-android-development-environment
+bash dev environment
 ===============================
 
-Backup required tools for android-development-environment, e.g. sdk, ndk, adt and etc.
+Automatic settings scripts for bash enviroment, e.g. vim, ant, marks, sdk, ndk, adt and etc.
