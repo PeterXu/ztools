@@ -17,6 +17,8 @@ set_vim()
 {
     (
     cd ~/
+    [ -e .vimrc ] && rm -rf .vimrc
+    [ -e .vim ] && rm -rf .vim
     ln -sf $ROOT/shell/.vimrc
     ln -sf $ROOT/shell/.vim
     )
