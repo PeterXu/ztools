@@ -36,6 +36,10 @@ EOF
 
 set_java()
 {
+	if [ "$osname" == "Darwin" ]; then
+		return
+	fi
+
     jver=`java -version >/tmp/err.log 2>&1`
     if [ $? -ne 0 ]; then
         echox 33 "no avaiable java, pls install it"
@@ -52,6 +56,10 @@ EOF
 
 set_ant()
 {
+	if [ "$osname" == "Darwin" ]; then
+		return
+	fi
+
 	label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
@@ -68,15 +76,15 @@ set_end()
 	had=""
 	label="<-- For envall.sh Setting"
 	label_end="End envall.sh Setting -->"
-	if [ -f ~/.bashrc ]; then
-		had=`sed -n /"$label"/p ~/.bashrc`
+	if [ -f "$bash_file" ]; then
+		had=`sed -n /"$label"/p "$bash_file"`
 	fi
 	if test -n "$had"; then
         echox 32 "[WARN] Had been set before!"
         return
     fi
 
-    cat >> ~/.bashrc << EOF
+    cat >> "$bash_file" << EOF
 # ${label}
 export ZTOOLS_ROOT=${ROOT}
 if [ -f \$ZTOOLS_ROOT/shell/envall.sh ]; then
@@ -91,8 +99,8 @@ set_clear()
 {
 	label="<-- For envall.sh Setting"
 	label_end="End envall.sh Setting -->"
-	if [ -f ~/.bashrc ]; then
-        sed -i /"$label"/,/"$label_end"/d ~/.bashrc
+	if [ -f "$bash_file" ]; then
+        sed -in /"$label"/,/"$label_end"/d "$bash_file"
     fi
 }
 
@@ -105,6 +113,13 @@ set_clear()
 if [ $# -ne 1 ]; then
     echox 34 "usage: $0 set|clear"
     exit 1
+fi
+
+osname=`uname`
+if [  "$osname" == "Darwin" ]; then
+	bash_file=~/.profile
+else
+	bash_file=~/.bashrc
 fi
 
 if [ $1 = "set" ]; then

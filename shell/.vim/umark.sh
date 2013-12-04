@@ -23,6 +23,6 @@ function unmark {
 }
 function marks {
     mkdir -p "$MARKPATH"
-    ls -l "$MARKPATH" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
+    ls -l "$MARKPATH" | sed 's/  / /g' | sed 's/  / /g' | cut -d' ' -f9-
 }
 
