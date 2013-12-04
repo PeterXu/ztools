@@ -36,9 +36,9 @@ EOF
 
 set_java()
 {
-	if [ "$osname" == "Darwin" ]; then
-		return
-	fi
+    if [ "$osname" == "Darwin" ]; then
+        return
+    fi
 
     jver=`java -version >/tmp/err.log 2>&1`
     if [ $? -ne 0 ]; then
@@ -46,7 +46,7 @@ set_java()
         exit 1
     fi
 
-	label="For JAVA_HOME Setting"
+    label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 export JAVA_HOME=/usr/java/default/
@@ -56,11 +56,11 @@ EOF
 
 set_ant()
 {
-	if [ "$osname" == "Darwin" ]; then
-		return
-	fi
+    if [ "$osname" == "Darwin" ]; then
+        return
+    fi
 
-	label="For ANT_HOME Setting"
+    label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 if [ ! -n "\$ANT_HOME" ]; then
@@ -73,13 +73,13 @@ EOF
 
 set_end()
 {
-	had=""
-	label="<-- For envall.sh Setting"
-	label_end="End envall.sh Setting -->"
-	if [ -f "$bash_file" ]; then
-		had=`sed -n /"$label"/p "$bash_file"`
-	fi
-	if test -n "$had"; then
+    had=""
+    label="<-- For envall.sh Setting"
+    label_end="End envall.sh Setting -->"
+    if [ -f "$bash_file" ]; then
+        had=`sed -n /"$label"/p "$bash_file"`
+    fi
+    if test -n "$had"; then
         echox 32 "[WARN] Had been set before!"
         return
     fi
@@ -97,9 +97,9 @@ EOF
 
 set_clear()
 {
-	label="<-- For envall.sh Setting"
-	label_end="End envall.sh Setting -->"
-	if [ -f "$bash_file" ]; then
+    label="<-- For envall.sh Setting"
+    label_end="End envall.sh Setting -->"
+    if [ -f "$bash_file" ]; then
         sed -in /"$label"/,/"$label_end"/d "$bash_file"
     fi
 }
@@ -117,9 +117,9 @@ fi
 
 osname=`uname`
 if [  "$osname" == "Darwin" ]; then
-	bash_file=~/.profile
+    bash_file=~/.profile
 else
-	bash_file=~/.bashrc
+    bash_file=~/.bashrc
 fi
 
 if [ $1 = "set" ]; then
