@@ -26,7 +26,7 @@ set_vim()
     label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-alias srcin="~/.vim/src_insight.sh"
+alias srcin="sh ~/.vim/src_insight.sh"
 if [ -f ~/.vim/umark.sh ]; then
     source ~/.vim/umark.sh
 fi
