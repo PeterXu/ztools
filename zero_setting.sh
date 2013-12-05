@@ -36,7 +36,7 @@ EOF
 
 set_java()
 {
-    if [ "$osname" == "Darwin" ]; then
+    if [ "$osname" = "Darwin" ]; then
         return
     fi
 
@@ -56,7 +56,7 @@ EOF
 
 set_ant()
 {
-    if [ "$osname" == "Darwin" ]; then
+    if [ "$osname" = "Darwin" ]; then
         return
     fi
 
@@ -116,7 +116,7 @@ if [ $# -ne 1 ]; then
 fi
 
 osname=`uname`
-if [  "$osname" == "Darwin" ]; then
+if [  "$osname" = "Darwin" ]; then
     bash_file=~/.profile
 else
     bash_file=~/.bashrc
