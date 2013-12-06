@@ -65,7 +65,7 @@ set_ant()
 # ${label}
 if [ ! -n "\$ANT_HOME" ]; then
     export ANT_HOME=\$ZTOOLS_ROOT/dist/ant-1.9.2
-    PATH=\$PATH:\$ANT_HOME/bin
+    PATH=\$ANT_HOME/bin:\$PATH
 fi
 
 EOF
