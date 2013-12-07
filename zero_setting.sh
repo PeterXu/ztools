@@ -39,17 +39,35 @@ set_java()
     if [ "$osname" = "Darwin" ]; then
         return
     fi
-
-    jver=`java -version >/tmp/err.log 2>&1`
-    if [ $? -ne 0 ]; then
+    
+    if [ -f "/usr/local/bin/java" ]; then
+        java="/usr/local/bin/java"
+    elif [ -f "/usr/bin/java" ]; then
+        java="/usr/bin/java"
+    else
         echox 33 "no avaiable java, pls install it"
-        exit 1
+        return
     fi
+
+    while true; do
+        if [ ! -e $java ]; then
+            echox 33 "no avaiable java: $java"
+            return
+        fi
+        if [ -h $java ]; then
+            java=`readlink $java`
+        else
+            break;
+        fi
+    done
+    java=${java/jre\/bin\/java/}
+    java=${java/bin\/java/}
+    java_home=$java
 
     label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-export JAVA_HOME=/usr/java/default/
+export JAVA_HOME=${java_home}
 
 EOF
 }
