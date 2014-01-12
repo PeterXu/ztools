@@ -1,8 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
-let g:netrw_dirhist_1='/home/yongzxu/Whitney/src/common/MediaSDK/shark/bin/shark_html'
-let g:netrw_dirhist_2='/home/yongzxu/Whitney/src/common/MediaSDK/wme/testbed/Android/WME_Android/bin'
-let g:netrw_dirhist_3='/home/yongzxu/Whitney/src/common/MediaSDK/wme/bld/client/android/jni'
-let g:netrw_dirhist_4='/opt/ztools/android'
-let g:netrw_dirhist_5='/opt/ztools/android/android-ndk-r9/platforms/android-18/arch-arm/usr'
-let g:netrw_dirhist_6='/root/wspace/codecs/T28L10N_MATRIX_1/wels/project/build/centos/dec'
