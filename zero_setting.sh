@@ -89,6 +89,23 @@ fi
 EOF
 }
 
+set_mvn()
+{
+    if [ "$osname" = "Darwin" ]; then
+        return
+    fi
+
+    label="For M2_HOME Setting"
+    cat >> $ROOT/shell/envall.sh << EOF
+# ${label}
+if [ ! -n "\$M2_HOME" ]; then
+    export M2_HOME=\$ZTOOLS_ROOT/dist/maven-3.2.1
+    PATH=\$M2_HOME/bin:\$PATH
+fi
+
+EOF
+}
+
 set_end()
 {
     had=""
@@ -146,6 +163,7 @@ if [ $1 = "set" ]; then
     set_vim
     set_java
     set_ant
+    set_mvn
     set_end
 elif [ $1 = "clear" ]; then
     set_clear
