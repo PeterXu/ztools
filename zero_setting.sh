@@ -60,8 +60,8 @@ set_java()
             break;
         fi
     done
-    java=${java/jre\/bin\/java/}
-    java=${java/bin\/java/}
+    java=${java%%jre\/bin\/java}
+    java=${java%%bin\/java}
     java_home=$java
 
     label="For JAVA_HOME Setting"
