@@ -67,7 +67,9 @@ set_java()
     label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-export JAVA_HOME=${java_home}
+if [ ! -n "\$JAVA_HOME" ]; then
+    export JAVA_HOME=${java_home}
+fi
 
 EOF
 }
