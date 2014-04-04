@@ -93,5 +93,13 @@ endif
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-"set expandtab " use spaces to expandtab, else <set noexpandtab>
+set expandtab " use spaces to expandtab, else <set noexpandtab>
+
+" for licenses setting
+map :mit :0r ~/.vim/licenses/mit.txt
+map :bsd2 :0r ~/.vim/licenses/bsd2.txt
+map :bsd3 :0r ~/.vim/licenses/bsd3.txt
+"autocmd BufNewFile *
+"    :0r ~/.vim/licenses/mit.txt
+"augroup END
 
