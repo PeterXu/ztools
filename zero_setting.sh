@@ -67,7 +67,7 @@ set_java()
     label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ "#"\$JAVA_HOME = "#" ]; then
+if [ "#\$JAVA_HOME" = "#" ]; then
     export JAVA_HOME=${java_home}
 fi
 
@@ -83,7 +83,7 @@ set_ant()
     label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ "#"\$ANT_HOME = "#" ]; then
+if [ "#\$ANT_HOME" = "#" ]; then
     export ANT_HOME=\$ZTOOLS_ROOT/dist/ant-1.9.2
     PATH=\$ANT_HOME/bin:\$PATH
 fi
@@ -100,10 +100,24 @@ set_mvn()
     label="For M2_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ "#"\$M2_HOME = "#" ]; then
+if [ "#\$M2_HOME" = "#" ]; then
     export M2_HOME=\$ZTOOLS_ROOT/dist/maven-3.2.1
     PATH=\$M2_HOME/bin:\$PATH
 fi
+
+EOF
+}
+
+set_android()
+{
+    if [ "$osname" = "Darwin" ]; then
+        return
+    fi
+
+    label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
+    cat >> $ROOT/shell/envall.sh << EOF
+# ${label}
+PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_NDK_HOME:\$PATH
 
 EOF
 }
@@ -166,6 +180,7 @@ if [ $1 = "set" ]; then
     set_java
     set_ant
     set_mvn
+    set_android
     set_end
 elif [ $1 = "clear" ]; then
     set_clear
