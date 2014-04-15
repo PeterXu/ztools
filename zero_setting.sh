@@ -76,10 +76,6 @@ EOF
 
 set_ant()
 {
-    if [ "$osname" = "Darwin" ]; then
-        return
-    fi
-
     label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
@@ -93,10 +89,6 @@ EOF
 
 set_mvn()
 {
-    if [ "$osname" = "Darwin" ]; then
-        return
-    fi
-
     label="For M2_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
@@ -110,10 +102,6 @@ EOF
 
 set_android()
 {
-    if [ "$osname" = "Darwin" ]; then
-        return
-    fi
-
     label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}

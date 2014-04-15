@@ -1,4 +1,5 @@
 bash dev environment
 ===============================
 
-Automatic settings scripts for bash enviroment, e.g. vim, ant, marks, sdk, ndk, adt and etc.
+Automatic scripts for bash, e.g. vim, java, ant/mvn, jump/marks, android sdk/ndk, and etc.
+
