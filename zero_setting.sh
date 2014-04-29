@@ -105,7 +105,13 @@ set_android()
     label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$ANDROID_NDK_HOME:\$PATH
+if [ "#\$ANDROID_HOME" != "#" ]; then
+    PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH
+fi
+
+if [ "#\$ANDROID_NDK_HOME" != "#" ]; then
+    PATH=\$ANDROID_NDK_HOME:\$PATH
+fi
 
 EOF
 }
