@@ -32,9 +32,11 @@ set_gnu()
     label="For Mac GNU Setting (coreutils)"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ -e ${gnubin} ] && PATH=${gnubin}:\$PATH
-[ -f ${gnubin}/ls ] && alias ls='ls --color'
-[ -f ${gnubin}/grep ] && alias grep='grep --color'
+if [ -e ${gnubin} ]; then
+    PATH=${gnubin}:\$PATH
+    alias ls='ls --color'
+    alias grep='grep --color'
+fi
 
 EOF
 }
