@@ -3,8 +3,18 @@
 #
 
 ROOT=`pwd`
+UNAME=`uname`
 
-echox() { color=$1; shift; echo -e "\033[${color}m$*\033[00m"; echo; }
+echox() { 
+    [ $# -gt 1 ] && b="\033[${1}m" && e="\033[00m" && shift
+    [ $UNAME = "Darwin" ] && echo=echo || echo="echo -e"
+    $echo "${b}$*${e}\n" 
+}
+
+usage()
+{
+    echox 34 "usage: $0 set|clear"
+}
 
 set_begin()
 {
@@ -27,38 +37,19 @@ set_vim()
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 alias srcin="sh ~/.vim/src_insight.sh"
-if [ -f ~/.vim/umark.sh ]; then
-    source ~/.vim/umark.sh
-fi
+[ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
 
 EOF
 }
 
 set_java()
 {
-    if [ "$osname" = "Darwin" ]; then
-        return
-    fi
+    [ "$UNAME" = "Darwin" ] && return
     
-    if [ -f "/usr/local/bin/java" ]; then
-        java="/usr/local/bin/java"
-    elif [ -f "/usr/bin/java" ]; then
-        java="/usr/bin/java"
-    else
-        echox 33 "no avaiable java, pls install it"
-        return
-    fi
-
+    java=`which java 2>/dev/null`
     while true; do
-        if [ ! -e $java ]; then
-            echox 33 "no avaiable java: $java"
-            return
-        fi
-        if [ -h $java ]; then
-            java=`readlink $java`
-        else
-            break;
-        fi
+        [ ! -f $java ] && echox 33 "no avaiable java: $java" && return
+        [ -h $java ] && java=`readlink $java` || break
     done
     java=${java%%jre\/bin\/java}
     java=${java%%bin\/java}
@@ -67,9 +58,7 @@ set_java()
     label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ "#\$JAVA_HOME" = "#" ]; then
-    export JAVA_HOME=${java_home}
-fi
+[ "#\$JAVA_HOME" = "#" ] && export JAVA_HOME=${java_home}
 
 EOF
 }
@@ -87,31 +76,13 @@ fi
 EOF
 }
 
-set_mvn()
-{
-    label="For M2_HOME Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
-if [ "#\$M2_HOME" = "#" ]; then
-    export M2_HOME=\$ZTOOLS_ROOT/dist/maven-3.2.1
-    PATH=\$M2_HOME/bin:\$PATH
-fi
-
-EOF
-}
-
 set_android()
 {
     label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ "#\$ANDROID_HOME" != "#" ]; then
-    PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH
-fi
-
-if [ "#\$ANDROID_NDK_HOME" != "#" ]; then
-    PATH=\$ANDROID_NDK_HOME:\$PATH
-fi
+[ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH
+[ "#\$ANDROID_NDK_HOME" != "#" ] && PATH=\$ANDROID_NDK_HOME:\$PATH
 
 EOF
 }
@@ -121,20 +92,13 @@ set_end()
     had=""
     label="<-- For envall.sh Setting"
     label_end="End envall.sh Setting -->"
-    if [ -f "$bash_file" ]; then
-        had=`sed -n /"$label"/p "$bash_file"`
-    fi
-    if test -n "$had"; then
-        echox 32 "[WARN] Had been set before!"
-        return
-    fi
+    [ -f "$bash_file" ] && had=`sed -n /"$label"/p "$bash_file"`
+    [ "#$had" != "#" ] && echox 32 "[WARN] Had been set before!" && return
 
     cat >> "$bash_file" << EOF
 # ${label}
 export ZTOOLS_ROOT=${ROOT}
-if [ -f \$ZTOOLS_ROOT/shell/envall.sh ]; then
-    source \$ZTOOLS_ROOT/shell/envall.sh
-fi
+[ -f \$ZTOOLS_ROOT/shell/envall.sh ] && source \$ZTOOLS_ROOT/shell/envall.sh
 # ${label_end}
 EOF
     echox 32 "[OK] Set successful and Should login again!"
@@ -144,9 +108,7 @@ set_clear()
 {
     label="<-- For envall.sh Setting"
     label_end="End envall.sh Setting -->"
-    if [ -f "$bash_file" ]; then
-        sed -in /"$label"/,/"$label_end"/d "$bash_file"
-    fi
+    [ -f "$bash_file" ] && sed -in /"$label"/,/"$label_end"/d "$bash_file"
 }
 
 
@@ -155,32 +117,21 @@ set_clear()
 ## entry point
 ##
 
-if [ $# -ne 1 ]; then
-    echox 34 "usage: $0 set|clear"
-    exit 1
-fi
+[ $# -ne 1 ] && usage && exit 1 || opt=$1
 
-osname=`uname`
-if [  "$osname" = "Darwin" ]; then
-    bash_file=~/.profile
-else
-    bash_file=~/.bashrc
-fi
+[ "$UNAME" = "Darwin" ] && bash_file=~/.profile || bash_file=~/.bashrc
 
-if [ $1 = "set" ]; then
-    set_clear
+if [ $opt = "set" ]; then
     set_begin
     set_vim
     set_java
     set_ant
-    set_mvn
     set_android
     set_end
-elif [ $1 = "clear" ]; then
+elif [ $opt = "clear" ]; then
     set_clear
 else
-    echox 34 "usage: $0 set|clear"
-    exit 1
+    usage && exit 1
 fi
 
 exit 0
