@@ -23,6 +23,22 @@ set_begin()
     chmod 750 ${ROOT}/shell/envall.sh
 }
 
+set_gnu() 
+{
+    [ "$UNAME" != "Darwin" ] && return
+
+    gnubin=/opt/local/libexec/gnubin
+
+    label="For Mac GNU Setting (coreutils)"
+    cat >> $ROOT/shell/envall.sh << EOF
+# ${label}
+[ -e ${gnubin} ] && PATH=${gnubin}:\$PATH
+[ -f ${gnubin}/ls ] && alias ls='ls --color'
+[ -f ${gnubin}/grep ] && alias grep='grep --color'
+
+EOF
+}
+
 set_vim()
 {
     (
@@ -122,7 +138,9 @@ set_clear()
 [ "$UNAME" = "Darwin" ] && bash_file=~/.profile || bash_file=~/.bashrc
 
 if [ $opt = "set" ]; then
+    set_clear
     set_begin
+    set_gnu
     set_vim
     set_java
     set_ant
