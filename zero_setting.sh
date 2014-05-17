@@ -57,9 +57,7 @@ prepare_mac() {
     pm=port
     install_pkg coreutils gls
     install_pkg npm npm
-
-    which npm 2>/dev/null 1>&2
-    [ $? -eq 0 ] && pm=npm && install_pkg cordova cordova
+    install_pkg cmake cmake
 }
 
 prepare_nix() {
@@ -76,10 +74,8 @@ prepare_nix() {
     [ $? -eq 0 ] && pm=aptitude
 
     [ "#$pm" = "#" ] && return
-
     install_pkg npm npm
-    which npm 2>/dev/null 1>&2
-    [ $? -eq 0 ] && pm=npm && install_pkg cordova cordova
+    install_pkg cmake cmake
 }
 
 set_prepare() {
