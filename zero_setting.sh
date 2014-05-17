@@ -6,14 +6,22 @@ ROOT=`pwd`
 UNAME=`uname`
 
 echox() { 
-    [ $# -gt 1 ] && b="\033[${1}m" && e="\033[00m" && shift
+    [ $# -le 2 ] && return
+    b="\033[${1}m" && shift
+    t=${1} && shift 
+    e="\033[00m"
     [ $UNAME = "Darwin" ] && echo=echo || echo="echo -e"
-    $echo "${b}$*${e}\n" 
+    $echo "${b}${t}${e} $*" 
 }
+
+echor() { echox 31 "[ERRO]" "$*"; echo; }
+echog() { echox 32 "[INFO]" "$*"; echo; }
+echoy() { echox 33 "[WARN]" "$*"; echo; }
+echob() { echox 34 "[INFO]" "$*"; echo; }
 
 usage()
 {
-    echox 34 "usage: $0 set|clear"
+    echog "usage: $0 set|clear|prepare"
 }
 
 set_begin()
@@ -21,6 +29,61 @@ set_begin()
     rm -f ${ROOT}/shell/envall.sh
     touch ${ROOT}/shell/envall.sh
     chmod 750 ${ROOT}/shell/envall.sh
+}
+
+install_pkg () {
+    [ $# -ne 2 ] && return
+    pkg=$1 && bin=$2 
+    which $bin 2>/dev/null 1>&2
+    [ $? -eq 0 ] && return
+    echob "\nFor package of $pkg ..."
+    printf "Installing '$pkg' (y/n): " && read ret
+    if [ $ret = "y" ]; then 
+        printf "Enter passwd(sudo) ..."
+        sudo $pm install $pkg
+        [ $? -eq 0 ] && echog "success!" || echor "fail!"
+        echob
+    fi
+}
+
+prepare_mac() {
+    [ "$UNAME" != "Darwin" ] && return
+
+    which port 2>/dev/null 1>&2
+    if [ $? -ne 0 ]; then
+        echob "Install 'port' from http://www.macports.org" && return
+    fi
+
+    pm=port
+    install_pkg coreutils gls
+    install_pkg npm npm
+
+    which npm 2>/dev/null 1>&2
+    [ $? -eq 0 ] && pm=npm && install_pkg cordova cordova
+}
+
+prepare_nix() {
+    [ "$UNAME" = "Darwin" ] && return
+
+    # For redhat/fedora/centos/..
+    which yum 2>/dev/null 1>&2
+    [ $? -eq 0 ] && pm=yum
+
+    # For debian/ubuntu
+    which apt-get 2>/dev/null 1>&2
+    [ $? -eq 0 ] && pm=apt-get
+    which aptitude 2>/dev/null 1>&2
+    [ $? -eq 0 ] && pm=aptitude
+
+    [ "#$pm" = "#" ] && return
+
+    install_pkg npm npm
+    which npm 2>/dev/null 1>&2
+    [ $? -eq 0 ] && pm=npm && install_pkg cordova cordova
+}
+
+set_prepare() {
+    [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
 }
 
 set_gnu() 
@@ -66,7 +129,7 @@ set_java()
     
     java=`which java 2>/dev/null`
     while true; do
-        [ ! -f $java ] && echox 33 "no avaiable java: $java" && return
+        [ ! -f $java ] && echoy "no avaiable java: $java" && return
         [ -h $java ] && java=`readlink $java` || break
     done
     java=${java%%jre\/bin\/java}
@@ -111,7 +174,7 @@ set_end()
     label="<-- For envall.sh Setting"
     label_end="End envall.sh Setting -->"
     [ -f "$bash_file" ] && had=`sed -n /"$label"/p "$bash_file"`
-    [ "#$had" != "#" ] && echox 32 "[WARN] Had been set before!" && return
+    [ "#$had" != "#" ] && echoy "Had been set before!" && return
 
     cat >> "$bash_file" << EOF
 # ${label}
@@ -119,7 +182,7 @@ export ZTOOLS_ROOT=${ROOT}
 [ -f \$ZTOOLS_ROOT/shell/envall.sh ] && source \$ZTOOLS_ROOT/shell/envall.sh
 # ${label_end}
 EOF
-    echox 32 "[OK] Set successful and Should login again!"
+    echog "Set successful and Should login again!"
 }
 
 set_clear()
@@ -148,6 +211,8 @@ if [ $opt = "set" ]; then
     set_ant
     set_android
     set_end
+elif [ $opt = "prepare" ]; then
+    set_prepare
 elif [ $opt = "clear" ]; then
     set_clear
 else
