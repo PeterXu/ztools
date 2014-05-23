@@ -24,13 +24,6 @@ usage()
     echog "usage: $0 set|clear|prepare"
 }
 
-set_begin()
-{
-    rm -f ${ROOT}/shell/envall.sh
-    touch ${ROOT}/shell/envall.sh
-    chmod 750 ${ROOT}/shell/envall.sh
-}
-
 install_pkg () {
     [ $# -ne 2 ] && return
     pkg=$1 && bin=$2 
@@ -82,20 +75,23 @@ set_prepare() {
     [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
 }
 
-set_gnu() 
+set_begin()
 {
-    [ "$UNAME" != "Darwin" ] && return
+    rm -f ${ROOT}/shell/envall.sh
+    touch ${ROOT}/shell/envall.sh
+    chmod 750 ${ROOT}/shell/envall.sh
+}
 
-    gnubin=/opt/local/libexec/gnubin
-
-    label="For Mac GNU Setting (coreutils)"
+set_env() 
+{
+    label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-if [ -e ${gnubin} ]; then
-    PATH=${gnubin}:\$PATH
-    alias ls='ls --color'
-    alias grep='grep --color'
-fi
+GLS=\`which gls 2>/dev/null\`
+[ -f "\$GLS" ] && alias ls='gls --color'
+alias ll='ls -l'
+alias grep='grep --color'
+[ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
 
 EOF
 }
@@ -114,7 +110,6 @@ set_vim()
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 alias srcin="sh ~/.vim/src_insight.sh"
-[ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
 
 EOF
 }
@@ -201,7 +196,7 @@ set_clear()
 if [ $opt = "set" ]; then
     set_clear
     set_begin
-    set_gnu
+    set_env
     set_vim
     set_java
     set_ant
