@@ -25,6 +25,7 @@ usage()
 }
 
 install_pkg () {
+    [ "$pm" = "" ] && return
     [ $# -ne 2 ] && return
     pkg=$1 && bin=$2 
     which $bin 2>/dev/null 1>&2
@@ -40,39 +41,23 @@ install_pkg () {
 }
 
 prepare_mac() {
-    [ "$UNAME" != "Darwin" ] && return
-
-    which port 2>/dev/null 1>&2
-    if [ $? -ne 0 ]; then
+    pm=`which port 2>/dev/null`
+    if [ "$pm" = "" ]; then
         echob "Install 'port' from http://www.macports.org" && return
     fi
-
-    pm=port
-    install_pkg coreutils gls
-    install_pkg npm npm
-    install_pkg cmake cmake
 }
 
 prepare_nix() {
-    [ "$UNAME" = "Darwin" ] && return
-
-    # For redhat/fedora/centos/..
-    which yum 2>/dev/null 1>&2
-    [ $? -eq 0 ] && pm=yum
-
-    # For debian/ubuntu
-    which apt-get 2>/dev/null 1>&2
-    [ $? -eq 0 ] && pm=apt-get
-    which aptitude 2>/dev/null 1>&2
-    [ $? -eq 0 ] && pm=aptitude
-
-    [ "#$pm" = "#" ] && return
-    install_pkg npm npm
-    install_pkg cmake cmake
+    # For redhat/fedora/centos/debian/ubuntu
+    pm=`which yum 2>/dev/null`
+    [ "$pm" = "" ] && pm=`which aptitude 2>/dev/null`
+    [ "$pm" = "" ] && pm=`which apt-get 2>/dev/null`
 }
 
 set_prepare() {
     [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
+    install_pkg npm npm
+    install_pkg cmake cmake
 }
 
 set_begin()
@@ -87,8 +72,7 @@ set_env()
     label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-GLS=\`which gls 2>/dev/null\`
-[ -f "\$GLS" ] && alias ls='gls --color'
+[ `uname` = "Darwin" ] && alias ls='ls -G'
 alias ll='ls -l'
 alias grep='grep --color'
 [ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
