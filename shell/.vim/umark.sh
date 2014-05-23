@@ -25,7 +25,7 @@ _jump() {
     COMPREPLY=()
     pre=${COMP_WORDS[COMP_CWORD-1]}
     cur=${COMP_WORDS[COMP_CWORD]}
-    opts=`mkdir -p "$MARKPATH" && ls --color=never "$MARKPATH" || ls "$MARKPATH"`
+    opts=`mkdir -p "$MARKPATH" && ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
     [ "$cur" = "" ] && tips="$opts" ||
         for opt in $opts; do
             tip=${opt/$cur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip"
