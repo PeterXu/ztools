@@ -45,6 +45,7 @@ prepare_mac() {
     if [ "$pm" = "" ]; then
         echob "Install 'port' from http://www.macports.org" && return
     fi
+    install_pkg coreutils gls
 }
 
 prepare_nix() {
@@ -73,6 +74,7 @@ set_env()
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 [ `uname` = "Darwin" ] && alias ls='ls -G'
+which gls 2>/dev/null 1>&2 && alias ls='gls --color'
 alias ll='ls -l'
 alias grep='grep --color'
 [ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
