@@ -13,36 +13,41 @@ function unmark {
     [ $# -gt 1 ] && echo "Usage: unmark [name]" && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
-
     [ -h "$iname" ] && rm -i "$iname"
 }
+function unmarkall { 
+    [ $# -ne 0 ] && echo "Usage: unmarkall" && return
+    printf "Remove all marks (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return
+    inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    for iname in $inames; do
+        [ -h "$MARKPATH/$iname" ] && rm -f "$MARKPATH/$iname"
+    done
+}
 function marks {
-    mkdir -p "$MARKPATH" && ls -l "$MARKPATH" | sed 's/  */ /g' | cut -d' ' -f9-
+    ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
 }
 
-_jump() {
-    local pre cur opts tips
+_tablist() {
+    [ $# -ne 1 ] && return
+
+    local key pre cur opts tips
+    key="$1"
     COMPREPLY=()
     pre=${COMP_WORDS[COMP_CWORD-1]}
     cur=${COMP_WORDS[COMP_CWORD]}
-    opts=`mkdir -p "$MARKPATH" && ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
-    [ "$pre" = "jump" ] && tips="$opts" ||
+    opts=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    [ "$pre" = "$key" ] && tips="$opts" ||
         for opt in $opts; do
             tip=${opt/$cur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip"
         done
     COMPREPLY=($(compgen -W "$tips" -- "$cur"))
 }
+_jump() {
+    _tablist "jump"
+}
 _unmark() {
-    local pre cur opts tips
-    COMPREPLY=()
-    pre=${COMP_WORDS[COMP_CWORD-1]}
-    cur=${COMP_WORDS[COMP_CWORD]}
-    opts=`mkdir -p "$MARKPATH" && ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
-    [ "$pre" = "unmark" ] && tips="$opts" ||
-        for opt in $opts; do
-            tip=${opt/$cur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip"
-        done
-    COMPREPLY=($(compgen -W "$tips" -- "$cur"))
+    _tablist "unmark"
 }
 
 complete -F _jump jump
