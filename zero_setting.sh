@@ -79,7 +79,7 @@ set_env()
     label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ `uname` = "Darwin" ] && alias ls='ls -G'
+[ \`uname\` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color'
 alias ll='ls -l'
 alias cls='clear'
