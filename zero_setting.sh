@@ -14,10 +14,10 @@ echox() {
     $echo "${b}${t}${e} $*" 
 }
 
-echor() { echox 31 "[ERRO]" "$*"; echo; }
-echog() { echox 32 "[INFO]" "$*"; echo; }
-echoy() { echox 33 "[WARN]" "$*"; echo; }
-echob() { echox 34 "[INFO]" "$*"; echo; }
+echor() { echox 31 "[ERRO]" "$*"; }
+echog() { echox 32 "[INFO]" "$*"; }
+echoy() { echox 33 "[WARN]" "$*"; }
+echob() { echox 34 "[INFO]" "$*"; }
 
 usage()
 {
@@ -25,26 +25,30 @@ usage()
 }
 
 install_pkg () {
-    [ "$pm" = "" ] && return
-    [ $# -ne 2 ] && return
+    local had pkg bin
+    [ "$pm" = "" -a $# -ne 2 -a $# -ne 3 ] && return
+
     pkg=$1 && bin=$2 
-    which $bin 2>/dev/null 1>&2
-    [ $? -eq 0 ] && return
-    echob "\nFor package of $pkg ..."
+    bin=`which $bin 2>/dev/null` && had=1 || had=0
+    if [ $# -eq 3 -a $had -eq 1 ]; then
+         $bin $3 2>/dev/null || had=0
+    fi
+    [ $had -eq 1 ] && return
+
+    echo && echob "For package of $pkg ..."
     printf "Installing '$pkg' (y/n): " && read ret
     if [ $ret = "y" ]; then 
         printf "Enter passwd(sudo) ..."
         sudo $pm install $pkg
         [ $? -eq 0 ] && echog "success!" || echor "fail!"
-        echob
+        echo
     fi
 }
 
 prepare_mac() {
     pm=`which port 2>/dev/null`
-    if [ "$pm" = "" ]; then
-        echob "Install 'port' from http://www.macports.org" && return
-    fi
+    [ "$pm" = "" ] && pm=`which brew 2>/dev/null`
+    [ "$pm" = "" ] && echoy "Pls install 'macports' or 'homebrew'" && return
     install_pkg coreutils gls
 }
 
@@ -57,6 +61,8 @@ prepare_nix() {
 
 set_prepare() {
     [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
+    install_pkg ctags ctags "--version"
+    install_pkg cscope cscope
     install_pkg npm npm
     install_pkg cmake cmake
 }
@@ -76,6 +82,7 @@ set_env()
 [ `uname` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color'
 alias ll='ls -l'
+alias cls='clear'
 alias grep='grep --color'
 [ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
 
@@ -84,13 +91,8 @@ EOF
 
 set_vim()
 {
-    (
-    cd ~/
-    [ -e .vimrc ] && rm -rf .vimrc
-    [ -e .vim ] && rm -rf .vim
-    ln -sf $ROOT/shell/.vimrc
-    ln -sf $ROOT/shell/.vim
-    )
+    [ -e ~/.vimrc ] && rm -rf ~/.vimrc && ln -sf $ROOT/shell/.vimrc ~/.vimrc
+    [ -e ~/.vim ] && rm -rf ~/.vim && ln -sf $ROOT/shell/.vim ~/.vim
 
     label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF

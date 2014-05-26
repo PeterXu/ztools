@@ -20,41 +20,37 @@ XCT_ROOT=..
 # for cscope 
 function gen_cs
 {
-    testp=`which cscope`
-	[ "AAA$testp" = "AAA" ] && echo "[WARN] Pls install cscope!" && return
+    local src dst
+    which cscope 2>/dev/null 1>&2 || echo "[WARN] Pls install cscope!" && return
+    [ $# -ne 2 ] && echo "[WARN] usage: gen_cs src dst" && return
+    src=$1 && dst=$2
 
-    [ $# -ne 2 ] && echo "[WARN] gen_cs need two arguments" && return
-    src_root=$1
-    dst_root=$2
-
-	find $src_root -type f \
+	find $src -type f \
 		-name "*.h" -o -name "*.c" \
 		-o -name "*.cc" -o -name "*.cpp" \
 		-o -name "*.java" \
 		-o -name "*.m" -o -name "*.mm" > cscope.files
-	cscope -bkq -i cscope.files
+	cscope -bkq -i cscope.files 2>/dev/null
 
 	cs_files="cscope.files cscope.in.out cscope.out cscope.po.out "
 	for csf in $cs_files; do
-		[ -f $csf ] && mv $csf $dst_root
+		[ -f $csf ] && mv $csf $dst
 	done
 }
 
 # for tags and cppcomplete
 function gen_ct
 {
-    testp=`which ctags`
-	[ "AAA$testp" = "AAA" ] && echo "[WARN] Pls install ctags!" && return
-
-    [ $# -ne 2 ] && echo "[WARN] gen_ct need two arguments" && return
-    src_root=$1
-    dst_root=$2
+    local src dst
+    which ctags 2>/dev/null 1>&2 || echo "[WARN] Pls install ctags!" && return
+    [ $# -ne 2 ] && echo "[WARN] usage: gen_ct src dst" && return
+    src=$1 && dst=$2
 
 	ct_opt="-R --c++-kinds=+p --fields=+iaS --extra=+q --languages=c++,c,java"
-	(cd $dst_root; ctags $ct_opt $src_root)
+	(cd -P $dst 2>/dev/null && ctags $ct_opt $src 2>/dev/null;)
 
 	ct_opt="-R --C++-kinds=+p --fields=+iaS --extra=+q --languages=c++,c,java -n"
-	(cd $dst_root; ctags $ct_opt -f cppcomplete.tags $src_root)
+	(cd -P $dst 2>/dev/null && ctags $ct_opt -f cppcomplete.tags $src;)
 }
 
 function gen_clean()
