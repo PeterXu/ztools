@@ -129,7 +129,7 @@ set_ant()
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 if [ "#\$ANT_HOME" = "#" ]; then
-    export ANT_HOME=\$ZTOOLS_ROOT/dist/ant-1.9.2
+    export ANT_HOME=\$ZTOOLS/dist/ant-1.9.2
     PATH=\$ANT_HOME/bin:\$PATH
 fi
 
@@ -157,8 +157,8 @@ set_end()
 
     cat >> "$bash_file" << EOF
 # ${label}
-export ZTOOLS_ROOT=${ROOT}
-[ -f \$ZTOOLS_ROOT/shell/envall.sh ] && source \$ZTOOLS_ROOT/shell/envall.sh
+export ZTOOLS=${ROOT}
+[ -f \$ZTOOLS/shell/envall.sh ] && source \$ZTOOLS/shell/envall.sh
 # ${label_end}
 EOF
     echog "Set successful and Should login again!"
