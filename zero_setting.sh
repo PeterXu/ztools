@@ -31,7 +31,7 @@ install_pkg () {
     pkg=$1 && bin=$2 
     bin=`which $bin 2>/dev/null` && had=1 || had=0
     if [ $# -eq 3 -a $had -eq 1 ]; then
-         $bin $3 2>/dev/null || had=0
+         $bin $3 2>/dev/null 1>&2 || had=0
     fi
     [ $had -eq 1 ] && return
 
