@@ -91,8 +91,10 @@ EOF
 
 set_vim()
 {
-    [ -e ~/.vimrc ] && rm -rf ~/.vimrc && ln -sf $ROOT/shell/.vimrc ~/.vimrc
-    [ -e ~/.vim ] && rm -rf ~/.vim && ln -sf $ROOT/shell/.vim ~/.vim
+    [ -e ~/.vimrc ] && rm -rf ~/.vimrc
+    ln -sf $ROOT/shell/.vimrc ~/.vimrc
+    [ -e ~/.vim ] && rm -rf ~/.vim
+    ln -sf $ROOT/shell/.vim ~/.vim
 
     label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
