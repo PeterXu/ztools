@@ -4,9 +4,13 @@
 export MARKPATH=$HOME/.marks
 
 function jump { 
-    [ $# -eq 1 ] && cd -P "$MARKPATH/$1" 2>/dev/null || echo "No such mark: $1"
+    local r=0
+    [ $# -eq 0 ] && cd -P "$ZTOOLS" 2>/dev/null && r=1
+    [ $# -eq 1 ] && cd -P "$MARKPATH/$1" 2>/dev/null && r=1
+    [ $r -ne 1 ] && echo "No such mark: $*"
 }
 function mark { 
+    [ $# -gt 1 ] && echo "Usage: mark [name]" && return
     mkdir -p "$MARKPATH" && ln -s "$(pwd)" "$MARKPATH/$1"
 }
 function unmark { 
