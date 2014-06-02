@@ -11,6 +11,7 @@ function jump {
 }
 function mark { 
     [ $# -gt 1 ] && echo "Usage: mark [name]" && return
+    [ $# -eq 1 ] && [ -h "$MARKPATH/$1" ] && rm -f "$MARKPATH/$1"
     mkdir -p "$MARKPATH" && ln -s "$(pwd)" "$MARKPATH/$1"
 }
 function unmark { 
