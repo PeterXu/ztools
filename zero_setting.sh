@@ -6,6 +6,7 @@ ROOT=`pwd`
 UNAME=`uname`
 
 echox() { 
+    local b t e
     [ $# -le 2 ] && return
     b="\033[${1}m" && shift
     t=${1} && shift 
@@ -76,14 +77,18 @@ set_begin()
 
 set_env() 
 {
+    local label
     label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 [ \`uname\` = "Darwin" ] && alias ls='ls -G'
-which gls 2>/dev/null 1>&2 && alias ls='gls --color'
+which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
 alias ll='ls -l'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
 alias cls='clear'
-alias grep='grep --color'
+alias grep='grep --color=auto'
 [ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
 
 EOF
@@ -91,6 +96,7 @@ EOF
 
 set_vim()
 {
+    local label
     [ -e ~/.vimrc ] && rm -rf ~/.vimrc
     ln -sf $ROOT/shell/.vimrc ~/.vimrc
     [ -e ~/.vim ] && rm -rf ~/.vim
@@ -106,6 +112,7 @@ EOF
 
 set_java()
 {
+    local java java_home label
     [ "$UNAME" = "Darwin" ] && return
     
     java=`which java 2>/dev/null`
@@ -127,6 +134,7 @@ EOF
 
 set_ant()
 {
+    local label
     label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
@@ -140,17 +148,19 @@ EOF
 
 set_android()
 {
+    local label
     label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH
-[ "#\$ANDROID_NDK_HOME" != "#" ] && PATH=\$ANDROID_NDK_HOME:\$PATH
+[ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH && export ANDROID_HOME
+[ "#\$ANDROID_NDK_HOME" != "#" ] && PATH=\$ANDROID_NDK_HOME:\$PATH && export ANDROID_NDK_HOME
 
 EOF
 }
 
 set_end()
 {
+    local had label label_end
     had=""
     label="<-- For envall.sh Setting"
     label_end="End envall.sh Setting -->"
@@ -159,6 +169,7 @@ set_end()
 
     cat >> "$bash_file" << EOF
 # ${label}
+#     Pls set custom ENV at front
 export ZTOOLS=${ROOT}
 [ -f \$ZTOOLS/shell/envall.sh ] && source \$ZTOOLS/shell/envall.sh
 # ${label_end}
@@ -168,6 +179,7 @@ EOF
 
 set_clear()
 {
+    local label label_end
     label="<-- For envall.sh Setting"
     label_end="End envall.sh Setting -->"
     [ -f "$bash_file" ] && sed -in /"$label"/,/"$label_end"/d "$bash_file"
