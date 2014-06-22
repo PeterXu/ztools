@@ -64,8 +64,10 @@ set_prepare() {
     [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
     install_pkg ctags ctags "--version"
     install_pkg cscope cscope
-    install_pkg npm npm
     install_pkg cmake cmake
+
+    `which pip 2>/dev/null` || echoy "<pip> not install for python"
+    `which npm 2>/dev/null` || echoy "<npm> not install for nodejs"
 }
 
 set_begin()
