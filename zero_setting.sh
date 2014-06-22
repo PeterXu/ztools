@@ -4,6 +4,7 @@
 
 ROOT=`pwd`
 UNAME=`uname`
+PPMM="" # package manage tool
 
 echox() { 
     local b t e
@@ -27,7 +28,7 @@ usage()
 
 install_pkg () {
     local had pkg bin
-    [ "$pm" = "" -a $# -ne 2 -a $# -ne 3 ] && return
+    [ "$PPMM" = "" -a $# -ne 2 -a $# -ne 3 ] && return
 
     pkg=$1 && bin=$2 
     bin=`which $bin 2>/dev/null` && had=1 || had=0
@@ -40,7 +41,7 @@ install_pkg () {
     printf "Installing '$pkg' (y/n): " && read ret
     if [ $ret = "y" ]; then 
         printf "Enter passwd(sudo) ..."
-        sudo $pm install $pkg
+        sudo $PPMM install $pkg
         [ $? -eq 0 ] && echog "success!" || echor "fail!"
         echo
     fi
@@ -48,16 +49,16 @@ install_pkg () {
 
 prepare_mac() {
     pm=`which port 2>/dev/null`
-    [ "$pm" = "" ] && pm=`which brew 2>/dev/null`
-    [ "$pm" = "" ] && echoy "Pls install 'macports' or 'homebrew'" && return
+    [ "$PPMM" = "" ] && pm=`which brew 2>/dev/null`
+    [ "$PPMM" = "" ] && echoy "Pls install 'macports' or 'homebrew'" && return
     install_pkg coreutils gls
 }
 
 prepare_nix() {
     # For redhat/fedora/centos/debian/ubuntu
     pm=`which yum 2>/dev/null`
-    [ "$pm" = "" ] && pm=`which aptitude 2>/dev/null`
-    [ "$pm" = "" ] && pm=`which apt-get 2>/dev/null`
+    [ "$PPMM" = "" ] && pm=`which aptitude 2>/dev/null`
+    [ "$PPMM" = "" ] && pm=`which apt-get 2>/dev/null`
 }
 
 set_prepare() {
@@ -115,16 +116,19 @@ EOF
 set_java()
 {
     local java java_home label
-    [ "$UNAME" = "Darwin" ] && return
-    
-    java=`which java 2>/dev/null`
-    while true; do
-        [ ! -f $java ] && echoy "no avaiable java: $java" && return
-        [ -h $java ] && java=`readlink $java` || break
-    done
-    java=${java%%jre\/bin\/java}
-    java=${java%%bin\/java}
-    java_home=$java
+    if [ "$UNAME" = "Darwin" ]; then
+        [ ! -f "/usr/libexec/java_home" ] && return
+        java_home=`/usr/libexec/java_home`
+    else
+        java=`which java 2>/dev/null`
+        while true; do
+            [ "$java" = "" -o ! -f "$java" ] && return
+            [ -h $java ] && java=`readlink $java` || break
+        done
+        java=${java%%jre\/bin\/java}
+        java=${java%%bin\/java}
+        java_home=$java
+    fi
 
     label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
