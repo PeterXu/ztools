@@ -87,7 +87,7 @@ set_env()
 [ \`uname\` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
 alias ll='ls -l'
-alias cp='cp -i'
+[ \`uname\` != "Darwin" ] && alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
 alias cls='clear'

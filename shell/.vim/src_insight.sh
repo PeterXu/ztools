@@ -8,9 +8,11 @@
 #   (c) jtags for java [option]
 #
 
+
 #=========================================
 # config for c/c++ files
 #=========================================
+
 
 # for cscope 
 gen_cs() 
@@ -39,6 +41,7 @@ gen_cs()
     done
 }
 
+
 # for tags and cppcomplete
 gen_ct()
 {
@@ -50,12 +53,13 @@ gen_ct()
     ct=`which ctags 2>/dev/null`
     [ "$ct" = "" ] && echo "[WARN] Pls install ctags!" && return
 
-    opt="-R --c++-kinds=+p --fields=+iaS --extra=+q --languages=c++,c,java"
+    opt="$gopts"
     (cd -P $dst 2>/dev/null && ctags $opt $src 2>/dev/null;)
 
-    opt="-R --C++-kinds=+p --fields=+iaS --extra=+q --languages=c++,c,java -n"
-    (cd -P $dst 2>/dev/null && ctags $opt -f cppcomplete.tags $src;)
+    opt="$gopts -n -f cppcomplete.tags"
+    (cd -P $dst 2>/dev/null && ctags $opt $src;)
 }
+
 
 gen_clean()
 {
@@ -63,15 +67,14 @@ gen_clean()
 }
 
 
-################################
-
-main() 
+# usage: main root path
+gen_main() 
 {
     # check
-    local xroot=".xtags/"
+    [ $# -lt 2 ] && exit 1
+    local xroot=$1 && shift
     mkdir -p $xroot
-    [ ! -d $xroot ] && echo "not found: $xroot" && exit 1
-    [ $# -eq 1 ] && [ "$1" = "clean" ] && gen_clean $xroot && exit 0
+    [ ! -d $xroot ] && echo "[ERROR] not found: $xroot" && exit 1
 
     local cs_root=.
     local ct_root=..
@@ -89,5 +92,65 @@ main()
     gen_ct "$xroot" "$ct_root" 
 }
 
-main $*
+
+
+#======================
+# entry of this script
+#======================
+
+usage() {
+    echo "usage: $gprog -c -a -e pats -l langs srcpath"
+    echo "      -c: clean previous tags"
+    echo "      -a: append mode, disabled default"
+    echo "      -e pats: Add patterns to a list of excluded files and directories, e.g. 'file1,dir2'."
+    echo "      -l langs: 'c++,c,java' default"
+    exit 1
+}
+
+parse() {
+    local args langs excludes OLD_IFS
+
+    args=`getopt hcae:l: $*`
+    [ $? != 0 ] && usage
+
+    langs="c++,c,java"
+    set -- $args
+    for c; do
+        case "$c" in
+            -h) shift; usage;;
+            -c) 
+                gen_clean $groot; shift; exit 0
+                ;;
+            -a) 
+                gopts="$gopts -a"; shift;;
+            -e) 
+                OLD_IFS="$IFS" && IFS=","
+                excludes=($2) && IFS="$OLD_IFS"
+                for pat in ${excludes[@]}; do 
+                    gopts="$gopts --exclude=\"$pat\""
+                done
+                shift; shift;;
+            -l) 
+                OLD_IFS="$IFS" && IFS=","
+                langs=($2) && IFS="$OLD_IFS"
+                for lang in ${langs[@]}; do 
+                    [ $lang = "c++" -o $lang = "java" -o $lang = "c" ] || usage 
+                done
+                langs="$2"; shift; shift;;
+            --) shift; break;;
+        esac
+    done
+
+    [ $# -ge 1 ] && gpath="$*" || gpath="."
+    gopts="-R --languages=$langs --c++-kinds=+p --fields=+iaS --extra=+q $gopts"
+}
+
+
+gprog=$0
+groot=".xtags/"
+gpath=.
+
+parse $*
+gen_main $groot $gpath
+
 exit 0
