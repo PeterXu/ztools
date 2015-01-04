@@ -5,12 +5,13 @@ endif
 "set compatible
 set nocompatible	" Use Vim defaults (much better!)
 set bs=indent,eol,start		" allow backspacing over everything in insert mode
-"set ai			" always set autoindenting on
+set ai			" always set autoindenting on
 "set backup		" keep a backup file
 set viminfo='20,\"50	" read/write a .viminfo file, don't store more
 			" than 50 lines of registers
 set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
+set nu          " show line number
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
@@ -30,19 +31,23 @@ if has("autocmd")
   augroup END
 endif
 
-if has("cscope") && filereadable("/usr/bin/cscope")
-   set csprg=/usr/bin/cscope
-   set csto=0
-   set cst
-   set nocsverb
-   " add any database in current directory
-   if filereadable("cscope.out")
-      cs add cscope.out
-   " else add database pointed to by environment
-   elseif $CSCOPE_DB != ""
-      cs add $CSCOPE_DB
-   endif
-   set csverb
+if has("cscope") 
+  "set csprg=/usr/bin/cscope
+  set csto=0
+  set cst
+  set nocsverb
+
+  " add any database in current directory
+  if filereadable("cscope.out")
+    cs add cscope.out
+  elseif filereadable(".xtags/cscope.out")
+    cs add .xtags/cscope.out
+  " else add database pointed to by environment
+  elseif $CSCOPE_DB != ""
+    cs add $CSCOPE_DB
+  endif
+
+  set csverb
 endif
 
 " Switch syntax highlighting on, when the terminal has colors
@@ -55,47 +60,31 @@ endif
 filetype plugin on
 
 if &term=="xterm"
-     set t_Co=8
-     set t_Sb=[4%dm
-     set t_Sf=[3%dm
+  set t_Co=8
+  set t_Sb=[4%dm
+  set t_Sf=[3%dm
 endif
 
 " Don't wake up system with blinking cursor:
 " http://www.linuxpowertop.org/known.php
 let &guicursor = &guicursor . ",a:blinkon0"
 
-" for src_insight
-if has("cscope")
-	"set csprg=/usr/bin/cscope
-	"set csto=0
-	"set cst
-	"set nocsverb
 
-	" if cscope.out exists, add any database in current directory
-	" else add database pointed to by environment
-	if filereadable(".xtags/cscope.out")
-		cs add .xtags/cscope.out
-	elseif $CSCOPE_DB != ""
-		cs add $CSCOPE_DB
-	endif
-
-	if filereadable(".xtags/tags")
-		set tag+=.xtags/tags
-	endif
-
-	"set csverb
-	"set cscopetag
-	"set cscopequickfix=s-,g-,c-,d-,t-,e-,f-,i-
-	set nu
+" ctags
+if filereadable(".tags")
+  set tag+=.tags
+elseif filereadable(".xtags/tags")
+  set tag+=.xtags/tags
+  set tag+=.xtags/systags
 endif
 
-" for tab setting
+" tab/space
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab " use spaces to expandtab, else <set noexpandtab>
 
-" for licenses setting
+" licenses setting
 map :mit :0r ~/.vim/licenses/mit.txt
 map :bsd2 :0r ~/.vim/licenses/bsd2.txt
 map :bsd3 :0r ~/.vim/licenses/bsd3.txt

@@ -99,13 +99,15 @@ EOF
 
 set_vim()
 {
-    local label
-    [ -e ~/.vimrc ] && rm -rf ~/.vimrc
-    ln -sf $ROOT/shell/.vimrc ~/.vimrc
-    [ -e ~/.vim ] && rm -rf ~/.vim
-    ln -sf $ROOT/shell/.vim ~/.vim
+    local vim=$HOME/.vim
+    [ -e $vim ] && rm -rf $vim
+    ln -sf $ROOT/shell/.vim $vim
 
-    label="For Vim Setting"
+    local vimrc=$HOME/.vimrc
+    [ -e $vimrc ] && rm -rf $vimrc
+    ln -sf $ROOT/shell/.vimrc $vimrc
+
+    local label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 alias srcin="bash ~/.vim/src_insight.sh"
@@ -115,12 +117,11 @@ EOF
 
 set_java()
 {
-    local java java_home label
     if [ "$UNAME" = "Darwin" ]; then
         [ ! -f "/usr/libexec/java_home" ] && return
-        java_home=`/usr/libexec/java_home`
+        local java_home=`/usr/libexec/java_home`
     else
-        java=`which java 2>/dev/null`
+        local java=`which java 2>/dev/null`
         while true; do
             [ "$java" = "" -o ! -f "$java" ] && return
             [ -h $java ] && java=`readlink $java` || break
@@ -130,7 +131,7 @@ set_java()
         java_home=$java
     fi
 
-    label="For JAVA_HOME Setting"
+    local label="For JAVA_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 [ "#\$JAVA_HOME" = "#" ] && export JAVA_HOME=${java_home}
@@ -140,8 +141,7 @@ EOF
 
 set_ant()
 {
-    local label
-    label="For ANT_HOME Setting"
+    local label="For ANT_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 if [ "#\$ANT_HOME" = "#" ]; then
@@ -154,8 +154,7 @@ EOF
 
 set_android()
 {
-    local label
-    label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
+    local label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
 [ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH && export ANDROID_HOME
@@ -166,28 +165,26 @@ EOF
 
 set_end()
 {
-    local had label label_end
-    had=""
-    label="<-- For envall.sh Setting"
-    label_end="End envall.sh Setting -->"
+    local had=""
+    local label="ztools begin"
+    local label_end="ztools end"
     [ -f "$bash_file" ] && had=`sed -n /"$label"/p "$bash_file"`
-    [ "#$had" != "#" ] && echoy "Had been set before!" && return
+    [ "$had" != "" ] && echoy "Had been set before!" && return
 
     cat >> "$bash_file" << EOF
-# ${label}
-#     Pls set custom ENV at front
+## ${label}
+## Please ensure it at the last line
 export ZTOOLS=${ROOT}
 [ -f \$ZTOOLS/shell/envall.sh ] && source \$ZTOOLS/shell/envall.sh
-# ${label_end}
+## ${label_end}
 EOF
     echog "Set successful and Should login again!"
 }
 
 set_clear()
 {
-    local label label_end
-    label="<-- For envall.sh Setting"
-    label_end="End envall.sh Setting -->"
+    local label="ztools begin"
+    local label_end="ztools end"
     [ -f "$bash_file" ] && sed -in /"$label"/,/"$label_end"/d "$bash_file"
 }
 
@@ -199,7 +196,10 @@ set_clear()
 
 [ $# -ne 1 ] && usage && exit 1 || opt=$1
 
-[ "$UNAME" = "Darwin" ] && bash_file=~/.profile || bash_file=~/.bashrc
+bash_file=$HOME/.bash_profile
+if [ ! -f $bash_file ]; then
+    [ "$UNAME" = "Darwin" ] && bash_file=$HOME/.profile || bash_file=$HOME/.bashrc
+fi
 
 if [ $opt = "set" ]; then
     set_clear
