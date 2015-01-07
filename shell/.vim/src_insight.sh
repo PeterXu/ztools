@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # author: uskee.org
 # date  : 2012/12/03
 #
@@ -111,7 +111,7 @@ parse() {
     local args langs excludes OLD_IFS
 
     args=`getopt hcae:l: $*`
-    [ $? != 0 ] && usage
+    [ $? -ne 0 ] && usage
 
     langs="c++,c,java"
     set -- $args
