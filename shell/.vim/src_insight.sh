@@ -88,8 +88,8 @@ gen_main()
     fi
 
     # generate
-    gen_cs "$xroot" "$cs_root" 
-    gen_ct "$xroot" "$ct_root" 
+    [[ "$gtype" =~ "cscope" ]] && gen_cs "$xroot" "$cs_root" 
+    [[ "$gtype" =~ "ctags" ]]  && gen_ct "$xroot" "$ct_root" 
 }
 
 
@@ -99,39 +99,42 @@ gen_main()
 #======================
 
 usage() {
-    echo "usage: $gprog -c -a -e pats -l langs srcpath"
-    echo "      -c: clean previous tags"
-    echo "      -a: append mode, disabled default"
-    echo "      -e pats: Add patterns to a list of excluded files and directories, e.g. 'file1,dir2'."
-    echo "      -l langs: 'c++,c,java' default"
+    echo "usage: $gprog -h -c -t -s -a -e pats -l langs srcpath"
+    echo "      -h: print help"
+    echo "      -c: clean previous tags/cscope files"
+    echo "      -t: only ctags, default ctags & cscope"
+    echo "      -s: only cscope, default ctags & cscope"
+    echo "      -a: append mode, default disabled"
+    echo "      -e pats: exclude path for ctags, 'path1,path2'. default 'third_party,out'"
+    echo "      -l langs: default 'c++,c,java'"
     exit 1
 }
 
 parse() {
-    local args langs excludes OLD_IFS
+    local args=`getopt hctsae:l: $*`
+    [ $? != 0 ] && usage
 
-    args=`getopt hcae:l: $*`
-    [ $? -ne 0 ] && usage
+    local langs="c++,c,java"
+    local ntags="--exclude=third_party --exclude=out"
 
-    langs="c++,c,java"
     set -- $args
     for c; do
         case "$c" in
             -h) shift; usage;;
-            -c) 
-                gen_clean $groot; shift; exit 0
-                ;;
-            -a) 
-                gopts="$gopts -a"; shift;;
+            -c) gen_clean $groot; shift; exit 0;;
+            -t) gtype="ctags"; shift;;
+            -s) gtype="cscope"; shift;;
+            -a) gopts="$gopts -a"; shift;;
             -e) 
-                OLD_IFS="$IFS" && IFS=","
-                excludes=($2) && IFS="$OLD_IFS"
+                local OLD_IFS="$IFS" && IFS=","
+                local excludes=($2) && IFS="$OLD_IFS"
+                ntags=""
                 for pat in ${excludes[@]}; do 
-                    gopts="$gopts --exclude=\"$pat\""
+                    ntags="$ntags --exclude=\"$pat\""
                 done
                 shift; shift;;
             -l) 
-                OLD_IFS="$IFS" && IFS=","
+                local OLD_IFS="$IFS" && IFS=","
                 langs=($2) && IFS="$OLD_IFS"
                 for lang in ${langs[@]}; do 
                     [ $lang = "c++" -o $lang = "java" -o $lang = "c" ] || usage 
@@ -142,13 +145,14 @@ parse() {
     done
 
     [ $# -ge 1 ] && gpath="$*" || gpath="."
-    gopts="-R --languages=$langs --c++-kinds=+p --fields=+iaS --extra=+q $gopts"
+    gopts="-R --languages=$langs --c++-kinds=+p --fields=+iaS --extra=+q $ntags $gopts"
 }
 
 
 gprog=$0
 groot=".xtags/"
 gpath=.
+gtype="ctags,cscope"
 
 parse $*
 gen_main $groot $gpath
