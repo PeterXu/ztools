@@ -2,9 +2,12 @@
 # uskee.org
 #
 
+
 ROOT=`pwd`
 UNAME=`uname`
 PPMM="" # package manage tool
+
+[ "$HOME" = "" ] && export HOME=~
 
 echox() { 
     local b t e
@@ -15,16 +18,14 @@ echox() {
     [ $UNAME = "Darwin" ] && echo=echo || echo="echo -e"
     $echo "${b}${t}${e} $*" 
 }
-
 echor() { echox 31 "[ERRO]" "$*"; }
 echog() { echox 32 "[INFO]" "$*"; }
 echoy() { echox 33 "[WARN]" "$*"; }
 echob() { echox 34 "[INFO]" "$*"; }
 
-usage()
-{
-    echog "usage: $0 set|clear|prepare"
-}
+
+
+###================================
 
 install_pkg () {
     local had pkg bin
@@ -51,7 +52,6 @@ prepare_mac() {
     pm=`which port 2>/dev/null`
     [ "$PPMM" = "" ] && pm=`which brew 2>/dev/null`
     [ "$PPMM" = "" ] && echoy "Pls install 'macports' or 'homebrew'" && return
-    install_pkg coreutils gls
 }
 
 prepare_nix() {
@@ -61,8 +61,20 @@ prepare_nix() {
     [ "$PPMM" = "" ] && pm=`which apt-get 2>/dev/null`
 }
 
-set_prepare() {
+
+
+###================================
+
+usage() 
+{
+    echog "usage: $0 set|clear|prepare"
+}
+
+set_prepare() 
+{
     [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
+
+    [ "$UNAME" = "Darwin" ] && install_pkg coreutils gls
     install_pkg ctags ctags "--version"
     install_pkg cscope cscope
     install_pkg cmake cmake
@@ -92,7 +104,8 @@ alias mv='mv -i'
 alias rm='rm -i'
 alias cls='clear'
 alias grep='grep --color=auto'
-[ -f ~/.vim/umark.sh ] && source ~/.vim/umark.sh
+[ -f $HOME/.vim/umark.sh ] && source $HOME/.vim/umark.sh
+[ -f $HOME/.vim/git-completion.bash ] && source $HOME/.vim/git-completion.bash
 
 EOF
 }
@@ -110,7 +123,7 @@ set_vim()
     local label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-alias srcin="bash ~/.vim/src_insight.sh"
+alias srcin="bash $HOME/.vim/src_insight.sh"
 
 EOF
 }
@@ -159,6 +172,7 @@ set_android()
 # ${label}
 [ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH && export ANDROID_HOME
 [ "#\$ANDROID_NDK_HOME" != "#" ] && PATH=\$ANDROID_NDK_HOME:\$PATH && export ANDROID_NDK_HOME
+[ "#\$ANDROID_NDK_HOME" != "#" ] && export ANDROID_NDK=\$ANDROID_NDK_HOME
 
 EOF
 }
