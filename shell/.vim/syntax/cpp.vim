@@ -20,7 +20,7 @@ else
 endif
 
 " C++ extentions
-syn keyword cppStatement	new delete this friend using
+syn keyword cppStatement	new delete this friend using std string vector map
 syn keyword cppAccess		public protected private override
 syn keyword cppType		inline virtual explicit export bool wchar_t
 syn keyword cppExceptions	throw try catch
