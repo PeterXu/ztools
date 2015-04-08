@@ -3,24 +3,24 @@
 
 export MARKPATH=$HOME/.marks
 
-function jump { 
+jump() { 
     local r=0
     [ $# -eq 0 ] && cd -P "$ZTOOLS" 2>/dev/null && r=1
     [ $# -eq 1 ] && cd -P "$MARKPATH/$1" 2>/dev/null && r=1
     [ $r -ne 1 ] && echo "No such mark: $*"
 }
-function mark { 
+mark() { 
     [ $# -gt 1 ] && echo "Usage: mark [name]" && return
     [ $# -eq 1 ] && [ -h "$MARKPATH/$1" ] && rm -f "$MARKPATH/$1"
     mkdir -p "$MARKPATH" && ln -s "$(pwd)" "$MARKPATH/$1"
 }
-function unmark { 
+unmark() { 
     [ $# -gt 1 ] && echo "Usage: unmark [name]" && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -i "$iname"
 }
-function unmarkall { 
+unmarkall() { 
     [ $# -ne 0 ] && echo "Usage: unmarkall" && return
     printf "Remove all marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
@@ -29,7 +29,7 @@ function unmarkall {
         [ -h "$MARKPATH/$iname" ] && rm -f "$MARKPATH/$iname"
     done
 }
-function marks {
+marks() {
     ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
 }
 
