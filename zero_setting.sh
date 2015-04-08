@@ -15,8 +15,7 @@ echox() {
     b="\033[${1}m" && shift
     t=${1} && shift 
     e="\033[00m"
-    [ $UNAME = "Darwin" ] && echo=echo || echo="echo -e"
-    $echo "${b}${t}${e} $*" 
+    printf "${b}${t}${e} $*\n" 
 }
 echor() { echox 31 "[ERRO]" "$*"; }
 echog() { echox 32 "[INFO]" "$*"; }
