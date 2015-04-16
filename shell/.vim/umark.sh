@@ -60,7 +60,7 @@ _unmark() {
 }
 _ssh() {
     local opts
-    opts=`cat $HOME/.ssh/config  | grep "Host " | awk '{print $2}'`
+    opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     _tablist "ssh" "$opts"
 }
 
