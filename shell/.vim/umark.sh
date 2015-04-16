@@ -34,14 +34,14 @@ marks() {
 }
 
 _tablist() {
-    [ $# -ne 1 ] && return
+    [ $# -ne 2 ] && return
 
     local key pre cur opts tips
-    key="$1"
+    key="$1" && shift
+    opts="$*" && shift
     COMPREPLY=()
     pre=${COMP_WORDS[COMP_CWORD-1]}
     cur=${COMP_WORDS[COMP_CWORD]}
-    opts=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
     [ "$pre" = "$key" ] && tips="$opts" ||
         for opt in $opts; do
             tip=${opt/$cur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip"
@@ -49,12 +49,22 @@ _tablist() {
     COMPREPLY=($(compgen -W "$tips" -- "$cur"))
 }
 _jump() {
-    _tablist "jump"
+    local opts
+    opts=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    _tablist "jump" "$opts"
 }
 _unmark() {
-    _tablist "unmark"
+    local opts
+    opts=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    _tablist "unmark" "$opts"
+}
+_ssh() {
+    local opts
+    opts=`cat $HOME/.ssh/config  | grep "Host " | awk '{print $2}'`
+    _tablist "ssh" "$opts"
 }
 
 complete -F _jump jump
 complete -F _unmark unmark
+complete -F _ssh ssh
 
