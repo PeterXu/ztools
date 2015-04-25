@@ -5,7 +5,7 @@
 
 ROOT=`pwd`
 UNAME=`uname`
-PPMM="" # package manage tool
+zpm="" # package manage tool
 
 [ "$HOME" = "" ] && export HOME=~
 
@@ -22,42 +22,92 @@ echog() { echox 32 "[INFO]" "$*"; }
 echoy() { echox 33 "[WARN]" "$*"; }
 echob() { echox 34 "[INFO]" "$*"; }
 
+echop() {
+    echo
+    echob "[*] Process: $*"
+    eval "$*"
+    echog "[*] Return: $?"
+    echo
+}
+
 
 
 ###================================
 
-install_pkg () {
-    local had pkg bin
-    [ "$PPMM" = "" -a $# -ne 2 -a $# -ne 3 ] && return
-
-    pkg=$1 && bin=$2 
-    bin=`which $bin 2>/dev/null` && had=1 || had=0
-    if [ $# -eq 3 -a $had -eq 1 ]; then
-         $bin $3 2>/dev/null 1>&2 || had=0
-    fi
-    [ $had -eq 1 ] && return
-
-    echo && echob "For package of $pkg ..."
-    printf "Installing '$pkg' (y/n): " && read ret
-    if [ $ret = "y" ]; then 
-        printf "Enter passwd(sudo) ..."
-        sudo $PPMM install $pkg
-        [ $? -eq 0 ] && echog "success!" || echor "fail!"
-        echo
-    fi
+check_pkg() {
+    [ $# -ne 1 ] && return 1
+    which $1 2>/dev/null || return 1
+    return 0
 }
 
-prepare_mac() {
-    pm=`which port 2>/dev/null`
-    [ "$PPMM" = "" ] && pm=`which brew 2>/dev/null`
-    [ "$PPMM" = "" ] && echoy "Pls install 'macports' or 'homebrew'" && return
+check_install() {
+    local opts args
+    opts="t:b:p:f"
+    args=`getopt $opts $*`
+    [ $? != 0 ] && return 1
+
+    local force tool bin pkg
+    force=""
+    set -- $args
+    for i; do
+        case "$i" in
+            -t)
+                tool=$2; shift;
+                shift;;
+            -b)
+                bin=$2; shift;
+                shift;;
+            -p)
+                pkg=$2; shift;
+                shift;;
+            -f)
+                force="true";
+                shift;;
+            --)
+                shift; break;;
+        esac
+    done
+
+    [ "$tool" = "" -o "$bin" = "" ] && return 1
+    [ "$pkg" = "" ] && pkg="$bin"
+
+    if [ "$force" != "" ]; then
+        echoy "===== FORCE INSTALL: $tool install $pkg ====="
+    else
+        check_pkg $bin && return 0
+        echoy "===== FRESH INSTALL: $tool install $pkg ====="
+    fi
+
+    local ret
+    printf "Installing '$pkg' by $zpm (y/n): " && read ret
+    [ $ret = "y" ] && $tool install $pkg
+    check_pkg $bin || return 1
+    return 0
 }
 
-prepare_nix() {
-    # For redhat/fedora/centos/debian/ubuntu
-    pm=`which yum 2>/dev/null`
-    [ "$PPMM" = "" ] && pm=`which aptitude 2>/dev/null`
-    [ "$PPMM" = "" ] && pm=`which apt-get 2>/dev/null`
+zpm_install() {
+    check_install -t "$zpm" $* || return 1
+    return 0
+}
+
+prepare_zpm() {
+    local msg
+    if [ "$UNAME" = "Darwin" ]; then
+        zpm=`which brew 2>/dev/null`
+        [ "$zpm" != "" ] && return 0
+        zpm=`which port 2>/dev/null`
+        [ "$zpm" != "" ] && zpm="sudo $zpm"
+        msg="Pls install 'macports' or 'homebrew'!"
+    else
+        # For redhat/fedora/centos/debian/ubuntu
+        zpm=`which yum 2>/dev/null`
+        [ "$zpm" = "" ] && zpm=`which aptitude 2>/dev/null`
+        [ "$zpm" = "" ] && zpm=`which apt-get 2>/dev/null`
+        [ "$zpm" != "" ] && zpm="sudo $zpm"
+        msg="Pls install yum/apt/aptitude!"
+    fi
+    [ "$zpm" = "" ] && echoy "$msg" && return 1
+    return 0
 }
 
 
@@ -71,15 +121,13 @@ usage()
 
 set_prepare() 
 {
-    [ "$UNAME" = "Darwin" ] && prepare_mac || prepare_nix
+    prepare_zpm || return 1
 
-    [ "$UNAME" = "Darwin" ] && install_pkg coreutils gls
-    install_pkg ctags ctags "--version"
-    install_pkg cscope cscope
-    install_pkg cmake cmake
-
-    `which pip 2>/dev/null` || echoy "<pip> not install for python"
-    `which npm 2>/dev/null` || echoy "<npm> not install for nodejs"
+    zpm_install -b ctags -f || return 1
+    zpm_install -b cscope || return 1
+    zpm_install -b cmake || return 1
+    zpm_install -b ant || return 1
+    return 0
 }
 
 set_begin()
@@ -151,19 +199,6 @@ set_java()
 EOF
 }
 
-set_ant()
-{
-    local label="For ANT_HOME Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
-if [ "#\$ANT_HOME" = "#" ]; then
-    export ANT_HOME=\$ZTOOLS/dist/ant-1.9.2
-    PATH=\$ANT_HOME/bin:\$PATH
-fi
-
-EOF
-}
-
 set_android()
 {
     local label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
@@ -220,7 +255,6 @@ if [ $opt = "set" ]; then
     set_env
     set_vim
     set_java
-    set_ant
     set_android
     set_end
 elif [ $opt = "prepare" ]; then
