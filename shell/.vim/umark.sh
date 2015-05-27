@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-export MARKPATH=$HOME/.marks
+export MARKPATH="$HOME/.marks"
 
 jump() { 
     local r=0
@@ -11,8 +11,13 @@ jump() {
 }
 mark() { 
     [ $# -gt 1 ] && echo "Usage: mark [name]" && return
-    [ $# -eq 1 ] && [ -h "$MARKPATH/$1" ] && rm -f "$MARKPATH/$1"
-    mkdir -p "$MARKPATH" && ln -s "$(pwd)" "$MARKPATH/$1"
+    [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
+    [ $# -eq 1 ] && iname="$MARKPATH/$1"
+    [ -h "$iname" ] && rm -f "$iname"    # rm symbolic file
+    [ -e "$iname" ] && rm -ir "$iname"   # rm file with propmpt
+
+    mkdir -p "$MARKPATH"
+    [ ! -e "$iname" ] && ln -s "$(pwd)" "$iname"
 }
 unmark() { 
     [ $# -gt 1 ] && echo "Usage: unmark [name]" && return
