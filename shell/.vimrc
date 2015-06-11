@@ -126,3 +126,7 @@ map <leader>to :tabonly
 map <leader>tc :tabclose
 map <leader>tm :tabmove
 
+
+" For markdown
+let g:vim_markdown_folding_disabled=1
+

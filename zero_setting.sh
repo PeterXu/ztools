@@ -127,6 +127,7 @@ set_prepare()
     zpm_install -b cscope || return 1
     zpm_install -b cmake || return 1
     zpm_install -b ant || return 1
+    zpm_install -b vim -f || return 1
     return 0
 }
 
