@@ -171,7 +171,7 @@ set_vim()
     local label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-alias srcin="bash $HOME/.vim/src_insight.sh"
+[ -f $HOME/.vim/srcin.sh ] && source $HOME/.vim/srcin.sh
 
 EOF
 }
