@@ -5,6 +5,7 @@
 
 ROOT=`pwd`
 UNAME=`uname`
+sudo=""
 zpm="" # package manage tool
 
 [ "$HOME" = "" ] && export HOME=~
@@ -80,7 +81,7 @@ check_install() {
 
     local ret
     printf "Installing '$pkg' by $zpm (y/n): " && read ret
-    [ $ret = "y" ] && $tool install $pkg
+    [ $ret = "y" ] && $sudo $tool install $pkg
     check_pkg $bin || return 1
     return 0
 }
@@ -96,14 +97,14 @@ prepare_zpm() {
         zpm=`which brew 2>/dev/null`
         [ "$zpm" != "" ] && return 0
         zpm=`which port 2>/dev/null`
-        [ "$zpm" != "" ] && zpm="sudo $zpm"
+        [ "$zpm" != "" ] && zpm="$zpm" && sudo="sudo"
         msg="Pls install 'macports' or 'homebrew'!"
     else
         # For redhat/fedora/centos/debian/ubuntu
         zpm=`which yum 2>/dev/null`
         [ "$zpm" = "" ] && zpm=`which aptitude 2>/dev/null`
         [ "$zpm" = "" ] && zpm=`which apt-get 2>/dev/null`
-        [ "$zpm" != "" ] && zpm="sudo $zpm"
+        [ "$zpm" != "" ] && zpm="$zpm" && sudo="sudo"
         msg="Pls install yum/apt/aptitude!"
     fi
     [ "$zpm" = "" ] && echoy "$msg" && return 1
