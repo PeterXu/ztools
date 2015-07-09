@@ -112,7 +112,7 @@ map <leader>bsd3 :0r ~/.vim/licenses/bsd3.txt
 "set lbr
 "set tw=500
 "set autoread       " Set to auto read when a file is changed from the outside
-set wrap           " wrap lines
+"set wrap           " wrap lines
 "set si             " smart indent
 "set laststatus=2   " Always show the status line
 
