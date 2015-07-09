@@ -9,6 +9,7 @@
 *.class
 
 # generated files
+.netrwhist
 bin/
 gen/
 

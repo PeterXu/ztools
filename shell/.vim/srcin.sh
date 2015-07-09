@@ -16,7 +16,7 @@
 
 # For the usage of cscope: _gen_cs dst src
 _gen_cs() {
-    local cs dst src csfile opts files
+    local cs dst src csfile exts opts files
     cs=`which cscope 2>/dev/null` || return 1
 
     [ $# -ne 2 ] && return 1
@@ -27,8 +27,10 @@ _gen_cs() {
     echo "[INFO] To proc <$src> by $(basename $cs) ..."
 
     # for cscope
-    opts="-name *.h -o -name *.c -o -name *.cc -o -name *.cpp"
-    opts="$opts -o -name *.java -o -name *.m -o -name *.mm"
+    exts="h c cc cpp java m mm"
+    for e in $exts; do
+        opts="$opts -name \"*.$e\""
+    done
     for s in $src; do
         find $s -type f $opts >> $csfile
     done
