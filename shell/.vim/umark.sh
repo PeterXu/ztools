@@ -26,7 +26,6 @@ unmark() {
     [ -h "$iname" ] && rm -i "$iname"
 }
 unmarkall() { 
-    [ $# -ne 0 ] && echo "Usage: unmarkall" && return
     printf "Remove all marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
@@ -36,6 +35,15 @@ unmarkall() {
 }
 marks() {
     ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
+}
+unmarkbroken() {
+    printf "Remove all broken marks (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return
+    inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    for iname in $inames; do
+        file "$MARKPATH/$iname" | grep -q "broken symbolic"
+        [ $? -eq 0 ] && echo "broken symbolic: $iname" && rm -f "$MARKPATH/$iname"
+    done
 }
 
 _tablist() {
@@ -63,13 +71,7 @@ _unmark() {
     opts=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
     _tablist "unmark" "$opts"
 }
-_ssh() {
-    local opts
-    opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
-    _tablist "ssh" "$opts"
-}
 
 complete -F _jump jump
 complete -F _unmark unmark
-complete -F _ssh ssh
 

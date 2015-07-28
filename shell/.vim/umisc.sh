@@ -36,3 +36,11 @@ map_del() {
     eval "unset ${vname}"
 }
 
+_ssh() {
+    local opts
+    opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
+    _tablist "ssh" "$opts"
+}
+
+complete -F _ssh ssh
+
