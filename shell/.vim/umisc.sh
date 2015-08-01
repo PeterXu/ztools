@@ -36,6 +36,15 @@ map_del() {
     eval "unset ${vname}"
 }
 
+zlist() {
+    local flist="$HOME/.vim/umark.sh $HOME/.vim/umisc.sh"
+    for item in $flist; 
+    do
+        local list=$(cat $item | grep "^[a-z][a-z_]\+() " | awk -F" " '{print $1}')
+        echo $(basename $item):"    "${list##\n}
+    done
+}
+
 _ssh() {
     local opts
     opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`

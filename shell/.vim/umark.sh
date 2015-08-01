@@ -5,8 +5,18 @@ export MARKPATH="$HOME/.marks"
 
 jump() { 
     local r=0
-    [ $# -eq 0 ] && cd -P "$ZTOOLS" 2>/dev/null && r=1
-    [ $# -eq 1 ] && cd -P "$MARKPATH/$1" 2>/dev/null && r=1
+    if [ $# -eq 0 ]; then
+        cd 2>/dev/null && r=1
+    elif [ $# -eq 1 ]; then
+        case "$1" in
+            -|..) 
+                cd $1 && r=1;;
+            ...) 
+                cd -P "$ZTOOLS" 2>/dev/null && r=1;;
+            *) 
+                cd -P "$MARKPATH/$1" 2>/dev/null && r=1;;
+        esac
+    fi
     [ $r -ne 1 ] && echo "No such mark: $*"
 }
 mark() { 
