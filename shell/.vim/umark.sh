@@ -35,7 +35,20 @@ unmark() {
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -i "$iname"
 }
-unmarkall() { 
+marks() {
+    ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
+}
+
+marks_broken() {
+    echo
+    inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
+    for iname in $inames; do
+        rname=`ls -l "$MARKPATH" 2>/dev/null | grep "$iname" | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null`
+        file "$MARKPATH/$iname" | grep -q "broken symbolic"
+        [ $? -eq 0 ] && echo "broken symbolic: $rname"
+    done
+}
+unmark_all() { 
     printf "Remove all marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
@@ -43,10 +56,7 @@ unmarkall() {
         [ -h "$MARKPATH/$iname" ] && rm -f "$MARKPATH/$iname"
     done
 }
-marks() {
-    ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
-}
-unmarkbroken() {
+unmark_broken() {
     printf "Remove all broken marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
