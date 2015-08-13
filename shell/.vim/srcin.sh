@@ -71,7 +71,7 @@ _gen_ct() {
 
 
 _gen_clean() {
-    [ $# -eq 1 ] && rm -rf $1
+    [ $# -eq 1 -a -d "$1" ] && rm -rf $1
 }
 
 
@@ -82,27 +82,27 @@ _gen_clean() {
 
 _gen_usage() {
     local prog="srcin"
-    echo "usage: $prog -h -c -t -s -a -e pats -l langs srcpath"
+    echo "usage: $prog [-h -c -t tool -s -a -e pats -l langs] srcpath"
     echo "      -h: print help"
     echo "      -c: clean previous tags/cscope files"
-    echo "      -t: only ctags, default ctags & cscope"
-    echo "      -s: only cscope, default ctags & cscope"
+    echo "      -t: use which tool, default both ctags & cscope"
+    echo "           - ctags: only ctags"
+    echo "           - cscope: only cscope"
+    echo "      -s: generate system tags(default /usr/include)"
     echo "      -a: append mode, default disabled"
     echo "      -e pats: exclude path for ctags, 'path1,path2'. default 'third_party,out'"
     echo "      -l langs: default 'c++,c,java'"
 }
 
 srcin() {
+    local mask="0x0"
     local root=".xtags/"
-    mkdir -p $root
-    [ ! -d $root ] && echo "[ERROR] not found: $root" && return 1
-
     local opts=""
     local cbin="ctags,cscope"
     local langs="c++,c,java"
     local ntags="--exclude=third_party --exclude=out"
 
-    local args=`getopt hctsae:l: $*`
+    local args=`getopt hct:sae:l: $*`
     if [ $? != 0 ]; then
         _gen_usage
         return 1
@@ -112,9 +112,18 @@ srcin() {
     for c; do
         case "$c" in
             -h) _gen_usage; shift; return 1;;
-            -c) _gen_clean $root; shift; return 0;;
-            -t) cbin="ctags"; shift;;
-            -s) cbin="cscope"; shift;;
+            -c) # clean
+                mask=$((mask|0x01))
+                shift;;
+            -t) # tool
+                [ "$2" != "ctags" -a "$2" != "cscope" ] && _gen_usage
+                cbin="$2"
+                shift; shift;;
+            -s) # system tags
+                mask=$((mask|0x02))
+                root="$HOME/.xtags" 
+                cbin="ctags"
+                shift;;
             -a) opts="$opts -a"; shift;;
             -e) 
                 local OLD_IFS="$IFS" && IFS=","
@@ -143,24 +152,41 @@ srcin() {
     done
     opts="-R --languages=$langs --c++-kinds=+p --fields=+iaS --extra=+q $ntags $opts"
 
-    # source path
-    if [ $# -lt 1 ]; then
-        _gen_usage;
-        return 1;
+    # clean path
+    local sbit=$((mask & 0x01))
+    if [ $sbit -ne 0 ]; then
+        _gen_clean $root
+        return 0
     fi
 
-    local path cs_root ct_root
-    path="$*"
-    if [ "$path" = "." ]; then
-        cs_root=. && ct_root=..
+    # source path
+    local spath cs_root ct_root
+    cs_root="" && ct_root=""
+    sbit=$((mask & 0x02))
+    if [ $sbit -ne 0 ]; then
+        spath="/usr/include"
+        ct_root="$spath"
     else
-        cs_root="" && ct_root=""
-        for f in $path; do
-            [ ! -d "$f" ] && echo "[WARN] not found: $f" && return 1
-            cs_root="$cs_root $f"
-            [[ ! $f =~ ^/.* ]] && ct_root="$ct_root ../$f"
-        done
+        if [ $# -lt 1 ]; then
+            _gen_usage;
+            return 1;
+        fi
+
+        spath="$*"
+        if [ "$spath" = "." ]; then
+            cs_root=. && ct_root=..
+        else
+            for f in $spath; do
+                [ ! -d "$f" ] && echo "[WARN] not found: $f" && return 1
+                cs_root="$cs_root $f"
+                [[ ! $f =~ ^/.* ]] && ct_root="$ct_root ../$f"
+            done
+        fi
     fi
+
+    # check root
+    mkdir -p $root
+    [ ! -d $root ] && echo "[ERROR] not found: $root" && return 1
 
     # generate
     [[ "$cbin" =~ "cscope" ]] && _gen_cs "$root" "$cs_root" 

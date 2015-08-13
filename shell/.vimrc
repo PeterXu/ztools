@@ -83,7 +83,10 @@ if filereadable(".tags")
   set tag+=.tags
 elseif filereadable(".xtags/tags")
   set tag+=.xtags/tags
-  set tag+=.xtags/systags
+endif
+  
+if filereadable(glob("$HOME/.xtags/tags"))
+  set tag+=${HOME}/.xtags/tags
 endif
 
 
