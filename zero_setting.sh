@@ -155,6 +155,7 @@ alias cls='clear'
 alias grep='grep --color=auto'
 [ -f $HOME/.vim/umisc.sh ] && source $HOME/.vim/umisc.sh
 [ -f $HOME/.vim/umark.sh ] && source $HOME/.vim/umark.sh
+[ -f $HOME/.vim/udocker.sh ] && source $HOME/.vim/udocker.sh
 [ -f $HOME/.vim/git-completion.bash ] && source $HOME/.vim/git-completion.bash
 
 EOF
