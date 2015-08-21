@@ -8,6 +8,8 @@ _make_vname() {
     echo $vname | tr -d "$vtrim"
 }
 
+
+## for bash map
 map_usage() {
     local opt
     [ $# -eq 0 ] && opt="set,get,del" || opt="$*"
@@ -36,20 +38,43 @@ map_del() {
     eval "unset ${vname}"
 }
 
+
+## print all avaiable commands
 zlist() {
-    local flist="$HOME/.vim/umark.sh $HOME/.vim/umisc.sh"
+    local ulist1 ulist2
+    local index=0
+    local flist="$HOME/.vim/umark.sh $HOME/.vim/umisc.sh $HOME/.vim/udocker.sh"
     for item in $flist; 
     do
-        local list=$(cat $item | grep "^[a-z][a-z_]\+() " | awk -F" " '{print $1}')
-        echo $(basename $item):"    "${list##\n}
+        ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
+        ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
+        if [ ${#ulist1} -gt 0 -o ${#ulist2} -gt 0 ]; then
+            echo "[$index] $(basename $item) tools:"
+            [ ${#ulist1} -gt 0 ] && echo "        => "${ulist1##\n}
+            [ ${#ulist2} -gt 0 ] && echo "        => "${ulist2##\n}
+            index=$((index+1))
+        fi
     done
 }
 
+
+## ssh with tips
 _ssh() {
     local opts
     opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     _tablist "ssh" "$opts"
 }
-
 complete -F _ssh ssh
+
+
+# ps -ef order by %mem/rsz
+ps-mem() {
+    local opts
+    if [ "$(uname)" = "Darwin" ]; then
+        opts='uid,pid,ppid,stime,time,%cpu,%mem,vsz,rss,comm' 
+    else
+        opts='euid,pid,ppid,stime,time,%cpu,%mem,vsz,rsz,comm'
+    fi
+    ps -eo $opts | sort -k 7 -n -s
+}
 
