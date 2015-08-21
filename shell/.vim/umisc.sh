@@ -75,6 +75,6 @@ ps-mem() {
     else
         opts='euid,pid,ppid,stime,time,%cpu,%mem,vsz,rsz,comm'
     fi
-    ps -eo $opts | sort -k 7 -n -s
+    ps -eo $opts | sort -k 9 -n -s
 }
 
