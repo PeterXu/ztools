@@ -68,7 +68,7 @@ complete -F _ssh ssh
 
 
 # ps -ef order by %mem/rsz
-ps-mem() {
+ps_mem() {
     local opts
     if [ "$(uname)" = "Darwin" ]; then
         opts='uid,pid,ppid,stime,time,%cpu,%mem,vsz,rss,comm' 
