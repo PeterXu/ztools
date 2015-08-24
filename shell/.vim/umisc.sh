@@ -87,12 +87,12 @@ _ps_ef() {
         ps -eo $opts | grep "$str"
     fi
 }
-alias ps_mem="_ps_ef 9 %MEM"
-alias ps_cpu="_ps_ef 6 %CPU"
-alias ps_pid="_ps_ef 2 ' PID'"
-alias ps_time="_ps_ef 4 ' TIME'"
-alias ps_stime="_ps_ef 5 STIME"
+alias ps-mem="_ps_ef 9 %MEM"
+alias ps-cpu="_ps_ef 6 %CPU"
+alias ps-pid="_ps_ef 2 ' PID'"
+alias ps-time="_ps_ef 4 ' TIME'"
+alias ps-stime="_ps_ef 5 STIME"
 
-alias psr_stime="_ps_ef 5 STIME -r"
-alias psr_pid="_ps_ef 2 PID -r"
+alias psr-stime="_ps_ef 5 STIME -r"
+alias psr-pid="_ps_ef 2 PID -r"
 

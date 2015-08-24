@@ -2,11 +2,11 @@
 # Author: yeasy@github
 # Created:2014-09-25
 
-alias docker_pid="sudo docker inspect --format '{{.State.Pid}}'"
-alias docker_ip="sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+alias docker-pid="sudo docker inspect --format '{{.State.Pid}}'"
+alias docker-ip="sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
-docker_enter() {
+_docker_enter() {
     #if [ -e $(dirname "$0")/nsenter ]; then
     #Change for centos bash running
     if [ -e $(dirname '$0')/nsenter ]; then
@@ -47,3 +47,5 @@ docker_enter() {
         fi
     fi
 }
+alias docker-enter="_docker_enter"
+
