@@ -37,6 +37,7 @@ unmark() {
 }
 marks() {
     ls -l "$MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
+    echo
 }
 
 marks_broken() {
@@ -50,6 +51,8 @@ marks_broken() {
 }
 unmark_all() { 
     printf "Remove all marks (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return
+    printf "Are you sure (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
     for iname in $inames; do
