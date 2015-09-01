@@ -3,7 +3,7 @@ if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
 endif
 
 
-"set compatible
+" set compatible
 set nocompatible	" Use Vim defaults (much better!)
 set bs=indent,eol,start		" allow backspacing over everything in insert mode
 set ai			" always set autoindenting on
@@ -34,26 +34,6 @@ if has("autocmd")
 endif
 
 
-" Set cscope for c/c++/java
-if has("cscope") 
-  "set csprg=/usr/bin/cscope
-  set csto=0
-  set cst
-  set nocsverb
-
-  " add any database in current directory
-  if filereadable("cscope.out")
-    cs add cscope.out
-  elseif filereadable(".xtags/cscope.out")
-    cs add .xtags/cscope.out
-  " else add database pointed to by environment
-  elseif $CSCOPE_DB != ""
-    cs add $CSCOPE_DB
-  endif
-
-  set csverb
-endif
-
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running") || has("syntax")
@@ -66,6 +46,8 @@ endif
 filetype plugin on
 filetype indent on
 
+
+" Set term properites
 if &term=="xterm"
   set t_Co=8
   set t_Sb=[4%dm
@@ -78,58 +60,8 @@ endif
 let &guicursor = &guicursor . ",a:blinkon0"
 
 
-" ctags
-if filereadable(".tags")
-  set tag+=.tags
-elseif filereadable(".xtags/tags")
-  set tag+=.xtags/tags
+" load custom vimrc.vim
+if filereadable(glob("$HOME/.vim/vimrc.vim"))
+  source $HOME/.vim/vimrc.vim
 endif
-  
-if filereadable(glob("$HOME/.xtags/tags"))
-  set tag+=${HOME}/.xtags/tags
-endif
-
-
-" tab/space
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set expandtab " use spaces to expandtab, else <set noexpandtab>
-
-
-" Set map leader
-let mapleader = ":"
-let g:mapleader = ":"
-
-
-" licenses setting
-map <leader>mit :0r ~/.vim/licenses/mit.txt
-map <leader>bsd2 :0r ~/.vim/licenses/bsd2.txt
-map <leader>bsd3 :0r ~/.vim/licenses/bsd3.txt
-"autocmd BufNewFile *
-"    :0r ~/.vim/licenses/mit.txt
-"augroup END
-
-
-" Linebreak on 500 characters
-"set lbr
-"set tw=500
-"set autoread       " Set to auto read when a file is changed from the outside
-"set wrap           " wrap lines
-"set si             " smart indent
-"set laststatus=2   " Always show the status line
-
-
-" spell checking
-map <leader>ss :setlocal spell!
-
-" Useful mappings for managing tabs
-map <leader>tn :tabnew
-map <leader>to :tabonly
-map <leader>tc :tabclose
-map <leader>tm :tabmove
-
-
-" For markdown
-let g:vim_markdown_folding_disabled=1
 
