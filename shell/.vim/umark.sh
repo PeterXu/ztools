@@ -3,6 +3,22 @@
 
 export MARKPATH="$HOME/.marks"
 
+_mark_help() {
+    local opt="jump,mark,unmark,marks,marks-broken,unmark-all,unmark-broken"
+    [ $# -gt 0 ] && opt="$*"
+    echo "usage:"
+    [[ "$opt" =~ "jump" ]]              && echo "       jump [name]"
+    [[ "$opt" =~ "mark," ]]             && echo "       mark [name]"
+    [[ "$opt" =~ "unmark" ]]            && echo "       unmark [name]"
+    [[ "$opt" =~ "marks" ]]             && echo "       marks"
+    [[ "$opt" =~ "marks-broken" ]]      && echo "       marks-broken"
+    [[ "$opt" =~ "unmark-all" ]]        && echo "       unmark-all"
+    [[ "$opt" =~ "unmark-broken" ]]     && echo "       unmark-broken"
+    echo
+    return 0
+}
+alias mark-help="_mark_help"
+
 jump() { 
     local r=0
     if [ $# -eq 0 ]; then
@@ -20,7 +36,7 @@ jump() {
     [ $r -ne 1 ] && echo "No such mark: $*"
 }
 mark() { 
-    [ $# -gt 1 ] && echo "Usage: mark [name]" && return
+    [ $# -gt 1 ] && _mark_help "mark," && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -f "$iname"    # rm symbolic file
@@ -30,7 +46,7 @@ mark() {
     [ ! -e "$iname" ] && ln -s "$(pwd)" "$iname"
 }
 unmark() { 
-    [ $# -gt 1 ] && echo "Usage: unmark [name]" && return
+    [ $# -gt 1 ] && _mark_help unmark && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -i "$iname"
@@ -40,7 +56,7 @@ marks() {
     echo
 }
 
-marks_broken() {
+_marks_broken() {
     echo
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
     for iname in $inames; do
@@ -49,7 +65,9 @@ marks_broken() {
         [ $? -eq 0 ] && echo "broken symbolic: $rname"
     done
 }
-unmark_all() { 
+alias marks-broken="_marks_broken"
+
+_unmark_all() {
     printf "Remove all marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     printf "Are you sure (y/n)? " && read ch 
@@ -59,7 +77,9 @@ unmark_all() {
         [ -h "$MARKPATH/$iname" ] && rm -f "$MARKPATH/$iname"
     done
 }
-unmark_broken() {
+alias unmark-all="_unmark_all"
+
+_unmark_broken() {
     printf "Remove all broken marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     inames=`ls --color=never "$MARKPATH" 2>/dev/null || ls "$MARKPATH" 2>/dev/null`
@@ -68,6 +88,7 @@ unmark_broken() {
         [ $? -eq 0 ] && echo "broken symbolic: $iname" && rm -f "$MARKPATH/$iname"
     done
 }
+alias unmark-broken="_unmark_broken"
 
 _tablist() {
     [ $# -ne 2 ] && return

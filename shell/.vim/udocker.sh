@@ -1,6 +1,9 @@
 # Some useful commands to use docker.
 # Author: yeasy@github
 # Created:2014-09-25
+#
+# Update: peter@uskee.org
+# Modified: 2015/09/01
 
 alias docker-pid="sudo docker inspect --format '{{.State.Pid}}'"
 alias docker-ip="sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
