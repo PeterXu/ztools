@@ -84,7 +84,7 @@ let g:vim_markdown_folding_disabled=1
 
 
 " ------------------------------------------
-" Insert date: YYYY-MM-DD, usage: <S-:> + dt
+" Insert date: YYYY-MM-DD
 map <leader>dt a<C-R>=strftime('%Y-%m-%d')<CR>
 
 
@@ -107,4 +107,23 @@ map <leader>aucc <Home>i<C-R>=
     \ . "Author: peter@uskee.org\n"
     \ . "Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "/\n" <CR>
+
+
+
+" -----------------------------
+" custom functions and commands
+func! Usage(arg)
+    echo "\n[Usage]: \n" 
+    if a:arg == "map" || a:arg == ""
+        echo ""
+            \ . "  <S-:> + ss:  spell checking\n"
+            \ . "  <S-:> + dt:  insert date, YYYY-MM-DD\n" 
+            \ . "  <S-:> + tn/to/tc/tm:  tabnew/tabonly/tabclose/tabmove\n" 
+            \ . "  <S-:> + aush/aupy/aucc:  insert author info for shell/python/c-c++\n"
+            \ . "  <S-:> + mit/bsd2/bsd3:  insert one license\n"
+    endif
+    echo
+endfunc
+
+command! -nargs=* Usage call Usage('<args>')
 
