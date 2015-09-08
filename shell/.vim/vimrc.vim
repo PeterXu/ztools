@@ -93,12 +93,16 @@ map <leader>dt a<C-R>=strftime('%Y-%m-%d')<CR>
 let _author = "peter@uskee.org"
 map <leader>aush <Home>i<C-R>= 
     \ ""
+    \ . "#!/usr/bin/env bash\n"
+    \ . "#\n"
     \ . "# Author: " . _author . "\n"
     \ . "# Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "#\n" <CR>
 map <leader>aupy <Home>i<C-R>= 
     \ ""
+    \ . "#!/usr/bin/env python\n"
     \ . "# coding: utf-8\n"
+    \ . "#\n"
     \ . "# Author: " . _author . "\n"
     \ . "# Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "#\n" <CR>

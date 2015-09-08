@@ -99,6 +99,7 @@ prepare_zpm() {
 usage() 
 {
     echog "usage: $0 set|clear|prepare"
+    echo
 }
 
 set_prepare() 
@@ -126,18 +127,26 @@ set_env()
     label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
+[ \`uname\` != "Darwin" ] && alias cp='cp -i'
 [ \`uname\` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
 alias ll='ls -l'
-[ \`uname\` != "Darwin" ] && alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
 alias cls='clear'
 alias grep='grep --color=auto'
-[ -f $HOME/.vim/umisc.sh ] && source $HOME/.vim/umisc.sh
-[ -f $HOME/.vim/umark.sh ] && source $HOME/.vim/umark.sh
-[ -f $HOME/.vim/udocker.sh ] && source $HOME/.vim/udocker.sh
-[ -f $HOME/.vim/git-completion.bash ] && source $HOME/.vim/git-completion.bash
+
+# For ENV variables
+[ "\$HOME" = "" ] && export HOME=~
+[[ ! "\$PATH" =~ "/usr/local/bin" ]] && PATH="/usr/local/bin:\$PATH"
+[[ ! "\$PATH" =~ "/usr/local/sbin" ]] && PATH="/usr/local/sbin:\$PATH"
+[[ ! "\$PATH" =~ "\$HOME/bin" ]] && PATH="\$HOME/bin:\$PATH"
+
+# For Extending Shell
+_zshs="udocs.sh umisc.sh umark.sh udocker.sh git-completion.bash"
+for k in \$_zshs; do
+    [ -f "\$HOME/.vim/\$k" ] && source "\$HOME/.vim/\$k"
+done
 
 EOF
 }
@@ -155,7 +164,7 @@ set_vim()
     local label="For Vim Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ -f $HOME/.vim/srcin.sh ] && source $HOME/.vim/srcin.sh
+[ -f \$HOME/.vim/srcin.sh ] && source \$HOME/.vim/srcin.sh
 
 EOF
 }
@@ -214,6 +223,7 @@ export ZTOOLS=${ROOT}
 ## ${label_end}
 EOF
     echog "Set successful and Should login again!"
+    echo
 }
 
 set_clear()
