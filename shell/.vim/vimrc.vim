@@ -90,21 +90,22 @@ map <leader>dt a<C-R>=strftime('%Y-%m-%d')<CR>
 
 " ------------------------------
 " Insert development author info
+let _author = "peter@uskee.org"
 map <leader>aush <Home>i<C-R>= 
     \ ""
-    \ . "# Author: peter@uskee.org\n"
+    \ . "# Author: " . _author . "\n"
     \ . "# Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "#\n" <CR>
 map <leader>aupy <Home>i<C-R>= 
     \ ""
     \ . "# coding: utf-8\n"
-    \ . "# Author: peter@uskee.org\n"
+    \ . "# Author: " . _author . "\n"
     \ . "# Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "#\n" <CR>
 map <leader>aucc <Home>i<C-R>= 
     \ ""
     \ . "/**\n"
-    \ . "Author: peter@uskee.org\n"
+    \ . "Author: " . _author . "\n"
     \ . "Created: " . strftime('%Y-%m-%d') . "\n"
     \ . "/\n" <CR>
 
@@ -125,5 +126,5 @@ func! Usage(arg)
     echo
 endfunc
 
-command! -nargs=* Usage call Usage('<args>')
+command! -nargs=* Help call Usage('<args>')
 
