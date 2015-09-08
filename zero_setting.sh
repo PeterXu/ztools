@@ -5,8 +5,8 @@
 
 ROOT=`pwd`
 UNAME=`uname`
-sudo=""
-zpm="" # package manage tool
+kSudo="sudo"
+kZpm="" # package manage tool
 
 [ "$HOME" = "" ] && export HOME=~
 
@@ -23,15 +23,6 @@ echog() { echox 32 "[INFO]" "$*"; }
 echoy() { echox 33 "[WARN]" "$*"; }
 echob() { echox 34 "[INFO]" "$*"; }
 
-echop() {
-    echo
-    echob "[*] Process: $*"
-    eval "$*"
-    echog "[*] Return: $?"
-    echo
-}
-
-
 
 ###================================
 
@@ -42,30 +33,19 @@ check_pkg() {
 }
 
 check_install() {
-    local opts args
-    opts="t:b:p:f"
-    args=`getopt $opts $*`
+    local opts="t:b:p:f"
+    local args=`getopt $opts $*`
     [ $? != 0 ] && return 1
 
-    local force tool bin pkg
-    force=""
+    local tool bin pkg force
     set -- $args
     for i; do
         case "$i" in
-            -t)
-                tool=$2; shift;
-                shift;;
-            -b)
-                bin=$2; shift;
-                shift;;
-            -p)
-                pkg=$2; shift;
-                shift;;
-            -f)
-                force="true";
-                shift;;
-            --)
-                shift; break;;
+            -t) tool=$2; shift; shift;;
+            -b) bin=$2; shift; shift;;
+            -p) pkg=$2; shift; shift;;
+            -f) force="true"; shift;;
+            --) shift; break;;
         esac
     done
 
@@ -80,37 +60,38 @@ check_install() {
     fi
 
     local ret
-    printf "Installing '$pkg' by $zpm (y/n): " && read ret
-    [ $ret = "y" ] && $sudo $tool install $pkg
+    printf "Installing '$pkg' by $(basename $tool) (y/n): " && read ret
+    [ $ret = "y" ] && $tool install $pkg
     check_pkg $bin || return 1
     return 0
 }
 
 zpm_install() {
-    check_install -t "$zpm" $* || return 1
+    check_install -t "$kZpm" $* || return 1
     return 0
 }
 
 prepare_zpm() {
-    local msg
-    if [ "$UNAME" = "Darwin" ]; then
-        zpm=`which brew 2>/dev/null`
-        [ "$zpm" != "" ] && return 0
-        zpm=`which port 2>/dev/null`
-        [ "$zpm" != "" ] && zpm="$zpm" && sudo="sudo"
-        msg="Pls install 'macports' or 'homebrew'!"
-    else
-        # For redhat/fedora/centos/debian/ubuntu
-        zpm=`which yum 2>/dev/null`
-        [ "$zpm" = "" ] && zpm=`which aptitude 2>/dev/null`
-        [ "$zpm" = "" ] && zpm=`which apt-get 2>/dev/null`
-        [ "$zpm" != "" ] && zpm="$zpm" && sudo="sudo"
-        msg="Pls install yum/apt/aptitude!"
-    fi
+    local msg zpm
+    while true; do
+        if [ "$UNAME" = "Darwin" ]; then
+            zpm=`which brew 2>/dev/null`
+            [ "$zpm" = "" ] && zpm=`which port 2>/dev/null` && zpm="$kSudo $zpm"
+            msg="Pls install 'macports' or 'homebrew'!"
+        else
+            # For redhat/fedora/centos/debian/ubuntu
+            zpm=`which yum 2>/dev/null`
+            [ "$zpm" = "" ] && zpm=`which aptitude 2>/dev/null`
+            [ "$zpm" = "" ] && zpm=`which apt-get 2>/dev/null`
+            [ "$zpm" != "" ] && zpm="$kSudo $zpm"
+            msg="Pls install yum/apt/aptitude!"
+        fi
+        break
+    done
     [ "$zpm" = "" ] && echoy "$msg" && return 1
+    kZpm="$zpm"
     return 0
 }
-
 
 
 ###================================
@@ -208,9 +189,11 @@ set_android()
     local label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ "#\$ANDROID_HOME" != "#" ] && PATH=\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/tools:\$PATH && export ANDROID_HOME
-[ "#\$ANDROID_NDK_HOME" != "#" ] && PATH=\$ANDROID_NDK_HOME:\$PATH && export ANDROID_NDK_HOME
-[ "#\$ANDROID_NDK_HOME" != "#" ] && export ANDROID_NDK=\$ANDROID_NDK_HOME
+[ "#\$ANDROID_SDK" = "#" ] && ANDROID_SDK=\$ANDROID_HOME
+[ "#\$ANDROID_SDK" != "#" ] && PATH=\$ANDROID_SDK/platform-tools:\$ANDROID_SDK/tools:\$PATH && export ANDROID_SDK
+
+[ "#\$ANDROID_NDK" = "#" ] && ANDROID_NDK=\$ANDROID_NDK_HOME
+[ "#\$ANDROID_NDK" != "#" ] && PATH=\$ANDROID_NDK:\$PATH && export ANDROID_NDK
 
 EOF
 }
