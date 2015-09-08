@@ -141,6 +141,7 @@ alias grep='grep --color=auto'
 [[ ! "\$PATH" =~ "/usr/local/bin" ]] && PATH="/usr/local/bin:\$PATH"
 [[ ! "\$PATH" =~ "/usr/local/sbin" ]] && PATH="/usr/local/sbin:\$PATH"
 [[ ! "\$PATH" =~ "\$HOME/bin" ]] && PATH="\$HOME/bin:\$PATH"
+[[ ! "\$PATH" =~ "\$HOME/.local/bin" ]] && PATH="\$HOME/.local/bin:\$PATH"
 
 # For Extending Shell
 _zshs="udocs.sh umisc.sh umark.sh udocker.sh git-completion.bash"
