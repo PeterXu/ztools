@@ -20,6 +20,21 @@ _ztools_update() {
 }
 alias ztools-update="_ztools_update"
 
+_zero_set() {
+    [ "$#" -ne 1 ] && echo "ztools-set set|clear|prepare" && return 1
+    action="$1"
+    sh=$(which bash 2>/dev/null) || return 1
+    (
+        jump ...
+        echo "Entering <$(pwd)> ..."
+        echo "Then set for shell ..."
+        $sh zero_setting.sh $action
+        echo
+    )
+    return 0
+}
+alias zero-set="_zero_set"
+
 
 ## ---------------------------
 ## print all avaiable commands
