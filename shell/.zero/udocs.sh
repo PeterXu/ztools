@@ -56,11 +56,12 @@ _zhelp_pnx() {
 }
 _zero_help() {
     if [ $# -eq 1 ]; then
-        eval "_help_$1"
+        declare -f "_help_$1" >/dev/null && eval "_help_$1" || printf "[WARN] no help for <$1>\n\n"
         return 0
     fi
 
     local index=0
+    local helps=""
     local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
     for item in $flist; do
         item="$HOME/.zero/$item"
@@ -72,11 +73,34 @@ _zero_help() {
             _zhelp_pnx "${ulist2}"
             index=$((index+1))
         fi
+
+        local hlist=$(cat $item | grep "^_help_[a-z_]\+() " | awk -F"(" '{print $1}')
+        for h in $hlist; do
+            h=${h/#_help_/}
+            [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
+        done
     done
+    printf "\n[*] Help [key]:\n"
+    _zhelp_pnx "$helps"
     echo
 }
 alias zero-help="_zero_help"
 alias Help="_zero_help"
+
+_Help() {
+    local helps=""
+    local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
+    for item in $flist; do
+        item="$HOME/.zero/$item"
+        local hlist=$(cat $item | grep "^_help_[a-z_]\+() " | awk -F"(" '{print $1}')
+        for h in $hlist; do
+            h=${h/#_help_/}
+            [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
+        done
+    done
+    _tablist "Help" "$helps"
+}
+complete -F _Help Help
 
 
 ## -----------------
