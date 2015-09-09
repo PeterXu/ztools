@@ -15,7 +15,7 @@ _make_vname() {
 
 ## ------------
 ## for bash map
-_map_help() {
+maphelp() {
     local opt="set,get,del"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
@@ -25,7 +25,6 @@ _map_help() {
     echo
     return 0
 }
-alias map-help="_map_help"
 mapset() {
     [ $# -ne 3 ] && _map_help set && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
