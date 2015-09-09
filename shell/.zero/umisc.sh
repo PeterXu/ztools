@@ -119,8 +119,16 @@ printx() {
 _help_printx() {
     local prog="printx" color="cyan" ctrl="bold"
     echo "usage: "
+    echo "  $prog [@opt] string"
+    echo "      options:" 
+    echo "          backgound"
+    echo "          black|red[r]|green[g]|yellow[y]|blue[b]|purple[p]|cyan[c]|white"
+    echo "          bold|bright|uscore|blink|invert"
+    echo
+    echo "e.g."
+    echo "  $prog font is normal"
     echo "  $prog @$color font is $color"
-    echo "  $prog @$color @$ctrl  font is $color and $ctrl"
+    echo "  $prog @$color @$ctrl font is $color and $ctrl"
     echo "  $prog @background @$color backgroud is $color and font unchanged"
     echo "  $prog @background @$color @$ctrl backgroud is $color and font is $ctrl"
     echo
