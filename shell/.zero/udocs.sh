@@ -55,6 +55,11 @@ _zhelp_pnx() {
     done
 }
 _zero_help() {
+    if [ $# -eq 1 ]; then
+        eval "_help_$1"
+        return 0
+    fi
+
     local index=0
     local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
     for item in $flist; do
@@ -83,7 +88,7 @@ _regex_pnx() {
         printf "$*\n"
     fi
 }
-_regex_help() {
+_help_regex() {
     local str="abcde.abcde"
     _regex_pnx  "usage:  e.g., str=\"${str}\""
     _regex_pnx  "  0. strlen"
@@ -122,5 +127,4 @@ _regex_help() {
     _regex_pnx  "echo -e \${fname/./'\t'}"  "=>"  "$(echo -e ${fname/./'\t'})" "replace '.' with tab"
     _regex_pnx
 }
-alias regex-help="_regex_help"
 

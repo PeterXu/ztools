@@ -3,7 +3,7 @@
 
 export MARKPATH="$HOME/.marks"
 
-_mark_help() {
+_help_mark() {
     local opt="jump,mark,unmark,marks,marks-broken,unmark-all,unmark-broken"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
@@ -17,7 +17,6 @@ _mark_help() {
     echo
     return 0
 }
-alias mark-help="_mark_help"
 
 jump() { 
     local r=0
@@ -36,7 +35,7 @@ jump() {
     [ $r -ne 1 ] && echo "No such mark: $*"
 }
 mark() { 
-    [ $# -gt 1 ] && _mark_help "mark," && return
+    [ $# -gt 1 ] && _help_mark "mark," && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -f "$iname"    # rm symbolic file
@@ -46,7 +45,7 @@ mark() {
     [ ! -e "$iname" ] && ln -s "$(pwd)" "$iname"
 }
 unmark() { 
-    [ $# -gt 1 ] && _mark_help unmark && return
+    [ $# -gt 1 ] && _help_mark unmark && return
     [ $# -eq 0 ] && iname="$MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$MARKPATH/$1"
     [ -h "$iname" ] && rm -i "$iname"
