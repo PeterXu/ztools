@@ -148,7 +148,7 @@ alias grep='grep --color=auto'
 [[ ! "\$PATH" =~ "\$HOME/.local/bin" ]] && PATH="\$HOME/.local/bin:\$PATH"
 
 # For Extending Shell
-_zshs="udocs.sh umisc.sh umark.sh udocker.sh srcin.sh git-completion.bash"
+_zshs="ubase.sh udocs.sh umisc.sh umark.sh udocker.sh srcin.sh git-completion.bash"
 for k in \$_zshs; do
     [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done

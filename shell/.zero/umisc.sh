@@ -2,17 +2,6 @@
 #
 
 
-## ------------------
-## make variable name
-_make_vname() {
-    [ $# -ne 1 ] && return 1
-    local vname=`echo g_${1} | tr [:space:]- _`
-    local vtrim=`echo $vname | tr -d [:alnum:]_`
-    echo $vname | tr -d "$vtrim"
-    return 0
-}
-
-
 ## ------------
 ## for bash map
 _help_map() {
