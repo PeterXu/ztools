@@ -3,6 +3,30 @@ let mapleader = ":"
 let g:mapleader = ":"
 
 
+" --------------------------------
+" For some plugins' global setting
+let g:vim_markdown_folding_disabled=1
+let g:openssl_backup=1
+
+
+" -----------------
+" For tab/space setting
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab " use spaces to expandtab, else <set noexpandtab>
+
+
+" ---------------------------
+" Linebreak on 500 characters
+"set lbr
+"set tw=500
+"set autoread       " Set to auto read when a file is changed from the outside
+"set wrap           " wrap lines
+"set si             " smart indent
+"set laststatus=2   " Always show the status line
+
+
 " -------------------------
 " Set cscope for c/c++/java
 if has("cscope") 
@@ -37,14 +61,6 @@ if filereadable(glob("$HOME/.xtags/tags"))
 endif
 
 
-" ---------
-" tab/space
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set expandtab " use spaces to expandtab, else <set noexpandtab>
-
-
 " ----------------
 " licenses setting
 map <leader>mit :0r ~/.vim/licenses/mit.txt
@@ -54,21 +70,9 @@ map <leader>bsd3 :0r ~/.vim/licenses/bsd3.txt
 "    :0r ~/.vim/licenses/mit.txt
 "augroup END
 
-
-" --------------------------
-" Linebreak on 500 characters
-"set lbr
-"set tw=500
-"set autoread       " Set to auto read when a file is changed from the outside
-"set wrap           " wrap lines
-"set si             " smart indent
-"set laststatus=2   " Always show the status line
-
-
 " --------------
 " spell checking
 map <leader>ss :setlocal spell!
-
 
 " ---------------------------------
 " Useful mappings for managing tabs
@@ -77,16 +81,9 @@ map <leader>to :tabonly
 map <leader>tc :tabclose
 map <leader>tm :tabmove
 
-
-" ------------
-" For markdown
-let g:vim_markdown_folding_disabled=1
-
-
-" ------------------------------------------
+" -----------------------
 " Insert date: YYYY-MM-DD
 map <leader>dt a<C-R>=strftime('%Y-%m-%d')<CR>
-
 
 " ------------------------------
 " Insert development author info
@@ -129,6 +126,5 @@ func! Usage(arg)
     endif
     echo
 endfunc
-
 command! -nargs=* Help call Usage('<args>')
 
