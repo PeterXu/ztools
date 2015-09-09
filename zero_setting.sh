@@ -98,7 +98,7 @@ prepare_zpm() {
 
 usage() 
 {
-    echog "usage: $0 set|clear|prepare"
+    echog "usage: zero-set set|clear|prepare"
     echo
 }
 
@@ -123,6 +123,10 @@ set_begin()
 
 set_env() 
 {
+    local zero=$HOME/.zero
+    [ -e $zero ] && rm -rf $zero
+    ln -sf $ROOT/shell/.zero $zero
+
     local label
     label="For Env Setting"
     cat >> $ROOT/shell/envall.sh << EOF
@@ -144,9 +148,9 @@ alias grep='grep --color=auto'
 [[ ! "\$PATH" =~ "\$HOME/.local/bin" ]] && PATH="\$HOME/.local/bin:\$PATH"
 
 # For Extending Shell
-_zshs="udocs.sh umisc.sh umark.sh udocker.sh git-completion.bash"
+_zshs="udocs.sh umisc.sh umark.sh udocker.sh srcin.sh git-completion.bash"
 for k in \$_zshs; do
-    [ -f "\$HOME/.vim/\$k" ] && source "\$HOME/.vim/\$k"
+    [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done
 
 EOF
@@ -161,13 +165,6 @@ set_vim()
     local vimrc=$HOME/.vimrc
     [ -e $vimrc ] && rm -rf $vimrc
     ln -sf $ROOT/shell/.vimrc $vimrc
-
-    local label="For Vim Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
-[ -f \$HOME/.vim/srcin.sh ] && source \$HOME/.vim/srcin.sh
-
-EOF
 }
 
 set_java()

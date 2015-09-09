@@ -69,9 +69,7 @@ _ps_ef() {
         opts='euid,pid,ppid,stime,time,%cpu,%mem,vsz,rsz,comm'
     fi
     ps -eo $opts | sort -k $nth -n -s $opt
-    if [[ ! "$opt" =~ "-r" ]]; then
-        ps -eo $opts | grep "$str"
-    fi
+    ps -eo $opts | grep "$str"
 }
 alias ps-mem="_ps_ef 9 %MEM"
 alias ps-cpu="_ps_ef 6 %CPU"
@@ -79,5 +77,5 @@ alias ps-pid="_ps_ef 2 ' PID'"
 alias ps-time="_ps_ef 4 ' TIME'"
 alias ps-stime="_ps_ef 5 STIME"
 alias psr-stime="_ps_ef 5 STIME -r"
-alias psr-pid="_ps_ef 2 PID -r"
+alias psr-pid="_ps_ef 2 ' PID' -r"
 

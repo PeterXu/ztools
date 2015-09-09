@@ -6,30 +6,31 @@
 
 
 ## -----------------
-## autoupdate ztools
-_ztools_update() {
+## update for ztools
+_zero_update() {
     git=$(which git 2>/dev/null) || return 1
     (
         jump ...
-        echo "Entering <$(pwd)> ..."
-        echo "Then auto-update will start ..."
+        echo "[*] Entering <$(pwd)> ..."
+        echo "[*] Then auto-update will start ..."
         $git pull
         echo
     )
     return 0
 }
-alias ztools-update="_ztools_update"
+alias zero-update="_zero_update"
 
+
+## -----------------
+## set for ztools
 _zero_set() {
-    [ "$#" -ne 1 ] && echo "ztools-set set|clear|prepare" && return 1
-    action="$1"
+    [ $# -eq 1 ] && action="$1"
     sh=$(which bash 2>/dev/null) || return 1
     (
         jump ...
-        echo "Entering <$(pwd)> ..."
-        echo "Then set for shell ..."
+        echo "[*] Entering <$(pwd)> ..."
+        echo "[*] Then set for shell ..."
         $sh zero_setting.sh $action
-        echo
     )
     return 0
 }
@@ -37,8 +38,8 @@ alias zero-set="_zero_set"
 
 
 ## ---------------------------
-## print all avaiable commands
-_zlist_pnx() {
+## print all ztools commands
+_zhelp_pnx() {
     local max=7
     local pos=0
     local ulist=($*)
@@ -53,23 +54,24 @@ _zlist_pnx() {
         echo "        => "${tmp##\n}
     done
 }
-zlist() {
+_zero_help() {
     local index=0
-    local flist="umark.sh umisc.sh udocker.sh udocs.sh"
+    local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
     for item in $flist; do
-        item="$HOME/.vim/$item"
+        item="$HOME/.zero/$item"
         local ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
         local ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
         if [ ${#ulist1} -gt 0 -o ${#ulist2} -gt 0 ]; then
             echo "[$index] $(basename $item) tools:"
-            _zlist_pnx "${ulist1}"
-            _zlist_pnx "${ulist2}"
+            _zhelp_pnx "${ulist1}"
+            _zhelp_pnx "${ulist2}"
             index=$((index+1))
         fi
     done
     echo
 }
-alias Help="zlist"
+alias zero-help="_zero_help"
+alias Help="_zero_help"
 
 
 ## -----------------
