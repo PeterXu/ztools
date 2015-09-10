@@ -55,18 +55,11 @@ _docker_enter() {
 alias dk-enter="_docker_enter"
 
 
-# Other alias
-alias dk-run="$kSudo docker run"
-alias dk-search="$kSudo docker search"
-alias dk-ps="$kSudo docker ps"
-alias dk-psa="$kSudo docker ps -a"
-
+### other docker commands
 _docker_pgrep() {
     [ $# -ne 1 ] && return 1
     $kSudo docker ps -a | grep "$1"
 }
-alias dk-pgrep="_docker_pgrep"
-
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
     printx @red "[*] Remove all containers (y/n)? " && read ch 
@@ -79,15 +72,29 @@ _docker_rmall() {
     done
     echo
 }
-alias dk-rma="_docker_rmall"
+__alias_docker() {
+    cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
+    for cmd in $cmdlist; do
+        alias dk-$cmd="$kSudo docker $cmd"
+    done
+
+    alias dk="docker"
+    alias dk-rma="_docker_rmall"
+    alias dk-pgrep="_docker_pgrep"
+    alias dk-psa="$kSudo docker ps -a"
+}
+__alias_docker
 
 _help_docker() {
     echo "usage: "
-    echo "  dk-run/search   => docker run/search"
-    echo "  dk-ps/psa       => docker ps/ps -a"
-    echo "  dk-pgrep        => docker ps -a | grep"
-    echo "  dk-rma          => docker rm <all containers>"
-    echo "  dk-pid          => get pid of container or image"
-    echo "  dk-ip           => get ip of container or image"
+    prefix="    [.]"
+    docker -h | grep "^    [a-z]" | sed "s/^    \([a-z]\)/$prefix dk-\1/"
+    echo
+    printf "%-20s %s\n" "$prefix dk-psa"    "Like dk-ps -a"
+    printf "%-20s %s\n" "$prefix dk-pgrep"  "Like dk-ps -a | grep .."
+    printf "%-20s %s\n" "$prefix dk-rma"    "Remove all containers"
+    printf "%-20s %s\n" "$prefix dk-pid"    "Acquire the pid of one image or container"
+    printf "%-20s %s\n" "$prefix dk-ip"     "Acquire the ip of one image or container"
     echo
 }
+
