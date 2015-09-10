@@ -80,7 +80,7 @@ _gen_clean() {
 # entry of this script
 #======================
 
-_gen_usage() {
+_help_srcin() {
     local prog="srcin"
     echo "usage: $prog [-h -c -t tool -s -a -e pats -l langs] srcpath"
     echo "      -h: print help"
@@ -92,6 +92,7 @@ _gen_usage() {
     echo "      -a: append mode, default disabled"
     echo "      -e pats: exclude path for ctags, 'path1,path2'. default 'third_party,out'"
     echo "      -l langs: default 'c++,c,java'"
+    echo
 }
 
 srcin() {
@@ -104,19 +105,19 @@ srcin() {
 
     local args=`getopt hct:sae:l: $*`
     if [ $? != 0 ]; then
-        _gen_usage
+        _help_srcin
         return 1
     fi
 
     set -- $args
     for c; do
         case "$c" in
-            -h) _gen_usage; shift; return 1;;
+            -h) _help_srcin; shift; return 1;;
             -c) # clean
                 mask=$((mask|0x01))
                 shift;;
             -t) # tool
-                [ "$2" != "ctags" -a "$2" != "cscope" ] && _gen_usage
+                [ "$2" != "ctags" -a "$2" != "cscope" ] && _help_srcin
                 cbin="$2"
                 shift; shift;;
             -s) # system tags
@@ -138,12 +139,12 @@ srcin() {
                 local OLD_IFS="$IFS" && IFS=","
                 langs=($2) && IFS="$OLD_IFS"
                 for lang in ${langs[@]}; do 
-                    [ "$lang" = "c++" -o "$lang" = "java" -o "$lang" = "c" ] || _gen_usage 
+                    [ "$lang" = "c++" -o "$lang" = "java" -o "$lang" = "c" ] || _help_srcin 
                 done
 
                 langs="$2";
                 if [ "$langs" = "" ]; then
-                    _gen_usage;
+                    _help_srcin;
                     return 1;
                 fi
                 shift; shift;;
@@ -168,7 +169,7 @@ srcin() {
         ct_root="$spath"
     else
         if [ $# -lt 1 ]; then
-            _gen_usage;
+            _help_srcin;
             return 1;
         fi
 

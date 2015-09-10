@@ -84,7 +84,6 @@ _zero_help() {
     _zhelp_pnx "$helps"
     echo
 }
-alias zero-help="_zero_help"
 alias Help="_zero_help"
 
 _Help() {
