@@ -5,8 +5,10 @@
 # Update: peter@uskee.org
 # Modified: 2015/09/01
 
-alias docker-pid="sudo docker inspect --format '{{.State.Pid}}'"
-alias docker-ip="sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+[ ! `uname` = "Darwin" ] && kSudo="sudo"
+
+alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
+alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
 _docker_enter() {
@@ -28,7 +30,7 @@ _docker_enter() {
         echo "Enters the Docker CONTAINER and executes the specified COMMAND."
         echo "If COMMAND is not specified, runs an interactive shell in CONTAINER."
     else
-        PID=$(sudo docker inspect --format "{{.State.Pid}}" "$1")
+        PID=$($kSudo docker inspect --format "{{.State.Pid}}" "$1")
         if [ -z "$PID" ]; then
             echo "WARN Cannot find the given container"
             return
@@ -43,12 +45,49 @@ _docker_enter() {
             # initialize the environment variables HOME, SHELL, USER, LOGNAME, PATH,
             # and start a login shell.
             #sudo $NSENTER "$OPTS" su - root
-            sudo $NSENTER --target $PID --mount --uts --ipc --net --pid su - root
+            $kSudo $NSENTER --target $PID --mount --uts --ipc --net --pid su - root
         else
             # Use env to clear all host environment variables.
-            sudo $NSENTER --target $PID --mount --uts --ipc --net --pid env -i $@
+            $kSudo $NSENTER --target $PID --mount --uts --ipc --net --pid env -i $@
         fi
     fi
 }
-alias docker-enter="_docker_enter"
+alias dk-enter="_docker_enter"
 
+
+# Other alias
+alias dk-run="$kSudo docker run"
+alias dk-search="$kSudo docker search"
+alias dk-ps="$kSudo docker ps"
+alias dk-psa="$kSudo docker ps -a"
+
+_docker_pgrep() {
+    [ $# -ne 1 ] && return 1
+    $kSudo docker ps -a | grep "$1"
+}
+alias dk-pgrep="_docker_pgrep"
+
+_docker_rmall() {
+    [ $# -gt 0 ] && return 1
+    printx @red "[*] Remove all containers (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return
+
+    containers=$($kSudo docker ps -a | grep -v CONTAINER | awk '{print $1}')
+    for ct in $containers; do
+        printx @green "[-] remove: "
+        $kSudo docker rm $ct
+    done
+    echo
+}
+alias dk-rma="_docker_rmall"
+
+_help_docker() {
+    echo "usage: "
+    echo "  dk-run/search   => docker run/search"
+    echo "  dk-ps/psa       => docker ps/ps -a"
+    echo "  dk-pgrep        => docker ps -a | grep"
+    echo "  dk-rma          => docker rm <all containers>"
+    echo "  dk-pid          => get pid of container or image"
+    echo "  dk-ip           => get ip of container or image"
+    echo
+}
