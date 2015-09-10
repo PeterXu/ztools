@@ -75,7 +75,7 @@ _print_color() {
     local b="\033[${1}${2}m"
     local e="\033[00m"
     shift; shift
-    printf "${b}${*}${e}\n" 
+    printf "${b}${*}${e}" 
     return 0
 }
 printx() {
@@ -104,6 +104,9 @@ printx() {
     [ $color -gt 0 ] && color=$((color+background))
     [ $# -lt 1 ] && return 1
     _print_color "$color" "$ctrl" "$*"
+}
+printxln() { 
+    printx $* "\n" 
 }
 _help_printx() {
     local prog="printx" color="cyan" ctrl="bold"
