@@ -224,6 +224,19 @@ EOF
     echo
 }
 
+set_bashrc()
+{
+    [ ! -f $bash_file ] && return 1
+
+    if [ "$UNAME" = "Darwin" ]; then
+        fplist=".bash_profile .profile"
+        for fp in $fplist; do
+            fp="$HOME/$fp"
+            [ -f "$fp" ] && rm -f $fp && ln -sf $bash_file $fp
+        done
+    fi
+}
+
 set_clear()
 {
     local label="ztools begin"
@@ -239,10 +252,7 @@ set_clear()
 
 [ $# -ne 1 ] && usage && exit 1 || opt=$1
 
-bash_file=$HOME/.bash_profile
-if [ ! -f $bash_file ]; then
-    [ "$UNAME" = "Darwin" ] && bash_file=$HOME/.profile || bash_file=$HOME/.bashrc
-fi
+bash_file=$HOME/.bashrc
 
 if [ $opt = "set" ]; then
     set_clear
@@ -252,6 +262,7 @@ if [ $opt = "set" ]; then
     set_java
     set_android
     set_end
+    set_bashrc
 elif [ $opt = "prepare" ]; then
     set_prepare
 elif [ $opt = "clear" ]; then
