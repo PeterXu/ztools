@@ -4,6 +4,7 @@
 # Created: 2015-09-08
 #
 
+export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
 
 ## -----------------
 ## update for ztools
@@ -62,8 +63,7 @@ _zero_help() {
 
     local index=0
     local helps=""
-    local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
-    for item in $flist; do
+    for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
         local ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
         local ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
@@ -88,8 +88,7 @@ alias Help="_zero_help"
 
 _Help() {
     local helps=""
-    local flist="umark.sh umisc.sh udocker.sh udocs.sh srcin.sh"
-    for item in $flist; do
+    for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
         local hlist=$(cat $item | grep "^_help_[a-z_]\+() " | awk -F"(" '{print $1}')
         for h in $hlist; do
@@ -150,4 +149,19 @@ _help_regex() {
     _regex_pnx  "echo -e \${fname/./'\t'}"  "=>"  "$(echo -e ${fname/./'\t'})" "replace '.' with tab"
     _regex_pnx
 }
+
+
+
+## -------------------
+## global init scripts
+_init_func() {
+    for item in $_SH_LIST; do
+        item="$HOME/.zero/$item"
+        local func_list=$(cat $item | grep "^__init_[a-z_]\+() " | awk -F"(" '{print $1}')
+        for func in $func_list; do
+            eval "$func" 2>/dev/null
+        done
+    done
+}
+_init_func
 

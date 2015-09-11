@@ -7,8 +7,6 @@
 
 [ ! `uname` = "Darwin" ] && kSudo="sudo"
 
-alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
-alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
 _docker_enter() {
@@ -52,7 +50,6 @@ _docker_enter() {
         fi
     fi
 }
-alias dk-enter="_docker_enter"
 
 
 ### other docker commands
@@ -65,15 +62,26 @@ _docker_rmall() {
     printx @red "[*] Remove all containers (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
 
-    containers=$($kSudo docker ps -a | grep -v CONTAINER | awk '{print $1}')
+    local containers=$($kSudo docker ps -a | grep -v CONTAINER | awk '{print $1}')
     for ct in $containers; do
         printx @green "[-] remove: "
         $kSudo docker rm $ct
     done
     echo
 }
-__alias_docker() {
-    cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
+_docker_cmd() {
+    [ $# -lt 2 ] && return 1
+    local args=($*)
+    $kSudo docker run -it ${args[0]} ${args[@]:1}
+}
+_docker_bash() {
+    [ $# -lt 1 ] && echo "usage: dk-bash IMAGE" && return 1
+    _docker_cmd "$1" "/bin/bash"
+}
+
+### init docker
+__init_docker() {
+    local cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
     for cmd in $cmdlist; do
         alias dk-$cmd="$kSudo docker $cmd"
     done
@@ -81,13 +89,17 @@ __alias_docker() {
     alias dk="docker"
     alias dk-rma="_docker_rmall"
     alias dk-pgrep="_docker_pgrep"
+    alias dk-bash="_docker_bash"
+    alias dk-enter="_docker_enter"
+
     alias dk-psa="$kSudo docker ps -a"
+    alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
+    alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 }
-__alias_docker
 
 _help_docker() {
     echo "usage: "
-    prefix="    [.]"
+    local prefix="    [.]"
     docker -h | grep "^    [a-z]" | sed "s/^    \([a-z]\)/$prefix dk-\1/"
     echo
     printf "%-20s %s\n" "$prefix dk-psa"    "Like dk-ps -a"
@@ -95,6 +107,7 @@ _help_docker() {
     printf "%-20s %s\n" "$prefix dk-rma"    "Remove all containers"
     printf "%-20s %s\n" "$prefix dk-pid"    "Acquire the pid of one image or container"
     printf "%-20s %s\n" "$prefix dk-ip"     "Acquire the ip of one image or container"
+    printf "%-20s %s\n" "$prefix dk-bash"   "Run /bin/bash in one image"
     echo
 }
 
