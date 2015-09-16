@@ -40,7 +40,10 @@ _zero_update() {
         jump ...
         echo "[*] Entering <$(pwd)> ..."
         echo "[*] Then auto-update will start ..."
-        $git pull
+        $git checkout --detach
+        $git branch | grep master 2>/dev/null 1>&1 && $git branch -D master
+        $git fetch origin master
+        $git checkout -b master origin/master
         echo
     )
     return 0
