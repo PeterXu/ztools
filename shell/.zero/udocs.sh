@@ -9,6 +9,29 @@ export _INIT_PREFIX="__init_"
 export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
 
 
+## --------------------------
+## os package management tool
+_zero_pm() {
+    local os=`uname` pm="" plist=""
+    if [ "$os" = "Darwin" ]; then
+        plist="brew port"
+    elif [ "$os" = "Linux" ]; then
+        plist="yum aptitude apt-get"
+    fi
+
+    for k in $plist; do
+        pm=`which $k 2>/dev/null` && break
+    done
+    [ -z "$pm" ] && return 1
+
+    if [[ ! "$pm" =~ "brew" ]]; then
+        [ `whoami` != "root" ] && pm="sudo $pm"
+    fi
+    $pm $*
+}
+alias zpm="_zero_pm"
+
+
 ## -----------------
 ## update for ztools
 _zero_update() {
