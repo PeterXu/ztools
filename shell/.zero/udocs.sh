@@ -4,7 +4,10 @@
 # Created: 2015-09-08
 #
 
+export _HELP_PREFIX="__help_"
+export _INIT_PREFIX="__init_"
 export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
+
 
 ## -----------------
 ## update for ztools
@@ -22,7 +25,7 @@ _zero_update() {
 alias zero-update="_zero_update"
 
 
-## -----------------
+## --------------
 ## set for ztools
 _zero_set() {
     [ $# -eq 1 ] && action="$1"
@@ -57,7 +60,8 @@ _zhelp_pnx() {
 }
 _zero_help() {
     if [ $# -eq 1 ]; then
-        declare -f "_help_$1" >/dev/null && eval "_help_$1" || printf "[WARN] no help for <$1>\n\n"
+        local hfunc="${_HELP_PREFIX}$1"
+        declare -f "$hfunc" >/dev/null && eval "$hfunc" || printf "[WARN] no help for <$1>\n\n"
         return 0
     fi
 
@@ -74,9 +78,9 @@ _zero_help() {
             index=$((index+1))
         fi
 
-        local hlist=$(cat $item | grep "^_help_[a-z_]\+() " | awk -F"(" '{print $1}')
+        local hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
         for h in $hlist; do
-            h=${h/#_help_/}
+            h=${h/#${_HELP_PREFIX}/}
             [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
         done
     done
@@ -86,13 +90,14 @@ _zero_help() {
 }
 alias Help="_zero_help"
 
+## To parse functions with prefix "__help_xxx".
 _Help() {
     local helps=""
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
-        local hlist=$(cat $item | grep "^_help_[a-z_]\+() " | awk -F"(" '{print $1}')
+        local hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
         for h in $hlist; do
-            h=${h/#_help_/}
+            h=${h/#${_HELP_PREFIX}/}
             [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
         done
     done
@@ -110,7 +115,7 @@ _regex_pnx() {
         printf "$*\n"
     fi
 }
-_help_regex() {
+__help_regex() {
     local str="abcde.abcde"
     _regex_pnx  "usage:  e.g., str=\"${str}\""
     _regex_pnx  "  0. strlen"
@@ -152,12 +157,13 @@ _help_regex() {
 
 
 
-## -------------------
-## global init scripts
+## ---------------------------------------------------
+## global init scripts: 
+##      To call functions with prefix of "__init_xxx".
 _init_func() {
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
-        local func_list=$(cat $item | grep "^__init_[a-z_]\+() " | awk -F"(" '{print $1}')
+        local func_list=$(cat $item | grep "^${_INIT_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
         for func in $func_list; do
             eval "$func" 2>/dev/null
         done

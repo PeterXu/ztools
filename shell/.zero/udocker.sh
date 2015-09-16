@@ -79,6 +79,40 @@ _docker_bash() {
     _docker_cmd "$1" "/bin/bash"
 }
 
+## set image tips
+_dk_images_tips() {
+    [ $# -ne 1 ] && return 1
+    local opts=$($kSudo docker images | grep -v REPOSITORY | awk '{print $1":"$2}')
+    _tablist "$1" "$opts"
+}
+_dk_run() { 
+    _dk_images_tips dk-run 
+}
+_dk_bash() { 
+    _dk_images_tips dk-bash 
+}
+
+## set ps tips
+_dk_ps_tips() {
+    [ $# -lt 1 -o $# -gt 2 ] && return 1
+    local opt
+    [ $# -eq 2 ] && opt="$2"
+    local opts=$($kSudo docker ps $opt | grep -v CONTAINER | awk '{print $NF}')
+    _tablist "$1" "$opts"
+}
+_dk_attach() {
+    _dk_ps_tips dk-attach
+}
+_dk_start() {
+    _dk_ps_tips dk-start
+}
+_dk_stop() {
+    _dk_ps_tips dk-stop
+}
+_dk_restart() {
+    _dk_ps_tips dk-restart
+}
+
 ### init docker
 __init_docker() {
     local cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
@@ -95,9 +129,16 @@ __init_docker() {
     alias dk-psa="$kSudo docker ps -a"
     alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
     alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+
+    complete -F _dk_run dk-run
+    complete -F _dk_bash dk-bash
+    complete -F _dk_attach dk-attach
+    complete -F _dk_start dk-start
+    complete -F _dk_stop dk-stop
+    complete -F _dk_restart dk-restart
 }
 
-_help_docker() {
+__help_docker() {
     echo "usage: "
     local prefix="    [.]"
     docker -h | grep "^    [a-z]" | sed "s/^    \([a-z]\)/$prefix dk-\1/"

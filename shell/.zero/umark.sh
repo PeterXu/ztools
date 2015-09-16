@@ -3,7 +3,7 @@
 
 export _MARKPATH="$HOME/.marks"
 
-_help_mark() {
+__help_mark() {
     local opt="jump,mark,unmark,marks,marks-broken,unmark-all,unmark-broken"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"

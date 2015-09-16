@@ -4,7 +4,7 @@
 
 ## ------------
 ## for bash map
-_help_map() {
+__help_map() {
     local opt="set,get,del"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
@@ -108,7 +108,7 @@ printx() {
 printxln() { 
     printx $* "\n" 
 }
-_help_printx() {
+__help_printx() {
     local prog="printx" color="cyan" ctrl="bold"
     echo "usage: "
     echo "  $prog [@opt] string"

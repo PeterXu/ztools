@@ -80,7 +80,7 @@ _gen_clean() {
 # entry of this script
 #======================
 
-_help_srcin() {
+__help_srcin() {
     local prog="srcin"
     echo "usage: $prog [-h -c -t tool -s -a -e pats -l langs] srcpath"
     echo "      -h: print help"
