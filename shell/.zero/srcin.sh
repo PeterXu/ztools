@@ -105,19 +105,19 @@ srcin() {
 
     local args=`getopt hct:sae:l: $*`
     if [ $? != 0 ]; then
-        _help_srcin
+        __help_srcin
         return 1
     fi
 
     set -- $args
     for c; do
         case "$c" in
-            -h) _help_srcin; shift; return 1;;
+            -h) __help_srcin; shift; return 1;;
             -c) # clean
                 mask=$((mask|0x01))
                 shift;;
             -t) # tool
-                [ "$2" != "ctags" -a "$2" != "cscope" ] && _help_srcin
+                [ "$2" != "ctags" -a "$2" != "cscope" ] && __help_srcin
                 cbin="$2"
                 shift; shift;;
             -s) # system tags
@@ -139,12 +139,12 @@ srcin() {
                 local OLD_IFS="$IFS" && IFS=","
                 langs=($2) && IFS="$OLD_IFS"
                 for lang in ${langs[@]}; do 
-                    [ "$lang" = "c++" -o "$lang" = "java" -o "$lang" = "c" ] || _help_srcin 
+                    [ "$lang" = "c++" -o "$lang" = "java" -o "$lang" = "c" ] || __help_srcin 
                 done
 
                 langs="$2";
                 if [ "$langs" = "" ]; then
-                    _help_srcin;
+                    __help_srcin;
                     return 1;
                 fi
                 shift; shift;;
@@ -169,7 +169,7 @@ srcin() {
         ct_root="$spath"
     else
         if [ $# -lt 1 ]; then
-            _help_srcin;
+            __help_srcin;
             return 1;
         fi
 

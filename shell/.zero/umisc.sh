@@ -15,18 +15,18 @@ __help_map() {
     return 0
 }
 mapset() {
-    [ $# -ne 3 ] && _help_map set && return 1
+    [ $# -ne 3 ] && __help_map set && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     eval "${vname}=\"${3}\""
 }
 mapget() {
-    [ $# -ne 2 ] && _help_map get && return 1
+    [ $# -ne 2 ] && __help_map get && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     declare -p ${vname} 2>/dev/null 1>&2 || return 1
     eval "echo \${${vname}}"
 }
 mapdel() {
-    [ $# -ne 2 ] && _help_map del && return 1
+    [ $# -ne 2 ] && __help_map del && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     eval "unset ${vname}"
 }

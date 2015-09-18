@@ -35,7 +35,7 @@ jump() {
     [ $r -ne 1 ] && echo "No such mark: $*"
 }
 mark() { 
-    [ $# -gt 1 ] && _help_mark "mark," && return
+    [ $# -gt 1 ] && __help_mark "mark," && return
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$_MARKPATH/$1"
     [ -h "$iname" ] && rm -f "$iname"    # rm symbolic file
@@ -45,7 +45,7 @@ mark() {
     [ ! -e "$iname" ] && ln -s "$(pwd)" "$iname"
 }
 unmark() { 
-    [ $# -gt 1 ] && _help_mark unmark && return
+    [ $# -gt 1 ] && __help_mark unmark && return
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$_MARKPATH/$1"
     [ -h "$iname" ] && rm -i "$iname"
