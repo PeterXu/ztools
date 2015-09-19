@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# start sshd
+mkdir -p /var/run/sshd/ && /usr/sbin/sshd
+
+# start jenkins
+which systemctl 2>/dev/null 1>&2 && systemctl start jenkins || service jenkins start
+
+# donot quit
+while :
+do
+    sleep 97
+done
+
+exit 0
