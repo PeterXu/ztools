@@ -82,7 +82,7 @@ _docker_bash() {
 ## set image tips
 _dk_images_tips() {
     [ $# -ne 1 ] && return 1
-    local opts=$($kSudo docker images | grep -v REPOSITORY | awk '{print $1":"$2}')
+    local opts=$($kSudo docker images | grep -v "REPOSITORY\|<none>" | awk '{print $1":"$2}')
     _tablist "$1" "$opts"
 }
 _dk_run() { 
@@ -91,20 +91,26 @@ _dk_run() {
 _dk_bash() { 
     _dk_images_tips dk-bash 
 }
+_dk_rmi() { 
+    _dk_images_tips dk-rmi 
+}
 
-## set ps tips
+## set ps containter tips
 _dk_ps_tips() {
     [ $# -lt 1 -o $# -gt 2 ] && return 1
     local opt
     [ $# -eq 2 ] && opt="$2"
-    local opts=$($kSudo docker ps $opt | grep -v CONTAINER | awk '{print $NF}')
+    local opts=$($kSudo docker ps $opt | grep -v CONTAINER | awk '{gsub(/\n/,"",$NF);print $NF}')
     _tablist "$1" "$opts"
+}
+_dk_rm() {
+    _dk_ps_tips dk-rm
 }
 _dk_attach() {
     _dk_ps_tips dk-attach
 }
 _dk_start() {
-    _dk_ps_tips dk-start
+    _dk_ps_tips dk-start -a
 }
 _dk_stop() {
     _dk_ps_tips dk-stop
@@ -112,6 +118,17 @@ _dk_stop() {
 _dk_restart() {
     _dk_ps_tips dk-restart
 }
+_dk_ip() {
+    _dk_ps_tips dk-ip
+}
+_dk_pid() {
+    _dk_ps_tips dk-pid
+}
+_dk_enter() {
+    _dk_ps_tips dk-enter
+}
+
+
 
 ### init docker
 __init_docker() {
@@ -130,12 +147,19 @@ __init_docker() {
     alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
     alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
+    complete -F _dk_rmi dk-rmi
     complete -F _dk_run dk-run
     complete -F _dk_bash dk-bash
+
+    complete -F _dk_rm dk-rm
     complete -F _dk_attach dk-attach
     complete -F _dk_start dk-start
     complete -F _dk_stop dk-stop
     complete -F _dk_restart dk-restart
+
+    complete -F _dk_ip dk-ip
+    complete -F _dk_pid dk-pid
+    complete -F _dk_enter dk-enter
 }
 
 __help_docker() {
