@@ -99,28 +99,34 @@ _dk_ps_tips() {
     _tablist "$1" "$opts"
 }
 _dk_rm() {
-    _dk_ps_tips dk-rm
+    _dk_ps_tips dk-rm "-f status=exited"
 }
 _dk_attach() {
-    _dk_ps_tips dk-attach
+    _dk_ps_tips dk-attach "-f status=running"
 }
 _dk_start() {
-    _dk_ps_tips dk-start -a
+    _dk_ps_tips dk-start "-f status=created -f status=exited"
 }
 _dk_stop() {
-    _dk_ps_tips dk-stop
+    _dk_ps_tips dk-stop "-f status=running"
 }
 _dk_restart() {
-    _dk_ps_tips dk-restart
+    _dk_ps_tips dk-restart "-f status=running"
+}
+_dk_pause() {
+    _dk_ps_tips dk-pause "-f status=running"
+}
+_dk_unpause() {
+    _dk_ps_tips dk-unpause "-f status=paused"
 }
 _dk_ip() {
-    _dk_ps_tips dk-ip
+    _dk_ps_tips dk-ip "-f status=running"
 }
 _dk_pid() {
-    _dk_ps_tips dk-pid
+    _dk_ps_tips dk-pid "-f status=running"
 }
 _dk_enter() {
-    _dk_ps_tips dk-enter
+    _dk_ps_tips dk-enter "-f status=running"
 }
 
 
@@ -152,6 +158,8 @@ __init_docker() {
     complete -F _dk_start dk-start
     complete -F _dk_stop dk-stop
     complete -F _dk_restart dk-restart
+    complete -F _dk_pause dk-pause
+    complete -F _dk_unpause dk-unpause
 
     complete -F _dk_ip dk-ip
     complete -F _dk_pid dk-pid
