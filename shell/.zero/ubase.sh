@@ -25,12 +25,12 @@ _tablist() {
     key="$1" && shift
     opts="$*" && shift
     COMPREPLY=()
-    pre2=${COMP_WORDS[COMP_CWORD-2]}
     pre=${COMP_WORDS[COMP_CWORD-1]}
     cur=${COMP_WORDS[COMP_CWORD]}
     if [ "$pre" = "$key" ]; then
         tips="$opts"
     else
+        pre2=${COMP_WORDS[COMP_CWORD-2]}
         [ "$pre2" = "$key" ] && rcur="$pre$cur" || rcur="$pre2$pre$cur"
         [ "$cur" = ":" ] && cur=""
         
