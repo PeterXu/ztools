@@ -4,10 +4,6 @@
 # Created: 2015-09-08
 #
 
-export _HELP_PREFIX="__help_"
-export _INIT_PREFIX="__init_"
-export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
-
 
 ## --------------------------
 ## os package management tool
@@ -29,13 +25,12 @@ _zero_pm() {
     fi
     $pm $*
 }
-alias zpm="_zero_pm"
 
 
 ## -----------------
 ## update for ztools
 _zero_update() {
-    git=$(which git 2>/dev/null) || return 1
+    local git=$(which git 2>/dev/null) || return 1
     (
         jump ...
         echo "[*] Entering <$(pwd)> ..."
@@ -48,12 +43,12 @@ _zero_update() {
     )
     return 0
 }
-alias zero-update="_zero_update"
 
 
 ## --------------
 ## set for ztools
 _zero_set() {
+    local action sh
     [ $# -eq 1 ] && action="$1"
     sh=$(which bash 2>/dev/null) || return 1
     (
@@ -64,7 +59,6 @@ _zero_set() {
     )
     return 0
 }
-alias zero-set="_zero_set"
 
 
 ## ---------------------------
@@ -114,7 +108,6 @@ _zero_help() {
     _zhelp_pnx "$helps"
     echo
 }
-alias Help="_zero_help"
 
 ## To parse functions with prefix "__help_xxx".
 _Help() {
@@ -129,7 +122,6 @@ _Help() {
     done
     _tablist "Help" "$helps"
 }
-complete -F _Help Help
 
 
 ## -----------------
@@ -182,11 +174,28 @@ __help_regex() {
 }
 
 
+### init docs
+__init_docs() {
+    export _HELP_PREFIX="__help_"
 
+    alias zpm="_zero_pm"
+    alias zero-update="_zero_update"
+    alias zero-set="_zero_set"
+    alias Help="_zero_help"
+
+    complete -F _Help Help
+}
+
+
+
+## ===================================================
 ## ---------------------------------------------------
 ## global init scripts: 
 ##      To call functions with prefix of "__init_xxx".
-_init_func() {
+_init_init() {
+    export _INIT_PREFIX="__init_"
+    export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
+
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
         local func_list=$(cat $item | grep "^${_INIT_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
@@ -195,5 +204,5 @@ _init_func() {
         done
     done
 }
-_init_func
+_init_init
 

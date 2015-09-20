@@ -69,14 +69,9 @@ _docker_rmall() {
     done
     echo
 }
-_docker_cmd() {
-    [ $# -lt 2 ] && return 1
-    local args=($*)
-    $kSudo docker run -it ${args[0]} ${args[@]:1}
-}
 _docker_bash() {
     [ $# -lt 1 ] && echo "usage: dk-bash IMAGE" && return 1
-    _docker_cmd "$1" "/bin/bash"
+    $kSudo docker run -it "$1" "/bin/bash"
 }
 
 ## set image tips
@@ -143,6 +138,7 @@ __init_docker() {
     alias dk-bash="_docker_bash"
     alias dk-enter="_docker_enter"
 
+    alias dk-ls="$kSudo docker images"
     alias dk-psa="$kSudo docker ps -a"
     alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
     alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"

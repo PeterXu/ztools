@@ -35,11 +35,9 @@ mapdel() {
 ## -------------
 ## ssh with tips
 _ssh() {
-    local opts
-    opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
+    local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     _tablist "ssh" "$opts"
 }
-complete -F _ssh ssh
 
 
 ## ------------------------
@@ -59,13 +57,6 @@ _ps_ef() {
     ps -eo $opts | sort -k $nth -n -s $opt
     ps -eo $opts | grep "$str"
 }
-alias ps-mem="_ps_ef 9 %MEM"
-alias ps-cpu="_ps_ef 6 %CPU"
-alias ps-pid="_ps_ef 2 ' PID'"
-alias ps-time="_ps_ef 4 ' TIME'"
-alias ps-stime="_ps_ef 5 STIME"
-alias psr-stime="_ps_ef 5 STIME -r"
-alias psr-pid="_ps_ef 2 ' PID' -r"
 
 
 ## ----------------
@@ -124,5 +115,20 @@ __help_printx() {
     echo "  $prog @background @$color backgroud is $color and font unchanged"
     echo "  $prog @background @$color @$ctrl backgroud is $color and font is $ctrl"
     echo
+}
+
+
+
+### init misc shell
+__init_misc() {
+    alias ps-mem="_ps_ef 9 %MEM"
+    alias ps-cpu="_ps_ef 6 %CPU"
+    alias ps-pid="_ps_ef 2 ' PID'"
+    alias ps-time="_ps_ef 4 ' TIME'"
+    alias ps-stime="_ps_ef 5 STIME"
+    alias psr-stime="_ps_ef 5 STIME -r"
+    alias psr-pid="_ps_ef 2 ' PID' -r"
+
+    complete -F _ssh ssh
 }
 
