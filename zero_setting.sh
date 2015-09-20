@@ -230,10 +230,24 @@ set_bashrc()
     [ ! -f $bash_file ] && return 1
 
     if [ "$UNAME" = "Darwin" ]; then
-        fplist=".bash_profile .profile"
+        local fplist=".bash_profile .profile"
         for fp in $fplist; do
             fp="$HOME/$fp"
-            [ -f "$fp" ] && rm -f $fp && ln -sf $bash_file $fp
+            [ ! -f "$fp" ] && continue
+            if [ -h "$fp" ]; then
+                rm -f $fp && ln -sf $bash_file $fp
+            else
+                local label="zbash begin"
+                local label_end="zbash end"
+                sed -in /"$label"/,/"$label_end"/d "$fp"
+                cat >> "$fp" << EOF
+## ${label}
+## Please ensure it at the last line
+[ -f \$HOME/.bashrc ] && source \$HOME/.bashrc
+## ${label_end}
+EOF
+
+            fi
         done
     fi
 }
