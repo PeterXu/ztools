@@ -3,12 +3,13 @@
 #
 
 
-ROOT=`pwd`
-UNAME=`uname`
+kRoot=`pwd`
+kUname=`uname`
 kSudo="sudo"
 kZpm="" # package manage tool
 
 [ "$HOME" = "" ] && export HOME=~
+kProfile=$HOME/.bashrc
 
 echox() { 
     local b t e
@@ -74,7 +75,7 @@ zpm_install() {
 prepare_zpm() {
     local msg zpm
     while true; do
-        if [ "$UNAME" = "Darwin" ]; then
+        if [ "$kUname" = "Darwin" ]; then
             zpm=`which brew 2>/dev/null`
             [ "$zpm" = "" ] && zpm=`which port 2>/dev/null` && zpm="$kSudo $zpm"
             msg="Pls install 'macports' or 'homebrew'!"
@@ -116,21 +117,19 @@ set_prepare()
 
 set_begin()
 {
-    rm -f ${ROOT}/shell/envall.sh
-    touch ${ROOT}/shell/envall.sh
-    chmod 750 ${ROOT}/shell/envall.sh
+    rm -f ${kRoot}/shell/envall.sh
+    touch ${kRoot}/shell/envall.sh
+    chmod 750 ${kRoot}/shell/envall.sh
 }
 
 set_env() 
 {
     local zero=$HOME/.zero
     [ -e $zero ] && rm -rf $zero
-    ln -sf $ROOT/shell/.zero $zero
+    ln -sf $kRoot/shell/.zero $zero
 
-    local label
-    label="For Env Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
+    cat >> $kRoot/shell/envall.sh << EOF
+# For general alias
 [ \`uname\` != "Darwin" ] && alias cp='cp -i'
 [ \`uname\` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
@@ -145,7 +144,7 @@ alias grep='grep --color=auto'
 _ZPATH="/usr/local/bin:/usr/local/sbin"
 _ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
 
-# For Extending Shell
+# For shell extending
 _zshs="ubase.sh umisc.sh umark.sh udocker.sh srcin.sh udocs.sh"
 _zshs="\$_zshs git-completion.bash"
 for k in \$_zshs; do
@@ -157,20 +156,22 @@ EOF
 
 set_vim()
 {
-    local vim=$HOME/.vim
-    [ -e $vim ] && rm -rf $vim
-    ln -sf $ROOT/shell/.vim $vim
-
-    local vimrc=$HOME/.vimrc
-    [ -e $vimrc ] && rm -rf $vimrc
-    ln -sf $ROOT/shell/.vimrc $vimrc
+    local ext=${RANDOM}.bak
+    local list=".vim .vimrc"
+    for rc in $list; do
+        local vim=$HOME/$rc
+        [ -h $vim ] && rm -f $vim
+        [ -e $vim ] && mv -f $vim ${vim}.${ext}
+        ln -sf $kRoot/shell/$rc $vim
+    done
 }
 
 set_java()
 {
-    if [ "$UNAME" = "Darwin" ]; then
+    local java_home
+    if [ "$kUname" = "Darwin" ]; then
         [ ! -f "/usr/libexec/java_home" ] && return
-        local java_home=`/usr/libexec/java_home`
+        java_home=`/usr/libexec/java_home`
     else
         local java=`which java 2>/dev/null`
         while true; do
@@ -182,9 +183,8 @@ set_java()
         java_home=$java
     fi
 
-    local label="For JAVA_HOME Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
+    cat >> $kRoot/shell/envall.sh << EOF
+# For Java
 [ "#\$JAVA_HOME" = "#" ] && export JAVA_HOME=${java_home}
 
 EOF
@@ -192,9 +192,8 @@ EOF
 
 set_android()
 {
-    local label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
-    cat >> $ROOT/shell/envall.sh << EOF
-# ${label}
+    cat >> $kRoot/shell/envall.sh << EOF
+# For Android
 [ "#\$ANDROID_SDK" = "#" ] && export ANDROID_SDK=\$ANDROID_HOME
 [ "#\$ANDROID_SDK" != "#" ] && _ZPATH="\$_ZPATH:\$ANDROID_SDK/platform-tools:\$ANDROID_SDK/tools"
 
@@ -206,8 +205,8 @@ EOF
 
 set_end()
 {
-    cat >> $ROOT/shell/envall.sh << EOF
-# export ENV
+    cat >> $kRoot/shell/envall.sh << EOF
+# To export PATH
 export PATH="\$_ZPATH:\$PATH"
 
 EOF
@@ -215,13 +214,13 @@ EOF
     local had=""
     local label="ztools begin"
     local label_end="ztools end"
-    [ -f "$bash_file" ] && had=`sed -n /"$label"/p "$bash_file"`
+    [ -f "$kProfile" ] && had=`sed -n /"$label"/p "$kProfile"`
     [ "$had" != "" ] && echoy "Had been set before!" && return
 
-    cat >> "$bash_file" << EOF
+    cat >> "$kProfile" << EOF
 ## ${label}
 ## Please ensure it at the last line
-export ZTOOLS=${ROOT}
+export ZTOOLS=${kRoot}
 [ -f \$ZTOOLS/shell/envall.sh ] && source \$ZTOOLS/shell/envall.sh
 ## ${label_end}
 EOF
@@ -231,28 +230,23 @@ EOF
 
 set_bashrc()
 {
-    [ ! -f $bash_file ] && return 1
+    [ ! -f $kProfile ] && return 1
 
-    if [ "$UNAME" = "Darwin" ]; then
-        local fplist=".bash_profile .profile"
-        for fp in $fplist; do
-            fp="$HOME/$fp"
-            [ ! -f "$fp" ] && continue
-            if [ -h "$fp" ]; then
-                rm -f $fp && ln -sf $bash_file $fp
-            else
-                local label="zbash begin"
-                local label_end="zbash end"
-                sed -in /"$label"/,/"$label_end"/d "$fp"
-                cat >> "$fp" << EOF
+    # if exists ".bash_profile", bash will not load ".profile"
+    local profile="$HOME/.bash_profile"
+    [ -h "$profile" ] && rm -f $profile
+    if [ ! -f "$profile" ]; then
+        ln -sf $kProfile $profile
+    else
+        local label="zbash begin"
+        local label_end="zbash end"
+        sed -in /"$label"/,/"$label_end"/d "$profile"
+        cat >> "$profile" << EOF
 ## ${label}
 ## Please ensure it at the last line
 [ -f \$HOME/.bashrc ] && source \$HOME/.bashrc
 ## ${label_end}
 EOF
-
-            fi
-        done
     fi
 }
 
@@ -260,7 +254,7 @@ set_clear()
 {
     local label="ztools begin"
     local label_end="ztools end"
-    [ -f "$bash_file" ] && sed -in /"$label"/,/"$label_end"/d "$bash_file"
+    [ -f "$kProfile" ] && sed -in /"$label"/,/"$label_end"/d "$kProfile"
 }
 
 
@@ -271,7 +265,6 @@ set_clear()
 
 [ $# -ne 1 ] && usage && exit 1 || opt=$1
 
-bash_file=$HOME/.bashrc
 
 if [ $opt = "set" ]; then
     set_clear
