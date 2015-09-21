@@ -142,10 +142,8 @@ alias grep='grep --color=auto'
 
 # For ENV variables
 [ "\$HOME" = "" ] && export HOME=~
-[[ ! "\$PATH" =~ "/usr/local/bin" ]] && PATH="/usr/local/bin:\$PATH"
-[[ ! "\$PATH" =~ "/usr/local/sbin" ]] && PATH="/usr/local/sbin:\$PATH"
-[[ ! "\$PATH" =~ "\$HOME/bin" ]] && PATH="\$HOME/bin:\$PATH"
-[[ ! "\$PATH" =~ "\$HOME/.local/bin" ]] && PATH="\$HOME/.local/bin:\$PATH"
+_ZPATH="/usr/local/bin:/usr/local/sbin"
+_ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
 
 # For Extending Shell
 _zshs="ubase.sh umisc.sh umark.sh udocker.sh srcin.sh udocs.sh"
@@ -197,17 +195,23 @@ set_android()
     local label="For ANDROID_HOME and ANDROID_NDK_HOME Setting"
     cat >> $ROOT/shell/envall.sh << EOF
 # ${label}
-[ "#\$ANDROID_SDK" = "#" ] && ANDROID_SDK=\$ANDROID_HOME
-[ "#\$ANDROID_SDK" != "#" ] && PATH=\$ANDROID_SDK/platform-tools:\$ANDROID_SDK/tools:\$PATH && export ANDROID_SDK
+[ "#\$ANDROID_SDK" = "#" ] && export ANDROID_SDK=\$ANDROID_HOME
+[ "#\$ANDROID_SDK" != "#" ] && _ZPATH="\$_ZPATH:\$ANDROID_SDK/platform-tools:\$ANDROID_SDK/tools"
 
-[ "#\$ANDROID_NDK" = "#" ] && ANDROID_NDK=\$ANDROID_NDK_HOME
-[ "#\$ANDROID_NDK" != "#" ] && PATH=\$ANDROID_NDK:\$PATH && export ANDROID_NDK
+[ "#\$ANDROID_NDK" = "#" ] && export ANDROID_NDK=\$ANDROID_NDK_HOME
+[ "#\$ANDROID_NDK" != "#" ] && _ZPATH="\$_ZPATH:\$ANDROID_NDK"
 
 EOF
 }
 
 set_end()
 {
+    cat >> $ROOT/shell/envall.sh << EOF
+# export ENV
+export PATH="\$_ZPATH:\$PATH"
+
+EOF
+
     local had=""
     local label="ztools begin"
     local label_end="ztools end"
