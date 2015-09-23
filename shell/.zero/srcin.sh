@@ -29,7 +29,7 @@ _gen_cs() {
     # for cscope
     exts="h c cc cpp java m mm"
     for e in $exts; do
-        opts="$opts -name \"*.$e\""
+        [ "$opts" = "" ] && opts="-name *.$e" || opts="$opts -o -name *.$e"
     done
     for s in $src; do
         find $s -type f $opts >> $csfile
