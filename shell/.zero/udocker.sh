@@ -53,31 +53,47 @@ _docker_enter() {
 
 
 ### other docker commands
+_docker_ps() {
+    docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Status}}\t{{.Ports}}\t{{.Names}}" $*
+}
 _docker_pgrep() {
     [ $# -ne 1 ] && return 1
-    $kSudo docker ps -a | grep "$1"
+    _docker_ps -a | grep "$1"
+}
+_docker_pname() {
+    [ $# -ne 1 ] && return 1
+    _docker_ps -a --filter "name=$1"
 }
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
-    printx @red "[*] Remove all containers (y/n)? " && read ch 
-    [ "$ch" != "y" ] && return
+    local ctids=($(_docker_ps -f status=exited --format "{{.ID}}"))
+    local ctlen=${#ctids[@]}
+    [ $ctlen -le 0 ] && printx "[*] No exited containers\n\n" && return 0
 
-    local containers=$($kSudo docker ps -a | grep -v CONTAINER | awk '{print $1}')
-    for ct in $containers; do
-        printx @green "[-] remove: "
-        $kSudo docker rm $ct
+    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"))
+    printx @yellow "[*] Exited containers: \n"
+    echo "   " ${ctnames[@]}
+
+    printx @yellow "[*] Remove all exited containers (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return 0
+
+    local idx=0
+    while [ $idx -lt $ctlen ]; do
+        printx @green "    [$idx] remove ${ctnames[idx]}: "
+        $kSudo docker rm ${ctids[idx]}
+        idx=$((idx+1))
     done
     echo
 }
 _docker_bash() {
-    [ $# -lt 1 ] && echo "usage: dk-bash IMAGE" && return 1
-    $kSudo docker run -it "$1" "/bin/bash"
+    [ $# -lt 1 ] && echo "usage: dk-bash [opt] IMAGE" && return 1
+    docker run -it $* "/bin/bash"
 }
 
 ## set image tips
 _dk_images_tips() {
     [ $# -ne 1 ] && return 1
-    local opts=$($kSudo docker images | grep -v "REPOSITORY\|<none>" | awk '{print $1":"$2}')
+    local opts=$(docker images | grep -v "REPOSITORY\|<none>" | awk '{print $1":"$2}')
     _tablist "$1" "$opts"
 }
 _dk_run() { 
@@ -95,7 +111,7 @@ _dk_ps_tips() {
     [ $# -lt 1 -o $# -gt 2 ] && return 1
     local opt
     [ $# -eq 2 ] && opt="$2"
-    local opts=$($kSudo docker ps $opt | grep -v CONTAINER | awk '{gsub(/\n/,"",$NF);print $NF}')
+    local opts=$(_docker_ps $opt | grep -v CONTAINER | awk '{gsub(/\n/,"",$NF);print $NF}')
     _tablist "$1" "$opts"
 }
 _dk_rm() {
@@ -143,9 +159,10 @@ __init_docker() {
     alias dk-pgrep="_docker_pgrep"
     alias dk-bash="_docker_bash"
     alias dk-enter="_docker_enter"
+    alias dk-ps="_docker_ps"
+    alias dk-psa="_docker_ps -a"
 
-    alias dk-ls="$kSudo docker images"
-    alias dk-psa="$kSudo docker ps -a"
+    alias dk-ls="docker images"
     alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
     alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
