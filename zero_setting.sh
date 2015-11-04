@@ -5,6 +5,8 @@
 
 kRoot=`pwd`
 kUname=`uname`
+[[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
+
 kSudo="sudo"
 kZpm="" # package manage tool
 
@@ -164,6 +166,12 @@ set_vim()
         [ -e $vim ] && mv -f $vim ${vim}.${ext}
         ln -sf $kRoot/shell/$rc $vim
     done
+    
+    if [ "$kUname" = "MINGW" ]; then
+        dos2unix -f $HOME/.vimrc
+        rm -f $HOME/.vim/plugin/taglist.vim
+        find $HOME/.vim/ -name *.vim -exec dos2unix -f {} \;
+    fi
 }
 
 set_java()

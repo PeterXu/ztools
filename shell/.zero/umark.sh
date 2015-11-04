@@ -1,43 +1,61 @@
 #!/usr/bin/env bash
 #
 
+kUname=$(uname)
+[[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
+export _MARKPATH="$HOME/.marks"
+
 
 jump() { 
-    local r=0
+    local r=0 dname
     if [ $# -eq 0 ]; then
         cd 2>/dev/null && r=1
     elif [ $# -eq 1 ]; then
         case "$1" in
             -|..) cd $1 && r=1;;
             ...)  cd -P "$ZTOOLS" 2>/dev/null && r=1;;
-            *)    cd -P "$_MARKPATH/$1" 2>/dev/null && r=1;;
+            *)    
+                  [ "$kUname" = "MINGW" ] && dname=$(cat "$_MARKPATH/$1") || dname="$_MARKPATH/$1"
+                  cd -P "$dname" 2>/dev/null && r=1;;
         esac
     fi
     [ $r -ne 1 ] && printxln @yellow "[WARN] No such mark: $*\n" && return 1
 }
-mark() { 
+mark() {
+    local iname
     [ $# -gt 1 ] && __help_mark "mark," && return 1
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$_MARKPATH/$1"
     [ -h "$iname" ] && rm -f "$iname"    # rm symbolic file
     [ -e "$iname" ] && rm -ir "$iname"   # rm file with propmpt
+    [ -e "$iname" ] && return 0
 
     mkdir -p "$_MARKPATH"
-    [ ! -e "$iname" ] && ln -s "$(pwd)" "$iname"
+    [ "$kUname" = "MINGW" ] && echo "$(pwd)" > "$iname" || ln -s "$(pwd)" "$iname"
 }
-unmark() { 
+unmark() {
+    local iname
     [ $# -gt 1 ] && __help_mark unmark && return
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$_MARKPATH/$1"
-    [ -h "$iname" ] && rm -i "$iname"
+    [ -f "$iname" ] && rm -i "$iname"
 }
 marks() {
-    ls -l "$_MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
+    if [ "$kUname" = "MINGW" ]; then
+        local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
+        for iname in $inames; do
+            local rname=$(cat "$_MARKPATH/$iname")
+            echo "$iname -> $rname"
+        done
+    else
+        ls -l "$_MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null
+    fi
     echo
 }
 
 _marks_broken() {
     echo
+    [ "$kUname" = "MINGW" ] && return 0
     local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
         rname=`ls -l "$_MARKPATH" 2>/dev/null | grep "$iname" | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null`
@@ -51,16 +69,17 @@ _unmark_all() {
     [ "$ch" != "y" ] && return
     printx @red "[*] Are you sure (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
-    inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
+    local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
-        [ -h "$_MARKPATH/$iname" ] && rm -f "$_MARKPATH/$iname"
+        [ -f "$_MARKPATH/$iname" ] && rm -f "$_MARKPATH/$iname"
     done
 }
 
 _unmark_broken() {
+    [ "$kUname" = "MINGW" ] && return 0
     printx @red "[*] Remove all broken marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
-    inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
+    local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
         file "$_MARKPATH/$iname" | grep -q "broken symbolic"
         [ $? -eq 0 ] && printxln @green "[-] broken symbolic: $iname" && rm -f "$_MARKPATH/$iname"
@@ -82,8 +101,6 @@ _unmark() {
 
 ### init mark
 __init_mark() {
-    export _MARKPATH="$HOME/.marks"
-
     alias marks-broken="_marks_broken"
     alias unmark-all="_unmark_all"
     alias unmark-broken="_unmark_broken"

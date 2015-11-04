@@ -5,7 +5,10 @@
 # Update: peter@uskee.org
 # Modified: 2015/09/01
 
-[ ! `uname` = "Darwin" ] && kSudo="sudo"
+kUname=$(uname)
+[[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
+[ "$kUname" = "Linux" ] && kSudo="sudo"
+[ "$kUname" = "MINGW" ] && kPty="winpty"
 
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
@@ -66,11 +69,11 @@ _docker_pname() {
 }
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
-    local ctids=($(_docker_ps -f status=exited --format "{{.ID}}"))
+    local ctids=($(_docker_ps -f status=created -f status=exited --format "{{.ID}}"))
     local ctlen=${#ctids[@]}
     [ $ctlen -le 0 ] && printx "[*] No exited containers\n\n" && return 0
 
-    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"))
+    local ctnames=($(_docker_ps -f status=created -f status=exited --format "{{.Names}}"))
     printx @yellow "[*] Exited containers: \n"
     echo "   " ${ctnames[@]}
 
@@ -87,7 +90,9 @@ _docker_rmall() {
 }
 _docker_bash() {
     [ $# -lt 1 ] && echo "usage: dk-bash [opt] IMAGE" && return 1
-    docker run -it $* "/bin/bash"
+    local cmd="/bin/bash"
+    [ "$kUname" = "MINGW" ] && cmd="bash"
+    $kPty docker run -it $* $cmd
 }
 
 ## set image tips
@@ -115,7 +120,7 @@ _dk_ps_tips() {
     _tablist "$1" "$opts"
 }
 _dk_rm() {
-    _dk_ps_tips dk-rm "-f status=exited"
+    _dk_ps_tips dk-rm "-f status=created -f status=exited"
 }
 _dk_attach() {
     _dk_ps_tips dk-attach "-f status=running"
