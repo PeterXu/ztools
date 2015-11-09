@@ -7,8 +7,8 @@
 
 kUname=$(uname)
 [[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
-[ "$kUname" = "Linux" ] && kSudo="sudo"
-[ "$kUname" = "MINGW" ] && kPty="winpty"
+#sudo usermod -aG docker username
+[ "$kUname" = "MINGW" ] && kPty="winpty" || kSudo="sudo"
 
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
@@ -31,7 +31,7 @@ _docker_enter() {
         echo "Enters the Docker CONTAINER and executes the specified COMMAND."
         echo "If COMMAND is not specified, runs an interactive shell in CONTAINER."
     else
-        PID=$($kSudo docker inspect --format "{{.State.Pid}}" "$1")
+        PID=$(docker inspect --format "{{.State.Pid}}" "$1")
         if [ -z "$PID" ]; then
             echo "WARN Cannot find the given container"
             return
@@ -83,16 +83,14 @@ _docker_rmall() {
     local idx=0
     while [ $idx -lt $ctlen ]; do
         printx @green "    [$idx] remove ${ctnames[idx]}: "
-        $kSudo docker rm ${ctids[idx]}
+        docker rm ${ctids[idx]}
         idx=$((idx+1))
     done
     echo
 }
 _docker_bash() {
     [ $# -lt 1 ] && echo "usage: dk-bash [opt] IMAGE" && return 1
-    local cmd="/bin/bash"
-    [ "$kUname" = "MINGW" ] && cmd="bash"
-    $kPty docker run -it $* $cmd
+    $kPty docker run -it $* bash
 }
 
 ## set image tips
@@ -218,7 +216,7 @@ EOF
 __init_docker() {
     local cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
     for cmd in $cmdlist; do
-        alias dk-$cmd="$kSudo docker $cmd"
+        alias dk-$cmd="docker $cmd"
     done
 
     alias dk="docker"
@@ -230,8 +228,8 @@ __init_docker() {
     alias dk-psa="_docker_ps -a"
 
     alias dk-ls="docker images"
-    alias dk-pid="$kSudo docker inspect --format '{{.State.Pid}}'"
-    alias dk-ip="$kSudo docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+    alias dk-pid="docker inspect --format '{{.State.Pid}}'"
+    alias dk-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
     alias dk-mingw="_dk_mingw"
 
     complete -F _dk_rmi dk-rmi

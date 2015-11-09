@@ -228,8 +228,9 @@ EOF
     cat >> "$kProfile" << EOF
 ## ${label}
 ## Please ensure it at the last line
-export ZTOOLS=${kRoot}
-[ -f \$ZTOOLS/shell/envall.sh ] && source \$ZTOOLS/shell/envall.sh
+export ZTOOLS="${kRoot}"
+export ZBASH="\$ZTOOLS/shell/envall.sh"
+[ -f "\$ZBASH" ] && source "\$ZBASH"
 ## ${label_end}
 EOF
     echog "Set successful and Should login again!"
