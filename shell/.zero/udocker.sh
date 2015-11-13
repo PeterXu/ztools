@@ -88,9 +88,9 @@ _docker_rmall() {
     done
     echo
 }
-_docker_bash() {
-    [ $# -lt 1 ] && echo "usage: dk-bash [opt] IMAGE" && return 1
-    $kPty docker run -it $* bash
+_docker_sh() {
+    [ $# -lt 1 ] && echo "usage: dk-sh [opt] IMAGE" && return 1
+    $kPty docker run -it $* sh
 }
 
 ## set image tips
@@ -99,14 +99,8 @@ _dk_images_tips() {
     local opts=$(docker images | grep -v "REPOSITORY\|<none>" | awk '{print $1":"$2}')
     _tablist "$1" "$opts"
 }
-_dk_run() { 
-    _dk_images_tips dk-run 
-}
-_dk_bash() { 
-    _dk_images_tips dk-bash 
-}
-_dk_rmi() { 
-    _dk_images_tips dk-rmi 
+_dk_sh() { 
+    _dk_images_tips dk-sh 
 }
 
 ## set ps containter tips
@@ -117,27 +111,6 @@ _dk_ps_tips() {
     local opts=$(_docker_ps $opt | grep -v CONTAINER | awk '{gsub(/\n/,"",$NF);print $NF}')
     _tablist "$1" "$opts"
 }
-_dk_rm() {
-    _dk_ps_tips dk-rm "-f status=created -f status=exited"
-}
-_dk_attach() {
-    _dk_ps_tips dk-attach "-f status=running"
-}
-_dk_start() {
-    _dk_ps_tips dk-start "-f status=created -f status=exited"
-}
-_dk_stop() {
-    _dk_ps_tips dk-stop "-f status=running"
-}
-_dk_restart() {
-    _dk_ps_tips dk-restart "-f status=running"
-}
-_dk_pause() {
-    _dk_ps_tips dk-pause "-f status=running"
-}
-_dk_unpause() {
-    _dk_ps_tips dk-unpause "-f status=paused"
-}
 _dk_ip() {
     _dk_ps_tips dk-ip "-f status=running"
 }
@@ -147,7 +120,8 @@ _dk_pid() {
 _dk_enter() {
     _dk_ps_tips dk-enter "-f status=running"
 }
-_dk_mingw() {
+
+_docker_mingw() {
     [ "$kUname" != "MINGW" ] && return 1
 
     local VM=default
@@ -214,52 +188,38 @@ EOF
 
 ### init docker
 __init_docker() {
-    local cmdlist=$(docker -h | grep "^    [a-z]" | awk -F" " '{print $1}')
-    for cmd in $cmdlist; do
-        alias dk-$cmd="docker $cmd"
-    done
-
-    alias dk="docker"
-    alias dk-rma="_docker_rmall"
-    alias dk-pgrep="_docker_pgrep"
-    alias dk-bash="_docker_bash"
-    alias dk-enter="_docker_enter"
-    alias dk-ps="_docker_ps"
     alias dk-psa="_docker_ps -a"
-
+    alias dk-pgrep="_docker_pgrep"
     alias dk-ls="docker images"
-    alias dk-pid="docker inspect --format '{{.State.Pid}}'"
-    alias dk-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
-    alias dk-mingw="_dk_mingw"
+    alias dk-rma="_docker_rmall"
+    alias dk-mingw="_docker_mingw"
+    
+    alias dk-sh="_docker_sh"
+    complete -F _dk_sh dk-sh
 
-    complete -F _dk_rmi dk-rmi
-    complete -F _dk_run dk-run
-    complete -F _dk_bash dk-bash
-
-    complete -F _dk_rm dk-rm
-    complete -F _dk_attach dk-attach
-    complete -F _dk_start dk-start
-    complete -F _dk_stop dk-stop
-    complete -F _dk_restart dk-restart
-    complete -F _dk_pause dk-pause
-    complete -F _dk_unpause dk-unpause
-
-    complete -F _dk_ip dk-ip
-    complete -F _dk_pid dk-pid
+    alias dk-enter="_docker_enter"
     complete -F _dk_enter dk-enter
+
+    alias dk-pid="docker inspect --format '{{.State.Pid}}'"
+    complete -F _dk_pid dk-pid
+
+    alias dk-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+    complete -F _dk_ip dk-ip
 }
 
 __help_docker() {
     echo "usage: "
     local prefix="    [.]"
-    docker -h | grep "^    [a-z]" | sed "s/^    \([a-z]\)/$prefix dk-\1/"
     echo
-    printf "%-20s %s\n" "$prefix dk-psa"    "Like dk-ps -a"
-    printf "%-20s %s\n" "$prefix dk-pgrep"  "Like dk-ps -a | grep .."
+    printf "%-20s %s\n" "$prefix dk-psa"    "Like docker ps -a"
+    printf "%-20s %s\n" "$prefix dk-pgrep"  "Like docker ps -a | grep .."
+    printf "%-20s %s\n" "$prefix dk-ls"     "Like docker images"
     printf "%-20s %s\n" "$prefix dk-rma"    "Remove all containers"
+    printf "%-20s %s\n" "$prefix dk-mingw"  "Init mingw env"
+    printf "%-20s %s\n" "$prefix dk-sh"     "Run /bin/sh in one image"
+    printf "%-20s %s\n" "$prefix dk-enter"  "Enter one running container"
     printf "%-20s %s\n" "$prefix dk-pid"    "Acquire the pid of one image or container"
     printf "%-20s %s\n" "$prefix dk-ip"     "Acquire the ip of one image or container"
-    printf "%-20s %s\n" "$prefix dk-bash"   "Run /bin/bash in one image"
     echo
 }
 
