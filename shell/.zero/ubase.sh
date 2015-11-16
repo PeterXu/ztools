@@ -5,14 +5,22 @@
 #
 
 
-## ------------------
+## -------------
+## escape string
+_escape() {
+    [ $# -ne 1 ] && return 1
+    local name=`printf ${1} | tr [:space:]- _`
+    local trim=`printf $name | tr -d [:alnum:]_`
+    echo $name | tr -d "$trim"
+    return 0
+}
 ## make variable name
 _make_vname() {
-    [ $# -ne 1 ] && return 1
-    local vname=`echo g_${1} | tr [:space:]- _`
-    local vtrim=`echo $vname | tr -d [:alnum:]_`
-    echo $vname | tr -d "$vtrim"
-    return 0
+    [ $# -eq 1 ] && _escape "_g_${1}" || return 1
+}
+## make real name
+_make_rname() {
+    [ $# -eq 1 ] && _escape "${1}" || return 1
 }
 
 

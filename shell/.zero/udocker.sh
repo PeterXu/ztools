@@ -67,6 +67,21 @@ _docker_pname() {
     [ $# -ne 1 ] && return 1
     _docker_ps -a --filter "name=$1"
 }
+_docker_stopall() {
+    [ $# -gt 0 ] && return 1
+    local ctids=($(_docker_ps -f status=running --format "{{.ID}}"))
+    local ctnames=($(_docker_ps -f status=running --format "{{.Names}}"))
+    local ctlen=${#ctids[@]}
+    [ $ctlen -le 0 ] && printx "[*] No running containers\n\n" && return 0
+
+    local idx=0
+    while [ $idx -lt $ctlen ]; do
+        printx @green "    [$idx] stop ${ctnames[idx]}: "
+        docker stop ${ctids[idx]}
+        idx=$((idx+1))
+    done
+    echo
+}
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
     local ctids=($(_docker_ps -f status=created -f status=exited --format "{{.ID}}"))
@@ -186,11 +201,107 @@ EOF
     echo
 }
 
+
+## -----------
+## for dk-ctrl
+_info_image() {
+    local idx=0 sec=$1 key
+    for key in `mapkey $sec`
+    do
+        echo "[$idx] $key=$(mapget \"$sec\" \"$key\")"
+        idx=$((idx+1))
+    done
+    echo
+    return 0
+}
+
+_gen_config() {
+    local fname="$1"
+    [ -f "$fname" ] && printxln @yellow "[WARN] $fname exists!\n" && return 1
+
+    cat >> "$fname" << EOF
+[jenkins]
+opt=-d -it -p 8080:8080 ;-v /var/zdisk/var/lib/jenkins/plugins:/var/lib/jenkins/plugins
+env=
+img=peterxu/jenkins:latest
+cmd=/root/bin/init
+
+[openldap]
+opt=-d
+env=-e LDAP_ORGANISATION="My Compagny" -e LDAP_DOMAIN="my-compagny.com" -e LDAP_ADMIN_PASSWORD="JonSn0w"
+img=osixia/openldap
+cmd=
+
+[ubuntu]
+opt=-it -v /var/zdisk/wspace:/root/wspace
+env=
+img=ubuntu:14.04
+cmd=bash
+
+EOF
+}
+
+_docker_ctrl() {
+    local todo="" image=""
+    local fname="$HOME/.docker/dkctrl.ini"
+
+    local opts="hcli:"
+    local args=`getopt $opts $*`
+    [ $? != 0 ] && __help_dkctrl && return 1
+
+    set -- $args
+    for i; do
+        case "$i" in
+            -h) __help_dkctrl; return 0;;
+            -c) _gen_config "$fname"; return 0;;
+            -l) todo="list"; shift;;
+            -i) todo="info"; image="$2"; shift; shift;;
+            --) shift; break;;
+        esac
+    done
+
+    [ "$todo" = "" -a $# -lt 1 ] && __help_dkctrl && return 1
+
+    ini_parse "$fname"
+    if [ $? -ne 0 ]; then
+        printx @red "[ERROR] " && printxln "Invalid $fname\n"
+        return 1
+    fi
+
+    if [ "$todo" = "list" ]; then
+        local secs=`ini_secs "$fname"` || return 1
+        printxln ${secs//' '/'\n'} "\n"
+    elif [ "$todo" = "info" ]; then
+        _info_image "$image"
+    else
+        [ $# -le 0 ] && __help_dkctrl && return 1
+        local str opt env img cmd
+        for sec in $*; do
+            img=$(mapget "$sec" "img")
+            if [ "$img" = "" ]; then
+                printx @y "[WARN] " && printxln "No such section: $sec"
+                continue
+            fi
+            opt=$(mapget "$sec" "opt")
+            env=$(mapget "$sec" "env")
+            cmd=$(mapget "$sec" "cmd")
+            str="docker run $opt $env $img $cmd"
+            printx @green "[INFO] " && printxln "$str" 
+            eval $str
+        done
+        echo
+    fi
+    return 0
+}
+
+
+### -----------
 ### init docker
 __init_docker() {
     alias dk-psa="_docker_ps -a"
     alias dk-pgrep="_docker_pgrep"
     alias dk-ls="docker images"
+    alias dk-stopa="_docker_stopall"
     alias dk-rma="_docker_rmall"
     alias dk-mingw="_docker_mingw"
     
@@ -205,6 +316,22 @@ __init_docker() {
 
     alias dk-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
     complete -F _dk_ip dk-ip
+
+    alias dk-ctrl="_docker_ctrl"
+}
+
+__help_dkctrl() {
+    local prog="dk-ctrl"
+    cat > /dev/stdout << EOF
+usage:
+    $prog [-h | -l | -i image | image1 [image2 ..]]
+        -h:         help
+        -c:         generate <\$HOME/.docker/dktool.ini> if not exists
+        -l:         list available objects
+        -i image:   list image's config
+
+EOF
+    return 0
 }
 
 __help_docker() {
@@ -214,12 +341,14 @@ __help_docker() {
     printf "%-20s %s\n" "$prefix dk-psa"    "Like docker ps -a"
     printf "%-20s %s\n" "$prefix dk-pgrep"  "Like docker ps -a | grep .."
     printf "%-20s %s\n" "$prefix dk-ls"     "Like docker images"
+    printf "%-20s %s\n" "$prefix dk-stopa"  "Stop all running containers"
     printf "%-20s %s\n" "$prefix dk-rma"    "Remove all containers"
     printf "%-20s %s\n" "$prefix dk-mingw"  "Init mingw env"
     printf "%-20s %s\n" "$prefix dk-sh"     "Run /bin/sh in one image"
     printf "%-20s %s\n" "$prefix dk-enter"  "Enter one running container"
     printf "%-20s %s\n" "$prefix dk-pid"    "Acquire the pid of one image or container"
     printf "%-20s %s\n" "$prefix dk-ip"     "Acquire the ip of one image or container"
+    printf "%-20s %s\n" "$prefix dk-ctrl"   "Control to run docker image by config"
     echo
 }
 
