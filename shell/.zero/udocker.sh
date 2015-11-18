@@ -104,36 +104,36 @@ _docker_rmall() {
     echo
 }
 _docker_sh() {
-    [ $# -lt 1 ] && echo "usage: dk-sh [opt] IMAGE" && return 1
+    [ $# -lt 1 ] && echo "usage: docker-sh [opt] IMAGE" && return 1
     $kPty docker run -it $* sh
 }
 
 ## set image tips
-_dk_images_tips() {
+_docker_images_tips() {
     [ $# -ne 1 ] && return 1
     local opts=$(docker images | grep -v "REPOSITORY\|<none>" | awk '{print $1":"$2}')
     _tablist "$1" "$opts"
 }
-_dk_sh() { 
-    _dk_images_tips dk-sh 
+_docker_sh_tips() { 
+    _docker_images_tips docker-sh 
 }
 
 ## set ps containter tips
-_dk_ps_tips() {
+_docker_ps_tips() {
     [ $# -lt 1 -o $# -gt 2 ] && return 1
     local opt
     [ $# -eq 2 ] && opt="$2"
     local opts=$(_docker_ps $opt | grep -v CONTAINER | awk '{gsub(/\n/,"",$NF);print $NF}')
     _tablist "$1" "$opts"
 }
-_dk_ip() {
-    _dk_ps_tips dk-ip "-f status=running"
+_docker_ip_tips() {
+    _docker_ps_tips docker-ip "-f status=running"
 }
-_dk_pid() {
-    _dk_ps_tips dk-pid "-f status=running"
+_docker_pid_tips() {
+    _docker_ps_tips docker-pid "-f status=running"
 }
-_dk_enter() {
-    _dk_ps_tips dk-enter "-f status=running"
+_docker_enter_tips() {
+    _docker_ps_tips docker-enter "-f status=running"
 }
 
 _docker_mingw() {
@@ -203,7 +203,7 @@ EOF
 
 
 ## -----------
-## for dk-ctrl
+## for docker-ctrl
 _info_image() {
     local idx=0 sec=$1 key
     for key in `mapkey $sec`
@@ -298,30 +298,30 @@ _docker_ctrl() {
 ### -----------
 ### init docker
 __init_docker() {
-    alias dk-psa="_docker_ps -a"
-    alias dk-pgrep="_docker_pgrep"
-    alias dk-ls="docker images"
-    alias dk-stopa="_docker_stopall"
-    alias dk-rma="_docker_rmall"
-    alias dk-mingw="_docker_mingw"
+    alias docker-psa="_docker_ps -a"
+    alias docker-pgrep="_docker_pgrep"
+    alias docker-ls="docker images"
+    alias docker-stopa="_docker_stopall"
+    alias docker-rma="_docker_rmall"
+    alias docker-mingw="_docker_mingw"
     
-    alias dk-sh="_docker_sh"
-    complete -F _dk_sh dk-sh
+    alias docker-sh="_docker_sh"
+    complete -F _docker_sh_tips docker-sh
 
-    alias dk-enter="_docker_enter"
-    complete -F _dk_enter dk-enter
+    alias docker-enter="_docker_enter"
+    complete -F _docker_enter_tips docker-enter
 
-    alias dk-pid="docker inspect --format '{{.State.Pid}}'"
-    complete -F _dk_pid dk-pid
+    alias docker-pid="docker inspect --format '{{.State.Pid}}'"
+    complete -F _docker_pid_tips docker-pid
 
-    alias dk-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
-    complete -F _dk_ip dk-ip
+    alias docker-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+    complete -F _docker_ip_tips docker-ip
 
-    alias dk-ctrl="_docker_ctrl"
+    alias docker-ctrl="_docker_ctrl"
 }
 
 __help_dkctrl() {
-    local prog="dk-ctrl"
+    local prog="docker-ctrl"
     cat > /dev/stdout << EOF
 usage:
     $prog [-h | -l | -i image | image1 [image2 ..]]
@@ -338,17 +338,17 @@ __help_docker() {
     echo "usage: "
     local prefix="    [.]"
     echo
-    printf "%-20s %s\n" "$prefix dk-psa"    "Like docker ps -a"
-    printf "%-20s %s\n" "$prefix dk-pgrep"  "Like docker ps -a | grep .."
-    printf "%-20s %s\n" "$prefix dk-ls"     "Like docker images"
-    printf "%-20s %s\n" "$prefix dk-stopa"  "Stop all running containers"
-    printf "%-20s %s\n" "$prefix dk-rma"    "Remove all containers"
-    printf "%-20s %s\n" "$prefix dk-mingw"  "Init mingw env"
-    printf "%-20s %s\n" "$prefix dk-sh"     "Run /bin/sh in one image"
-    printf "%-20s %s\n" "$prefix dk-enter"  "Enter one running container"
-    printf "%-20s %s\n" "$prefix dk-pid"    "Acquire the pid of one image or container"
-    printf "%-20s %s\n" "$prefix dk-ip"     "Acquire the ip of one image or container"
-    printf "%-20s %s\n" "$prefix dk-ctrl"   "Control to run docker image by config"
+    printf "%-20s %s\n" "$prefix docker-psa"    "Like docker ps -a"
+    printf "%-20s %s\n" "$prefix docker-pgrep"  "Like docker ps -a | grep .."
+    printf "%-20s %s\n" "$prefix docker-ls"     "Like docker images"
+    printf "%-20s %s\n" "$prefix docker-stopa"  "Stop all running containers"
+    printf "%-20s %s\n" "$prefix docker-rma"    "Remove all containers"
+    printf "%-20s %s\n" "$prefix docker-mingw"  "Init mingw env"
+    printf "%-20s %s\n" "$prefix docker-sh"     "Run /bin/sh in one image"
+    printf "%-20s %s\n" "$prefix docker-enter"  "Enter one running container"
+    printf "%-20s %s\n" "$prefix docker-pid"    "Acquire the pid of one image or container"
+    printf "%-20s %s\n" "$prefix docker-ip"     "Acquire the ip of one image or container"
+    printf "%-20s %s\n" "$prefix docker-ctrl"   "Control to run docker image by config"
     echo
 }
 
