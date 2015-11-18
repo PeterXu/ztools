@@ -147,8 +147,7 @@ _ZPATH="/usr/local/bin:/usr/local/sbin"
 _ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
 
 # For shell extending
-_zshs="ubase.sh umisc.sh umark.sh udocker.sh srcin.sh udocs.sh"
-_zshs="\$_zshs git-completion.bash"
+_zshs="uinit.sh git-completion.bash"
 for k in \$_zshs; do
     [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done

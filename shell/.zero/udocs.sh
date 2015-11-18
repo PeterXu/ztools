@@ -186,23 +186,3 @@ __init_docs() {
     complete -F _Help Help
 }
 
-
-
-## ===================================================
-## ---------------------------------------------------
-## global init scripts: 
-##      To call functions with prefix of "__init_xxx".
-_init_init() {
-    export _INIT_PREFIX="__init_"
-    export _SH_LIST="srcin.sh umark.sh umisc.sh udocker.sh udocs.sh"
-
-    for item in $_SH_LIST; do
-        item="$HOME/.zero/$item"
-        local func_list=$(cat $item | grep "^${_INIT_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
-        for func in $func_list; do
-            eval "$func" 2>/dev/null
-        done
-    done
-}
-_init_init
-
