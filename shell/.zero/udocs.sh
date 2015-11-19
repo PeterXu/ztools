@@ -90,12 +90,13 @@ _zero_help() {
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
         ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
-        ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
+        ulist2=$(cat $item | grep "alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
         if [ ${#ulist1} -gt 0 -o ${#ulist2} -gt 0 ]; then
             echo "[$index] $(basename $item) tools:"
             _zhelp_pnx "${ulist1}"
             _zhelp_pnx "${ulist2}"
             index=$((index+1))
+            echo
         fi
 
         hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
