@@ -243,6 +243,7 @@ _make_ycm() {
         cd $tmpdir || exit 1 
         git pull || exit 1
         git submodule update --init --recursive || exit 1
+        chmod +x install.sh
         ./install.sh --clang-completer || exit 1
         ) || return 1
 
@@ -250,7 +251,8 @@ _make_ycm() {
     fi
 
     # config ycm
-    [ -f $workdir/config.vim ] && return 0
+    rm -f $workdir/config.vim
+    local ycm="\$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
     cat > $workdir/config.vim << EOF
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -260,6 +262,15 @@ Plugin 'VundleVim/Vundle.vim'   " required
 Plugin 'Valloric/YouCompleteMe'
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <leader>ff :YcmForceCompileAndDiagnostics<CR>
+
+let g:ycm_global_ycm_extra_conf = expand('$ycm')
+" Do not ask when starting vim
+let g:ycm_confirm_extra_conf = 0
+" Disable left warning dialog
+let g:ycm_show_diagnostics_ui = 0
 
 EOF
 }

@@ -1,9 +1,3 @@
-" load bundle plugins
-if filereadable(glob("$HOME/.vim/bundle/config.vim"))
-  source $HOME/.vim/bundle/config.vim
-endif
-
-
 " ------------------------
 " For some global settings
 let mapleader = ":"
@@ -64,6 +58,13 @@ if filereadable(glob("$HOME/.xtags/tags"))
 endif
 
 
+" -------------------
+" load bundle plugins
+if filereadable(glob("$HOME/.vim/bundle/config.vim"))
+  source $HOME/.vim/bundle/config.vim
+endif
+
+
 " ----------------
 " licenses setting
 map <leader>mit :0r ~/.vim/licenses/mit.txt
@@ -119,13 +120,22 @@ map <leader>aucc <Home>i<C-R>=
 " custom functions and commands
 func! Usage(arg)
     echo "\n[Usage]: \n" 
-    if a:arg == "map" || a:arg == ""
-        echo ""
+    if a:arg == "misc" || a:arg == ""
+        echo "=== misc ===\n"
             \ . "  <S-:> + ss:  spell checking\n"
             \ . "  <S-:> + dt:  insert date, YYYY-MM-DD\n" 
             \ . "  <S-:> + tn/to/tc/tm:  tabnew/tabonly/tabclose/tabmove\n" 
             \ . "  <S-:> + aush/aupy/aucc:  insert author info for shell/python/c-c++\n"
             \ . "  <S-:> + mit/bsd2/bsd3:  insert one license\n"
+            \ . "\n"
+    endif
+    if a:arg == "ycm" || a:arg == ""
+        echo "=== ycm ===\n"
+            \ . "  <C-O>:  jump back\n"
+            \ . "  <C-I>:  jump forward\n"
+            \ . "  <S-:> + jd:  goto definition else declaration\n"
+            \ . "  <S-:> + ff:  force compile and diagnostics"
+            \ . "\n"
     endif
     echo
 endfunc
