@@ -185,9 +185,9 @@ ini_parse() {
             local ch=${line:$idx:1}
             case $ch in
                 "#" | ";") xtype="comm"; quit=1;;
-                "[") [ $xtype = "none" ] && xtype="sec0";;&
-                "]") [ $xtype = "sec1" ] && xtype="sec2";;&
-                "=") [ $xtype = "item0" ] && xtype="item1";;&
+                "[") [ $xtype = "none" ] && xtype="sec0";;
+                "]") [ $xtype = "sec1" ] && xtype="sec2";;
+                "=") [ $xtype = "item0" ] && xtype="item1";;
                 *);;
             esac
             [ $quit -ne 0 ] && break
