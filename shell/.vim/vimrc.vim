@@ -1,10 +1,13 @@
-" Set map leader
+" load bundle plugins
+if filereadable(glob("$HOME/.vim/bundle/config.vim"))
+  source $HOME/.vim/bundle/config.vim
+endif
+
+
+" ------------------------
+" For some global settings
 let mapleader = ":"
 let g:mapleader = ":"
-
-
-" --------------------------------
-" For some plugins' global setting
 let g:vim_markdown_folding_disabled=1
 let g:openssl_backup=1
 
