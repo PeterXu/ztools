@@ -247,12 +247,12 @@ _docker_ctrl() {
 
     local opts="hcli:"
     local args=`getopt $opts $*`
-    [ $? != 0 ] && __help_dkctrl && return 1
+    [ $? != 0 ] && __help_docker_ctrl && return 1
 
     set -- $args
     for i; do
         case "$i" in
-            -h) __help_dkctrl; return 0;;
+            -h) __help_docker_ctrl; return 0;;
             -c) _gen_config "$fname"; return 0;;
             -l) todo="list"; shift;;
             -i) todo="info"; image="$2"; shift; shift;;
@@ -260,7 +260,7 @@ _docker_ctrl() {
         esac
     done
 
-    [ "$todo" = "" -a $# -lt 1 ] && __help_dkctrl && return 1
+    [ "$todo" = "" -a $# -lt 1 ] && __help_docker_ctrl && return 1
 
     ini_parse "$fname"
     if [ $? -ne 0 ]; then
@@ -274,7 +274,7 @@ _docker_ctrl() {
     elif [ "$todo" = "info" ]; then
         _info_image "$image"
     else
-        [ $# -le 0 ] && __help_dkctrl && return 1
+        [ $# -le 0 ] && __help_docker_ctrl && return 1
         local str opt env img cmd
         for sec in $*; do
             img=$(mapget "$sec" "img")
@@ -320,13 +320,13 @@ __init_docker() {
     alias docker-ctrl="_docker_ctrl"
 }
 
-__help_dkctrl() {
+__help_docker_ctrl() {
     local prog="docker-ctrl"
     cat > /dev/stdout << EOF
 usage:
     $prog [-h | -l | -i image | image1 [image2 ..]]
         -h:         help
-        -c:         generate <\$HOME/.docker/dktool.ini> if not exists
+        -c:         generate <\$HOME/.docker/dkctrl.ini> if not exists
         -l:         list available objects
         -i image:   list image's config
 

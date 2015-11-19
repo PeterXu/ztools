@@ -81,16 +81,16 @@ _zhelp_pnx() {
 _zero_help() {
     if [ $# -eq 1 ]; then
         local hfunc="${_HELP_PREFIX}$1"
+        hfunc=${hfunc//-/_}
         declare -f "$hfunc" >/dev/null && eval "$hfunc" || printf "[WARN] no help for <$1>\n\n"
         return 0
     fi
 
-    local index=0
-    local helps=""
+    local index=0 helps="" item ulist1 ulist2 hlist 
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
-        local ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
-        local ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
+        ulist1=$(cat $item | grep "^[a-z][a-z_-]\+() " | awk -F" " '{print $1}')
+        ulist2=$(cat $item | grep "^alias [a-z][a-z_-]\+=" | awk -F"=" '{print $1}' | sed 's#alias ##')
         if [ ${#ulist1} -gt 0 -o ${#ulist2} -gt 0 ]; then
             echo "[$index] $(basename $item) tools:"
             _zhelp_pnx "${ulist1}"
@@ -98,10 +98,11 @@ _zero_help() {
             index=$((index+1))
         fi
 
-        local hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
-        for h in $hlist; do
-            h=${h/#${_HELP_PREFIX}/}
-            [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
+        hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
+        for item in $hlist; do
+            item=${item/#${_HELP_PREFIX}/}
+            item=${item//_/-}
+            [ "$helps" = "" ] && helps="$item" || helps="$helps $item"
         done
     done
     printf "\n[*] Help [key]:\n"
@@ -111,13 +112,14 @@ _zero_help() {
 
 ## To parse functions with prefix "__help_xxx".
 _Help() {
-    local helps=""
+    local helps="" item hlist
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"
-        local hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
-        for h in $hlist; do
-            h=${h/#${_HELP_PREFIX}/}
-            [ "$helps" = "" ] && helps="$h" || helps="$helps $h"
+        hlist=$(cat $item | grep "^${_HELP_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
+        for item in $hlist; do
+            item=${item/#${_HELP_PREFIX}/}
+            item=${item//_/-}
+            [ "$helps" = "" ] && helps="$item" || helps="$helps $item"
         done
     done
     _tablist "Help" "$helps"

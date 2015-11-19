@@ -188,19 +188,18 @@ ini_parse() {
                 "[") [ $xtype = "none" ] && xtype="sec0";;&
                 "]") [ $xtype = "sec1" ] && xtype="sec2";;&
                 "=") [ $xtype = "item0" ] && xtype="item1";;&
-                *)
-                    case $xtype in
-                        "none") xtype="item0"; key="$key$ch";;
-                        "sec1") sec="$sec$ch";;  # sec
-                        "sec0") xtype="sec1";;   # '['
-                        "item0") key="$key$ch";; # key
-                        "item2") val="$val$ch";; # val
-                        "item1") xtype="item2";; # '='
-                        *) ;;
-                    esac
-                    ;;
+                *);;
             esac
             [ $quit -ne 0 ] && break
+            case $xtype in
+                "none") xtype="item0"; key="$key$ch";;
+                "sec1") sec="$sec$ch";;  # sec
+                "sec0") xtype="sec1";;   # '['
+                "item0") key="$key$ch";; # key
+                "item2") val="$val$ch";; # val
+                "item1") xtype="item2";; # '='
+                *) ;;
+            esac
         done
 
         sec=`echo "$sec" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
