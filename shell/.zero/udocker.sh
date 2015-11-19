@@ -260,14 +260,14 @@ _docker_ctrl() {
 
     [ "$todo" = "" -a $# -lt 1 ] && __help_docker_ctrl && return 1
 
-    ini_parse "$fname"
+    _ini_parse "$fname"
     if [ $? -ne 0 ]; then
         _printx @red "[ERROR] " && _printx "Invalid $fname\n\n"
         return 1
     fi
 
     if [ "$todo" = "list" ]; then
-        local secs=`ini_secs "$fname"` || return 1
+        local secs=`_ini_secs "$fname"` || return 1
         _printx ${secs//' '/'\n'} "\n\n"
     elif [ "$todo" = "info" ]; then
         _info_image "$image"
