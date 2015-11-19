@@ -5,11 +5,6 @@
 # Update: peter@uskee.org
 # Modified: 2015/09/01
 
-kUname=$(uname)
-[[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
-#sudo usermod -aG docker username
-[ "$kUname" = "MINGW" ] && kPty="winpty" || kSudo="sudo"
-
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
 _docker_enter() {
@@ -40,6 +35,7 @@ _docker_enter() {
 
         OPTS="--target $PID --mount --uts --ipc --net --pid"
 
+        local kSudo="sudo"
         if [ -z "$1" ]; then
             # No command given.
             # Use su to clear all host environment variables except for TERM,
@@ -105,6 +101,8 @@ _docker_rmall() {
 }
 _docker_sh() {
     [ $# -lt 1 ] && echo "usage: docker-sh [opt] IMAGE" && return 1
+    local kPty=""
+    [ "$_UNAME" = "MINGW" ] && kPty="winpty"
     $kPty docker run -it $* sh
 }
 
@@ -137,7 +135,7 @@ _docker_enter_tips() {
 }
 
 _docker_mingw() {
-    [ "$kUname" != "MINGW" ] && return 1
+    [ "$_UNAME" != "MINGW" ] && return 1
 
     local VM=default
     local VBOXMANAGE
@@ -349,6 +347,7 @@ __help_docker() {
     printf "%-20s %s\n" "$prefix docker-pid"    "Acquire the pid of one image or container"
     printf "%-20s %s\n" "$prefix docker-ip"     "Acquire the ip of one image or container"
     printf "%-20s %s\n" "$prefix docker-ctrl"   "Control to run docker image by config"
+    printf "For general users, should set 'sudo usermod -aG docker username'"
     echo
 }
 

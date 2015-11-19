@@ -56,6 +56,7 @@ _zero_set() {
         echo "[*] Entering <$(pwd)> ..."
         echo "[*] Then set for shell ..."
         $sh zero_setting.sh $action
+        [ -f $ZBASH ] && source $ZBASH
     )
     return 0
 }

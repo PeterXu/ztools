@@ -16,7 +16,7 @@ __help_map() {
     echo
     return 0
 }
-mapset() {
+_mapset() {
     [ $# -ne 3 ] && __help_map set && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     eval "${vname}='${3}'"
@@ -26,23 +26,23 @@ mapset() {
     local rkeys=$(eval "echo \${${vkeys}}")
     eval "${vkeys}='${rkeys} ${rkey}'"
 }
-mapget() {
+_mapget() {
     [ $# -ne 2 ] && __help_map get && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     declare -p ${vname} 2>/dev/null 1>&2 || return 1
     eval "echo \"\${${vname}}\""
 }
-mapdel() {
+_mapdel() {
     [ $# -ne 2 ] && __help_map del && return 1
     local vname=`_make_vname "${1}_${2}"` || return 1
     eval "unset ${vname}"
 }
-mapkey() {
+_mapkey() {
     [ $# -ne 1 ] && __help_map key && return 1
     local vkeys=`_make_vname "${1}_keys"` || return 1
     eval "echo \${${vkeys}}"
 }
-mapunkey() {
+_mapunkey() {
     [ $# -ne 1 ] && __help_map unk && return 1
     local vkeys=`_make_vname "${1}_keys"` || return 1
     eval "unset ${vkeys}"
@@ -113,7 +113,7 @@ _print_color() {
     printf "${b}${*}${e}" 
     return 0
 }
-printx() {
+_printx() {
     local background=0 color=0 ctrl=""
     while [ $# -ge 1 ]; do
         case "$1" in
@@ -139,9 +139,6 @@ printx() {
     [ $color -gt 0 ] && color=$((color+background))
     [ $# -lt 1 ] && return 1
     _print_color "$color" "$ctrl" "$*"
-}
-printxln() { 
-    printx $* "\n" 
 }
 __help_printx() {
     local prog="printx" color="cyan" ctrl="bold"
@@ -171,7 +168,7 @@ __help_ini() {
     echo
     return 0
 }
-ini_parse() {
+_ini_parse() {
     [ $# -ne 1 ] && __help_ini && return 1
     local ini=$1
     [ ! -f "$ini" ] && return 1
@@ -213,7 +210,7 @@ ini_parse() {
     eval "${vsecs}='${secs[@]}'"
     return 0
 }
-ini_secs() {
+_ini_secs() {
     [ $# -ne 1 ] && __help_ini && return 1
     local vsecs=`_make_vname "${1}_secs"` || return 1
     eval "echo \${${vsecs}}"
@@ -223,7 +220,16 @@ ini_secs() {
 
 ### init misc shell
 __init_misc() {
+    alias mapget="_mapget"
+    alias mapset="_mapset"
+    alias mapdel="_mapdel"
+    alias mapkey="_mapkey"
+    alias mapunkey="_mapunkey"
+
     alias venv="_venv"
+    alias printx="_printx"
+    alias ini-parse="_ini_parse"
+    alias ini-secs="_ini_secs"
 
     alias ps-mem="_ps_ef 9 %MEM"
     alias ps-cpu="_ps_ef 6 %CPU"
