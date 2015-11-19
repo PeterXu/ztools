@@ -68,11 +68,11 @@ _docker_stopall() {
     local ctids=($(_docker_ps -f status=running --format "{{.ID}}"))
     local ctnames=($(_docker_ps -f status=running --format "{{.Names}}"))
     local ctlen=${#ctids[@]}
-    [ $ctlen -le 0 ] && printx "[*] No running containers\n\n" && return 0
+    [ $ctlen -le 0 ] && _printx "[*] No running containers\n\n" && return 0
 
     local idx=0
     while [ $idx -lt $ctlen ]; do
-        printx @green "    [$idx] stop ${ctnames[idx]}: "
+        _printx @green "    [$idx] stop ${ctnames[idx]}: "
         docker stop ${ctids[idx]}
         idx=$((idx+1))
     done
@@ -82,18 +82,18 @@ _docker_rmall() {
     [ $# -gt 0 ] && return 1
     local ctids=($(_docker_ps -f status=created -f status=exited --format "{{.ID}}"))
     local ctlen=${#ctids[@]}
-    [ $ctlen -le 0 ] && printx "[*] No exited containers\n\n" && return 0
+    [ $ctlen -le 0 ] && _printx "[*] No exited containers\n\n" && return 0
 
     local ctnames=($(_docker_ps -f status=created -f status=exited --format "{{.Names}}"))
-    printx @yellow "[*] Exited containers: \n"
+    _printx @yellow "[*] Exited containers: \n"
     echo "   " ${ctnames[@]}
 
-    printx @yellow "[*] Remove all exited containers (y/n)? " && read ch 
+    _printx @yellow "[*] Remove all exited containers (y/n)? " && read ch 
     [ "$ch" != "y" ] && return 0
 
     local idx=0
     while [ $idx -lt $ctlen ]; do
-        printx @green "    [$idx] remove ${ctnames[idx]}: "
+        _printx @green "    [$idx] remove ${ctnames[idx]}: "
         docker rm ${ctids[idx]}
         idx=$((idx+1))
     done
@@ -215,7 +215,7 @@ _info_image() {
 
 _gen_config() {
     local fname="$1"
-    [ -f "$fname" ] && printxln @yellow "[WARN] $fname exists!\n" && return 1
+    [ -f "$fname" ] && _printx @yellow "[WARN] $fname exists!\n\n" && return 1
 
     cat >> "$fname" << EOF
 [jenkins]
@@ -262,13 +262,13 @@ _docker_ctrl() {
 
     ini_parse "$fname"
     if [ $? -ne 0 ]; then
-        printx @red "[ERROR] " && printxln "Invalid $fname\n"
+        _printx @red "[ERROR] " && _printx "Invalid $fname\n\n"
         return 1
     fi
 
     if [ "$todo" = "list" ]; then
         local secs=`ini_secs "$fname"` || return 1
-        printxln ${secs//' '/'\n'} "\n"
+        _printx ${secs//' '/'\n'} "\n\n"
     elif [ "$todo" = "info" ]; then
         _info_image "$image"
     else
@@ -277,14 +277,14 @@ _docker_ctrl() {
         for sec in $*; do
             img=$(mapget "$sec" "img")
             if [ "$img" = "" ]; then
-                printx @y "[WARN] " && printxln "No such section: $sec"
+                _printx @y "[WARN] " && _printx "No such section: $sec\n"
                 continue
             fi
             opt=$(mapget "$sec" "opt")
             env=$(mapget "$sec" "env")
             cmd=$(mapget "$sec" "cmd")
             str="docker run $opt $env $img $cmd"
-            printx @green "[INFO] " && printxln "$str" 
+            _printx @green "[INFO] " && _printx "$str\n" 
             eval $str
         done
         echo

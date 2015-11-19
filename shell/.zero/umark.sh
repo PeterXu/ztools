@@ -14,7 +14,7 @@ _jump() {
                   cd -P "$dname" 2>/dev/null && r=1;;
         esac
     fi
-    [ $r -ne 1 ] && printxln @yellow "[WARN] No such mark: $*\n" && return 1
+    [ $r -ne 1 ] && _printx @yellow "[WARN] No such mark: $*\n\n" && return 1
 }
 _mark() {
     local iname
@@ -55,14 +55,14 @@ _marks_broken() {
     for iname in $inames; do
         rname=`ls -l "$_MARKPATH" 2>/dev/null | grep "$iname" | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null`
         file "$_MARKPATH/$iname" | grep -q "broken symbolic"
-        [ $? -eq 0 ] && printxln @yellow "[.] broken symbolic: $rname"
+        [ $? -eq 0 ] && _printx @yellow "[.] broken symbolic: $rname\n"
     done
 }
 
 _unmark_all() {
-    printx @red "[*] Remove all marks (y/n)? " && read ch 
+    _printx @red "[*] Remove all marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
-    printx @red "[*] Are you sure (y/n)? " && read ch 
+    _printx @red "[*] Are you sure (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
@@ -72,12 +72,12 @@ _unmark_all() {
 
 _unmark_broken() {
     [ "$_UNAME" = "MINGW" ] && return 0
-    printx @red "[*] Remove all broken marks (y/n)? " && read ch 
+    _printx @red "[*] Remove all broken marks (y/n)? " && read ch 
     [ "$ch" != "y" ] && return
     local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
         file "$_MARKPATH/$iname" | grep -q "broken symbolic"
-        [ $? -eq 0 ] && printxln @green "[-] broken symbolic: $iname" && rm -f "$_MARKPATH/$iname"
+        [ $? -eq 0 ] && _printx @green "[-] broken symbolic: $iname\n" && rm -f "$_MARKPATH/$iname"
     done
 }
 

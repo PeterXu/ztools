@@ -44,10 +44,10 @@ _tablist() {
         
         for opt in $opts; do
             tip=${opt/$rcur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip "
-            #printx @green "\n=>$opt, $rcur, $tip<=\n"
+            #_printx @green "\n=>$opt, $rcur, $tip<=\n"
         done
     fi
-    #printx @red "\n=>$pre2,$pre,$key: $tips<=\n"
+    #_printx @red "\n=>$pre2,$pre,$key: $tips<=\n"
     COMPREPLY=($(compgen -W "$tips" -- "$cur"))
 }
 

@@ -32,7 +32,7 @@ _zero_pm() {
 _zero_update() {
     local git=$(which git 2>/dev/null) || return 1
     (
-        jump ...
+        _jump ...
         echo "[*] Entering <$(pwd)> ..."
         echo "[*] Then auto-update will start ..."
         $git checkout --detach
@@ -52,11 +52,10 @@ _zero_set() {
     [ $# -eq 1 ] && action="$1"
     sh=$(which bash 2>/dev/null) || return 1
     (
-        jump ...
+        _jump ...
         echo "[*] Entering <$(pwd)> ..."
         echo "[*] Then set for shell ..."
         $sh zero_setting.sh $action
-        [ -f $ZBASH ] && source $ZBASH
     )
     return 0
 }

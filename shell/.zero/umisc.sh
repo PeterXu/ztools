@@ -202,8 +202,8 @@ _ini_parse() {
         sec=`echo "$sec" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         key=`echo "$key" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         val=`echo "$val" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
-        [ "$sec" != "" ] && secs=(${secs[@]} $sec) && mapunkey "$sec"
-        [ "$key" != "" -a "$val" != "" ] && mapset "${secs[-1]}" "$key" "$val"
+        [ "$sec" != "" ] && secs=(${secs[@]} $sec) && _mapunkey "$sec"
+        [ "$key" != "" -a "$val" != "" ] && _mapset "${secs[-1]}" "$key" "$val"
     done < $ini
 
     local vsecs=`_make_vname "${ini}_secs"` || return 1
