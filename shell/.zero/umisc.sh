@@ -217,6 +217,53 @@ _ini_secs() {
 }
 
 
+## ------------------------
+## make YouCompleteMe plugin
+_make_ycm() {
+    # check vimrc whether it is from ztools?
+    local vimdir=$HOME/.vim
+    [ ! -f $vimdir/vimrc.vim ] && return 1
+    
+    # check vundle
+    local workdir=$vimdir/bundle
+    local vundle=$workdir/Vundle.vim
+    if [ ! -d $vundle ]; then
+        mkdir -p $workdir || return 1
+        local uri="https://github.com/VundleVim/Vundle.vim.git"
+        git clone $uri $vundle || return 1
+    fi
+
+    # check ycm
+    local ycmdir=$workdir/YouCompleteMe
+    if [ ! -d $ycmdir ]; then
+        local tmpdir=${ycmdir}.tmp
+        local uri="https://github.com/Valloric/YouCompleteMe.git"
+        (
+        [ ! -d ${tmpdir} ] && git clone --recursive $uri ${tmpdir}
+        cd $tmpdir || exit 1 
+        git pull || exit 1
+        git submodule update --init --recursive || exit 1
+        ./install.sh --clang-completer || exit 1
+        ) || return 1
+
+        mv $tmpdir $ycmdir || return 1
+    fi
+
+    # config ycm
+    [ -f $workdir/config.vim ] && return 0
+    cat > $workdir/config.vim << EOF
+set nocompatible              " be iMproved, required
+filetype off                  " required
+set rtp+=\$HOME/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'   " required
+Plugin 'Valloric/YouCompleteMe'
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+EOF
+}
+
 
 ### init misc shell
 __init_misc() {
@@ -238,6 +285,8 @@ __init_misc() {
     alias ps-stime="_ps_ef 5 STIME"
     alias psr-stime="_ps_ef 5 STIME -r"
     alias psr-pid="_ps_ef 2 ' PID' -r"
+
+    alias make-ycm="_make_ycm"
 
     complete -F _ssh ssh
 }
