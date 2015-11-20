@@ -296,26 +296,27 @@ _docker_ctrl() {
 ### -----------
 ### init docker
 __init_docker() {
-    alias docker-psa="_docker_ps -a"
-    alias docker-pgrep="_docker_pgrep"
+    # for image
     alias docker-ls="docker images"
-    alias docker-stopa="_docker_stopall"
-    alias docker-rma="_docker_rmall"
-    alias docker-mingw="_docker_mingw"
-    
+    alias docker-untagged="docker images --filter 'dangling=true'"
     alias docker-sh="_docker_sh"
     complete -F _docker_sh_tips docker-sh
+    alias docker-ctrl="_docker_ctrl"
 
+    # for container
+    alias docker-psa="_docker_ps -a"
+    alias docker-pgrep="_docker_pgrep"
+    alias docker-stopa="_docker_stopall"
+    alias docker-rma="_docker_rmall"
     alias docker-enter="_docker_enter"
     complete -F _docker_enter_tips docker-enter
-
     alias docker-pid="docker inspect --format '{{.State.Pid}}'"
     complete -F _docker_pid_tips docker-pid
-
     alias docker-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
     complete -F _docker_ip_tips docker-ip
 
-    alias docker-ctrl="_docker_ctrl"
+    # for mingw
+    alias docker-mingw="_docker_mingw"
 }
 
 __help_docker_ctrl() {
@@ -334,20 +335,22 @@ EOF
 
 __help_docker() {
     echo "usage: "
-    local prefix="    [.]"
+    local fmt="%-30s %s" prefix="    [.]"
     echo
-    printf "%-20s %s\n" "$prefix docker-psa"    "Like docker ps -a"
-    printf "%-20s %s\n" "$prefix docker-pgrep"  "Like docker ps -a | grep .."
-    printf "%-20s %s\n" "$prefix docker-ls"     "Like docker images"
-    printf "%-20s %s\n" "$prefix docker-stopa"  "Stop all running containers"
-    printf "%-20s %s\n" "$prefix docker-rma"    "Remove all containers"
-    printf "%-20s %s\n" "$prefix docker-mingw"  "Init mingw env"
-    printf "%-20s %s\n" "$prefix docker-sh"     "Run /bin/sh in one image"
-    printf "%-20s %s\n" "$prefix docker-enter"  "Enter one running container"
-    printf "%-20s %s\n" "$prefix docker-pid"    "Acquire the pid of one image or container"
-    printf "%-20s %s\n" "$prefix docker-ip"     "Acquire the ip of one image or container"
-    printf "%-20s %s\n" "$prefix docker-ctrl"   "Control to run docker image by config"
-    printf "For general users, should set 'sudo usermod -aG docker username'"
+    printf "$fmt\n" "$prefix docker-ls"             "Like docker images"
+    printf "$fmt\n" "$prefix docker-untagged"       "List untagged docker images"
+    printf "$fmt\n" "$prefix docker-ctrl"           "Control to run docker image by config"
+
+    printf "$fmt\n" "$prefix docker-psa"    "Like docker ps -a"
+    printf "$fmt\n" "$prefix docker-pgrep"  "Like docker ps -a | grep .."
+    printf "$fmt\n" "$prefix docker-stopa"  "Stop all running containers"
+    printf "$fmt\n" "$prefix docker-rma"    "Remove all containers"
+    printf "$fmt\n" "$prefix docker-enter"  "Enter one running container"
+    printf "$fmt\n" "$prefix docker-pid"    "Acquire the pid of one image or container"
+    printf "$fmt\n" "$prefix docker-ip"     "Acquire the ip of one image or container"
+
+    printf "$fmt\n" "$prefix docker-mingw"  "Init mingw env"
+    printf "For general users, should set 'sudo usermod -aG docker username'\n"
     echo
 }
 
