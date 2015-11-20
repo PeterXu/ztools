@@ -1,8 +1,8 @@
 " ------------------------
 " For some global settings
-let mapleader = ":"
-let g:mapleader = ":"
-let g:vim_markdown_folding_disabled=1
+let mapleader = "cc"
+let g:mapleader = "cc"
+let g:vim_markdown_folding_disabled=0
 let g:openssl_backup=1
 
 
@@ -119,22 +119,14 @@ map <leader>aucc <Home>i<C-R>=
 " -----------------------------
 " custom functions and commands
 func! Usage(arg)
-    echo "\n[Usage]: \n" 
-    if a:arg == "misc" || a:arg == ""
-        echo "=== misc ===\n"
-            \ . "  <S-:> + ss:  spell checking\n"
-            \ . "  <S-:> + dt:  insert date, YYYY-MM-DD\n" 
-            \ . "  <S-:> + tn/to/tc/tm:  tabnew/tabonly/tabclose/tabmove\n" 
-            \ . "  <S-:> + aush/aupy/aucc:  insert author info for shell/python/c-c++\n"
-            \ . "  <S-:> + mit/bsd2/bsd3:  insert one license\n"
-            \ . "\n"
-    endif
-    if a:arg == "ycm" || a:arg == ""
-        echo "=== ycm ===\n"
-            \ . "  <C-O>:  jump back\n"
-            \ . "  <C-I>:  jump forward\n"
-            \ . "  <S-:> + jd:  goto definition else declaration\n"
-            \ . "  <S-:> + ff:  force compile and diagnostics"
+    if a:arg == ""
+        echo "\n[Usage]: \n" 
+            \ . "  cc + ss:                 spell checking\n"
+            \ . "  cc + dt:                 insert date, YYYY-MM-DD\n" 
+            \ . "  cc + tn/to/tc/tm:        tabnew/tabonly/tabclose/tabmove\n" 
+            \ . "  cc + aush/aupy/aucc:     insert author info for shell/python/c-c++\n"
+            \ . "  cc + mit/bsd2/bsd3:      insert one license\n"
+            \ . "  <S-:> + Ycm:             need to install YCM first\n"
             \ . "\n"
     endif
     echo
