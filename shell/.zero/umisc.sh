@@ -218,14 +218,26 @@ _ini_secs() {
 
 
 ## ------------------------
-## make YouCompleteMe plugin
-_make_ycm() {
-    # check vimrc whether it is from ztools?
+## install YouCompleteMe plugin
+_ycm_config() {
+    [ $# -ne 1 ] && __help_ycm config && return 1
+
+    local todo="$1"
     local vimdir=$HOME/.vim
-    [ ! -f $vimdir/vimrc.vim ] && return 1
-    
-    # check vundle
     local workdir=$vimdir/bundle
+    local ycmconf=$workdir/config.vim
+    if [ "$todo" = "clean" ]; then
+        rm -f $ycmconf
+        return 0
+    elif [ "$todo" = "install" ]; then
+        # check vimrc whether it is from ztools?
+        [ ! -f $vimdir/vimrc.vim ] && return 1
+    else
+        __help_ycm config
+        return 1
+    fi
+
+    # check vundle
     local vundle=$workdir/Vundle.vim
     if [ ! -d $vundle ]; then
         mkdir -p $workdir || return 1
@@ -251,9 +263,9 @@ _make_ycm() {
     fi
 
     # config ycm
-    rm -f $workdir/config.vim
+    rm -f $ycmconf
     local ycm="\$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-    cat > $workdir/config.vim << EOF
+    cat > $ycmconf << EOF
 set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=\$HOME/.vim/bundle/Vundle.vim
@@ -298,6 +310,27 @@ command! -nargs=* Ycm call YcmRun('<args>')
 
 EOF
 }
+_ycm_this() {
+    [ $# -ne 1 ] && __help_ycm this && return 1
+
+    local todo="$1"
+    if [ "$todo" = "clean" ]; then
+        rm -f ./.ycm_extra_conf.py{,c}
+    elif [ "$todo" = "install" ]; then
+        local ycm="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+        cp -f "$ycm" ./
+    else
+        __help_ycm this
+    fi
+}
+__help_ycm() {
+    local opt="config,this"
+    [ $# -gt 0 ] && opt="$*"
+    echo "usage:"
+    [[ "$opt" =~ "config" ]]    && echo "       ycm-config install|clean"
+    [[ "$opt" =~ "this" ]]      && echo "       ycm-this install|clean"
+    echo
+}
 
 
 ### init misc shell
@@ -321,7 +354,8 @@ __init_misc() {
     alias psr-stime="_ps_ef 5 STIME -r"
     alias psr-pid="_ps_ef 2 ' PID' -r"
 
-    alias make-ycm="_make_ycm"
+    alias ycm-config="_ycm_config"
+    alias ycm-this="_ycm_this"
 
     complete -F _ssh ssh
 }
