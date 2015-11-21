@@ -60,10 +60,11 @@ _marks_broken() {
 }
 
 _unmark_all() {
+    local ch
     _printx @red "[*] Remove all marks (y/n)? " && read ch 
-    [ "$ch" != "y" ] && return
+    [ "$ch" != "y" ] && return 0
     _printx @red "[*] Are you sure (y/n)? " && read ch 
-    [ "$ch" != "y" ] && return
+    [ "$ch" != "y" ] && return 0
     local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
         [ -f "$_MARKPATH/$iname" ] && rm -f "$_MARKPATH/$iname"
@@ -72,8 +73,9 @@ _unmark_all() {
 
 _unmark_broken() {
     [ "$_UNAME" = "MINGW" ] && return 0
+    local ch
     _printx @red "[*] Remove all broken marks (y/n)? " && read ch 
-    [ "$ch" != "y" ] && return
+    [ "$ch" != "y" ] && return 0
     local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
     for iname in $inames; do
         file "$_MARKPATH/$iname" | grep -q "broken symbolic"

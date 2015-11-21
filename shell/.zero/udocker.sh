@@ -70,6 +70,10 @@ _docker_stopall() {
     local ctlen=${#ctids[@]}
     [ $ctlen -le 0 ] && _printx "[*] No running containers\n\n" && return 0
 
+    local ch
+    _printx @yellow "[*] Stop all running containers (y/n)? " && read ch 
+    [ "$ch" != "y" ] && return 0
+
     local idx=0
     while [ $idx -lt $ctlen ]; do
         _printx @green "    [$idx] stop ${ctnames[idx]}: "
@@ -88,6 +92,7 @@ _docker_rmall() {
     _printx @yellow "[*] Exited containers: \n"
     echo "   " ${ctnames[@]}
 
+    local ch
     _printx @yellow "[*] Remove all exited containers (y/n)? " && read ch 
     [ "$ch" != "y" ] && return 0
 
@@ -291,6 +296,12 @@ _docker_ctrl() {
     fi
     return 0
 }
+_docker_ctrl_tips() {
+    local fname="$HOME/.docker/dkctrl.ini"
+    _ini_parse "$fname" || return 1
+    local opts=`_ini_secs "$fname"` || return 1
+    _tablist "docker-ctrl" "$opts"
+}
 
 
 ### -----------
@@ -302,6 +313,7 @@ __init_docker() {
     alias docker-sh="_docker_sh"
     complete -F _docker_sh_tips docker-sh
     alias docker-ctrl="_docker_ctrl"
+    complete -F _docker_ctrl_tips docker-ctrl
 
     # for container
     alias docker-psa="_docker_ps -a"
