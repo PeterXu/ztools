@@ -266,26 +266,29 @@ _ycm_config() {
     rm -f $ycmconf
     local ycm="\$HOME/.vim/misc/.ycm_extra_conf.py"
     cat > $ycmconf << EOF
-set nocompatible              " be iMproved, required
-filetype off                  " required
-set rtp+=\$HOME/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'   " required
-Plugin 'Valloric/YouCompleteMe'
-call vundle#end()            " required
-filetype plugin indent on    " required
+func! YcmInit()
+    set nocompatible              " be iMproved, required
+    filetype off                  " required
+    set rtp+=\$HOME/.vim/bundle/Vundle.vim
+    call vundle#begin()
+    Plugin 'VundleVim/Vundle.vim'   " required
+    Plugin 'Valloric/YouCompleteMe'
+    call vundle#end()            " required
+    filetype plugin indent on    " required
 
-nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-nnoremap <leader>ff :YcmForceCompileAndDiagnostics<CR>
-nnoremap <leader>er :YcmDiags<CR>
+    " GoTo/GoToInclude/GoToDeclaration/GoToDefinition
+    nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+    nnoremap <leader>ff :YcmForceCompileAndDiagnostics<CR>
+    nnoremap <leader>er :YcmDiags<CR>
 
-let g:ycm_global_ycm_extra_conf = expand('$ycm')
-" Do not ask when starting vim
-let g:ycm_confirm_extra_conf = 0
-" Disable left warning dialog
-let g:ycm_show_diagnostics_ui = 0
-" Completion Tips
-let g:ycm_key_invoke_completion = '<C-c>'
+    let g:ycm_global_ycm_extra_conf = expand('$ycm')
+    " Do not ask when starting vim
+    let g:ycm_confirm_extra_conf = 0
+    " Disable left warning dialog
+    let g:ycm_show_diagnostics_ui = 0
+    " Completion Tips
+    let g:ycm_key_invoke_completion = '<C-c>'
+endfunc
 
 func! YcmRun(arg)
     if a:arg == "help" || a:arg == ""
@@ -306,7 +309,9 @@ func! YcmRun(arg)
         YcmDiags
     endif
 endfunc
+
 command! -nargs=* Ycm call YcmRun('<args>')
+call YcmInit()
 
 EOF
 }
