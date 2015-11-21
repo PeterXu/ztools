@@ -226,12 +226,12 @@ _ycm_config() {
     local vimdir=$HOME/.vim
     local workdir=$vimdir/bundle
     local ycmconf=$workdir/config.vim
-    if [ "$todo" = "clean" ]; then
-        rm -f $ycmconf
-        return 0
-    elif [ "$todo" = "install" ]; then
+    if [ "$todo" = "install" ]; then
         # check vimrc whether it is from ztools?
         [ ! -f $vimdir/vimrc.vim ] && return 1
+    elif [ "$todo" = "clean" ]; then
+        rm -f $ycmconf
+        return 0
     else
         __help_ycm config
         return 1
@@ -264,7 +264,7 @@ _ycm_config() {
 
     # config ycm
     rm -f $ycmconf
-    local ycm="\$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+    local ycm="\$HOME/.vim/misc/.ycm_extra_conf.py"
     cat > $ycmconf << EOF
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -314,11 +314,17 @@ _ycm_this() {
     [ $# -ne 1 ] && __help_ycm this && return 1
 
     local todo="$1"
-    if [ "$todo" = "clean" ]; then
-        rm -f ./.ycm_extra_conf.py{,c}
-    elif [ "$todo" = "install" ]; then
-        local ycm="$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-        cp -f "$ycm" ./
+    local ycm="$HOME/.vim/misc/.ycm_extra_conf.py"
+    local dst="./.ycm_extra_conf.py"
+    if [ "$todo" = "cpp" ]; then
+        cp -f "$ycm" $dst
+    elif [ "$todo" = "c99" ]; then
+        if cp -f "$ycm" $dst; then
+            sed -i "s/^'-std=c++11',/'-std=c99',/" $dst
+            sed -i "s/^'c++',/'c',/" $dst
+        fi
+    elif [ "$todo" = "clean" ]; then
+        rm -f $dst ${dst}c
     else
         __help_ycm this
     fi
@@ -328,7 +334,7 @@ __help_ycm() {
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
     [[ "$opt" =~ "config" ]]    && echo "       ycm-config install|clean"
-    [[ "$opt" =~ "this" ]]      && echo "       ycm-this install|clean"
+    [[ "$opt" =~ "this" ]]      && echo "       ycm-this cpp|c99|clean"
     echo
 }
 
