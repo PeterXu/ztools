@@ -315,8 +315,8 @@ call YcmInit()
 
 EOF
 }
-_ycm_this() {
-    [ $# -ne 1 ] && __help_ycm this && return 1
+_ycm_here() {
+    [ $# -ne 1 ] && __help_ycm here && return 1
 
     local todo="$1"
     local ycm="$HOME/.vim/misc/.ycm_extra_conf.py"
@@ -331,15 +331,15 @@ _ycm_this() {
     elif [ "$todo" = "clean" ]; then
         rm -f $dst ${dst}c
     else
-        __help_ycm this
+        __help_ycm here
     fi
 }
 __help_ycm() {
-    local opt="config,this"
+    local opt="config,here"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
     [[ "$opt" =~ "config" ]]    && echo "       ycm-config install|clean"
-    [[ "$opt" =~ "this" ]]      && echo "       ycm-this cpp|c99|clean"
+    [[ "$opt" =~ "here" ]]      && echo "       ycm-here cpp|c99|clean"
     echo
 }
 
@@ -366,7 +366,7 @@ __init_misc() {
     alias psr-pid="_ps_ef 2 ' PID' -r"
 
     alias ycm-config="_ycm_config"
-    alias ycm-this="_ycm_this"
+    alias ycm-here="_ycm_here"
 
     complete -F _ssh ssh
 }
