@@ -344,6 +344,21 @@ __help_ycm() {
 }
 
 
+##--------------
+## For pip
+_set_pip() {
+    local pip="$HOME/.pip"
+    mkdir -p "$pip" || return 1
+    rm -f $pip/pip.conf
+    cat > $pip/pip.conf << EOF
+[install]
+install-option=--prefix=~/.local
+
+EOF
+}
+
+
+
 ### init misc shell
 __init_misc() {
     alias mapget="_mapget"
@@ -367,6 +382,7 @@ __init_misc() {
 
     alias ycm-config="_ycm_config"
     alias ycm-here="_ycm_here"
+    alias set-pip="_set_pip"
 
     complete -F _ssh ssh
 }

@@ -362,7 +362,12 @@ __help_docker() {
     printf "$fmt\n" "$prefix docker-ip"     "Acquire the ip of one image or container"
 
     printf "$fmt\n" "$prefix docker-mingw"  "Init mingw env"
-    printf "For general users, should set 'sudo usermod -aG docker username'\n"
+    echo
+    printf "$fmt\n" "    For general users, should set 'sudo usermod -aG docker username'"
+    printf "$fmt\n" "    For private registry, set as below:"
+    printf "$fmt\n" "       update /lib/systemd/system/docker.service:"
+    printf "$fmt\n" "       EnvironmentFile=-/etc/default/docker"
+    printf "$fmt\n" "       ExecStart=/usr/bin/docker daemon $DOCKER_OPTS -H fd://"
     echo
 }
 
