@@ -1,5 +1,6 @@
 FROM ubuntu:15.10
 MAINTAINER Peter <peter@uskee.org>
+LABEL "org.uskee.vendor"="Peter"
 
 
 ## update apt-get repo
@@ -17,11 +18,10 @@ RUN apt-get -f install
 RUN apt-get clean
 
 
-## init script
+## work script
 WORKDIR /root
 RUN mkdir -p /root/bin
 ADD glusterdctl /root/bin
-ADD ./init /root/bin
 
 ADD glusterfs-bin.tar.gz /root
 RUN mv /root/var/lib/glusterfs /var/lib/
@@ -29,11 +29,9 @@ RUN rm -rf /root/var
 RUN touch /var/lib/glusterfs/var/lib/glusterd/{glusterd.info,options}
 RUN echo "global-option-version=0" >/var/lib/glusterfs/var/lib/glusterd/options
 
-ENV PATH $PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin
-
-VOLUME ["/var/lib/xdata"]
+VOLUME ["/var/lib/gdata"]
 
 ## start program and args
-ENTRYPOINT ["/root/bin/init"]
-#CMD ["--help"]
+#ENTRYPOINT [""]
+CMD ["/var/lib/glusterfs/sbin/glusterd", "-N", "-p", "/var/run/glusterd.pid", "-f", "/var/lib/glusterfs/etc/glusterfs/glusterd.vol"]
 
