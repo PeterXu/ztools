@@ -1,0 +1,10 @@
+#!/bin/sh
+
+/root/bin/glusterdctl start
+
+while :
+do
+    sleep 97
+done
+
+exit 0
