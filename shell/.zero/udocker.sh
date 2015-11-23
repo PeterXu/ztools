@@ -110,6 +110,12 @@ _docker_sh() {
     [ "$_UNAME" = "MINGW" ] && kPty="winpty"
     $kPty docker run -it $* sh
 }
+_docker_bash() {
+    [ $# -lt 1 ] && echo "usage: docker-bash [opt] IMAGE" && return 1
+    local kPty=""
+    [ "$_UNAME" = "MINGW" ] && kPty="winpty"
+    $kPty docker run -it $* bash
+}
 
 ## set image tips
 _docker_images_tips() {
@@ -120,6 +126,10 @@ _docker_images_tips() {
 _docker_sh_tips() { 
     _docker_images_tips docker-sh 
 }
+_docker_bash_tips() { 
+    _docker_images_tips docker-bash 
+}
+
 
 ## set ps containter tips
 _docker_ps_tips() {
@@ -312,6 +322,8 @@ __init_docker() {
     alias docker-untagged="docker images --filter 'dangling=true'"
     alias docker-sh="_docker_sh"
     complete -F _docker_sh_tips docker-sh
+    alias docker-bash="_docker_bash"
+    complete -F _docker_bash_tips docker-bash
     alias docker-ctrl="_docker_ctrl"
     complete -F _docker_ctrl_tips docker-ctrl
 
