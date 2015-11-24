@@ -28,10 +28,10 @@ RUN mv /root/var/lib/glusterfs /var/lib/
 RUN rm -rf /root/var
 RUN touch /var/lib/glusterfs/var/lib/glusterd/{glusterd.info,options}
 RUN echo "global-option-version=0" >/var/lib/glusterfs/var/lib/glusterd/options
-
 VOLUME ["/var/lib/gdata"]
 
 ## start program and args
+ENV PATH "$PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
 #ENTRYPOINT [""]
 CMD ["/var/lib/glusterfs/sbin/glusterd", "-N", "-p", "/var/run/glusterd.pid", "-f", "/var/lib/glusterfs/etc/glusterfs/glusterd.vol"]
 
