@@ -1,4 +1,4 @@
-FROM ubuntu:15.10
+FROM ubuntu:latest
 MAINTAINER Peter <peter@uskee.org>
 LABEL "org.uskee.vendor"="Peter"
 
@@ -29,6 +29,7 @@ RUN rm -rf /root/var
 RUN touch /var/lib/glusterfs/var/lib/glusterd/{glusterd.info,options}
 RUN echo "global-option-version=0" >/var/lib/glusterfs/var/lib/glusterd/options
 VOLUME ["/var/lib/gdata"]
+
 
 ## start program and args
 ENV PATH "$PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
