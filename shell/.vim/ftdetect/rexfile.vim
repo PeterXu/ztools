@@ -1,1 +1,1 @@
-au BufNewFile,BufRead Rexfile set ft=perl
+au BufNewFile,BufRead Rexfile set ft=rexfile.perl
