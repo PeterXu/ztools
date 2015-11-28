@@ -33,7 +33,7 @@ _unmark() {
     [ $# -gt 1 ] && __help_mark unmark && return
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
     [ $# -eq 1 ] && iname="$_MARKPATH/$1"
-    [ -f "$iname" ] && rm -i "$iname"
+    [ -e "$iname" ] && rm -i "$iname"
 }
 _marks() {
     if [ "$_UNAME" = "MINGW" ]; then
