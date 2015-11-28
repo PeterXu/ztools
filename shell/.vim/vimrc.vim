@@ -2,7 +2,7 @@
 " For some global settings
 let mapleader = "cc"
 let g:mapleader = "cc"
-let g:vim_markdown_folding_disabled=0
+let g:vim_markdown_folding_disabled=1
 let g:openssl_backup=1
 
 

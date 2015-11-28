@@ -16,6 +16,10 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
+# for pyclewn
+pyclewn*
+clewn*
+
 # for ztools
 *.pyc
 envall.sh
