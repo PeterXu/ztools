@@ -52,11 +52,12 @@ _zero_set() {
     [ $# -eq 1 ] && action="$1"
     sh=$(which bash 2>/dev/null) || return 1
     (
-        _jump ...
+        cd -P $ZTOOLS || exit 1
         echo "[*] Entering <$(pwd)> ..."
         echo "[*] Then set for shell ..."
         $sh zero_setting.sh $action
     )
+    [ -f "$ZBASH" ] && source "$ZBASH"
     return 0
 }
 
