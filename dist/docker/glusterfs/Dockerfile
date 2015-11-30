@@ -6,7 +6,7 @@ LABEL "org.uskee.vendor"="Peter"
 ## update apt-get repo
 ADD sources.list /etc/apt/
 RUN apt-get update
-RUN apt-get install -y apt-utils fuse portmap net-tools uuid sqlite3 python
+RUN apt-get install -y apt-utils fuse portmap net-tools uuid sqlite3 python attr
 RUN apt-get install -y libssl1.0.0 libuuid1 libsqlite3-0 libxml2 libreadline6 libncurses5
 #RUN apt-get install -y python-ctypeslib python-simplejson
 RUN apt-get install -y libaio1 libacl1 libattr1 libcmocka0 liburcu1 libibverbs1 librdmacm1
@@ -25,7 +25,7 @@ RUN mv /root/var/lib/glusterfs /var/lib/
 RUN rm -rf /root/var
 RUN touch /var/lib/glusterfs/var/lib/glusterd/glusterd.info
 RUN echo "global-option-version=0" > /var/lib/glusterfs/var/lib/glusterd/options
-VOLUME ["/var/lib/gdata"]
+#VOLUME ["/var/lib/gdata"]
 
 
 ## start program and args
