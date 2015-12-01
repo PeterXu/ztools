@@ -17,8 +17,7 @@ RUN apt-get clean
 
 ## work script
 WORKDIR /root
-RUN mkdir -p /root/bin
-ADD glusterdctl /root/bin
+ADD glusterdctl /usr/sbin
 
 ADD glusterfs-bin.tar.gz /root
 RUN mv /root/var/lib/glusterfs /var/lib/
@@ -32,7 +31,7 @@ RUN echo "global-option-version=0" > /var/lib/glusterfs/var/lib/glusterd/options
 
 
 ## start program and args
-#ENV PATH "$PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
+#ENV PATH "$PATH:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
 #ENTRYPOINT [""]
 CMD ["/var/lib/glusterfs/sbin/glusterd", "-N", "-p", "/var/run/glusterd.pid", "-f", "/var/lib/glusterfs/etc/glusterfs/glusterd.vol"]
 
