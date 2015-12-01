@@ -23,13 +23,16 @@ ADD glusterdctl /root/bin
 ADD glusterfs-bin.tar.gz /root
 RUN mv /root/var/lib/glusterfs /var/lib/
 RUN rm -rf /root/var
+
 RUN touch /var/lib/glusterfs/var/lib/glusterd/glusterd.info
+RUN ln -s /var/lib/glusterfs/sbin/gluster /usr/sbin/gluster
+RUN ln -s /var/lib/glusterfs/rootfs/sbin/mount.glusterfs /sbin/mount.glusterfs
 RUN echo "global-option-version=0" > /var/lib/glusterfs/var/lib/glusterd/options
 #VOLUME ["/var/lib/gdata"]
 
 
 ## start program and args
-ENV PATH "$PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
+#ENV PATH "$PATH:/root/bin:/var/lib/glusterfs/bin:/var/lib/glusterfs/sbin"
 #ENTRYPOINT [""]
 CMD ["/var/lib/glusterfs/sbin/glusterd", "-N", "-p", "/var/run/glusterd.pid", "-f", "/var/lib/glusterfs/etc/glusterfs/glusterd.vol"]
 
