@@ -65,9 +65,8 @@ _docker_pname() {
 }
 _docker_stopall() {
     [ $# -gt 0 ] && return 1
-    local ctids=($(_docker_ps -f status=running --format "{{.ID}}"))
     local ctnames=($(_docker_ps -f status=running --format "{{.Names}}"))
-    local ctlen=${#ctids[@]}
+    local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No running containers\n\n" && return 0
 
     local ch
@@ -77,18 +76,18 @@ _docker_stopall() {
     local idx=0
     while [ $idx -lt $ctlen ]; do
         _printx @green "    [$idx] stop ${ctnames[idx]}: "
-        docker stop ${ctids[idx]}
+        docker stop ${ctnames[idx]}
         idx=$((idx+1))
     done
     echo
 }
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
-    local ctids=($(_docker_ps -f status=created -f status=exited --format "{{.ID}}"))
-    local ctlen=${#ctids[@]}
+
+    local ctnames=($(_docker_ps -f status=created -f status=exited --format "{{.Names}}"|grep -v "_data"))
+    local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No exited containers\n\n" && return 0
 
-    local ctnames=($(_docker_ps -f status=created -f status=exited --format "{{.Names}}"))
     _printx @yellow "[*] Exited containers: \n"
     echo "   " ${ctnames[@]}
 
@@ -99,7 +98,7 @@ _docker_rmall() {
     local idx=0
     while [ $idx -lt $ctlen ]; do
         _printx @green "    [$idx] remove ${ctnames[idx]}: "
-        docker rm ${ctids[idx]}
+        docker rm ${ctnames[idx]}
         idx=$((idx+1))
     done
     echo
@@ -341,7 +340,7 @@ __init_docker() {
     # for mingw
     alias docker-mingw="_docker_mingw"
 
-    mkdir -p "$HOME/.docker"
+    mkdir -p "$HOME/.docker" >/dev/null 2>&1
 }
 
 __help_docker_ctrl() {
