@@ -258,7 +258,7 @@ _docker_ctrl() {
     local todo="" image=""
     local fname="$HOME/.docker/dkctrl.ini"
 
-    local opts="hcli:"
+    local opts="hcli:a:"
     local args=`getopt $opts $*`
     [ $? != 0 ] && __help_docker_ctrl && return 1
 
@@ -269,11 +269,12 @@ _docker_ctrl() {
             -c) _gen_config "$fname"; return 0;;
             -l) todo="list"; shift;;
             -i) todo="info"; image="$2"; shift; shift;;
+            -a) todo="todo"; action="$2"; shift; shift;;
             --) shift; break;;
         esac
     done
 
-    [ "$todo" = "" -a $# -lt 1 ] && __help_docker_ctrl && return 1
+    [ "$todo" = "" ] && __help_docker_ctrl && return 1
 
     _ini_parse "$fname"
     if [ $? -ne 0 ]; then
@@ -286,31 +287,30 @@ _docker_ctrl() {
         _printx ${secs//' '/'\n'} "\n\n"
     elif [ "$todo" = "info" ]; then
         _info_image "$image"
-    else
-        [ $# -le 0 ] && __help_docker_ctrl && return 1
+    elif [ "$todo" = "todo" ]; then
+        [ $# -le 0 -o "$action" = "" ] && __help_docker_ctrl && return 1
+
         local str opt env img cmd
         for sec in $*; do
-            img=$(mapget "$sec" "img")
-            if [ "$img" = "" ]; then
-                _printx @y "[WARN] " && _printx "No such section: $sec\n"
-                continue
+            if [ "$action" = "run" ]; then
+                img=$(mapget "$sec" "img")
+                if [ "$img" = "" ]; then
+                    _printx @y "[WARN] " && _printx "No such section: $sec\n"
+                    continue
+                fi
+                opt=$(mapget "$sec" "opt")
+                env=$(mapget "$sec" "env")
+                cmd=$(mapget "$sec" "cmd")
+                str="docker run $opt --name=\"$sec\" $env $img $cmd"
+            else
+                str="docker $action $sec"
             fi
-            opt=$(mapget "$sec" "opt")
-            env=$(mapget "$sec" "env")
-            cmd=$(mapget "$sec" "cmd")
-            str="docker run $opt $env $img $cmd"
             _printx @green "[INFO] " && _printx "$str\n" 
             eval $str
         done
         echo
     fi
     return 0
-}
-_docker_ctrl_tips() {
-    local fname="$HOME/.docker/dkctrl.ini"
-    _ini_parse "$fname" || return 1
-    local opts=`_ini_secs "$fname"` || return 1
-    _tablist "docker-ctrl" "$opts"
 }
 
 
@@ -325,7 +325,6 @@ __init_docker() {
     alias docker-bash="_docker_bash"
     complete -F _docker_bash_tips docker-bash
     alias docker-ctrl="_docker_ctrl"
-    complete -F _docker_ctrl_tips docker-ctrl
 
     # for container
     alias docker-psa="_docker_ps -a"
@@ -347,11 +346,12 @@ __help_docker_ctrl() {
     local prog="docker-ctrl"
     cat > /dev/stdout << EOF
 usage:
-    $prog [-h | -l | -i image | image1 [image2 ..]]
+    $prog [-h | -l | -i item | -a [run|start|stop|restart|rm] | item1 [item2 ..]]
         -h:         help
         -c:         generate <\$HOME/.docker/dkctrl.ini> if not exists
         -l:         list available objects
-        -i image:   list image's config
+        -a:         todo for item
+        -i image:   list item config
 
 EOF
     return 0
