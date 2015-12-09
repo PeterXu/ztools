@@ -340,6 +340,8 @@ __init_docker() {
 
     # for mingw
     alias docker-mingw="_docker_mingw"
+
+    mkdir -p "$HOME/.docker"
 }
 
 __help_docker_ctrl() {
