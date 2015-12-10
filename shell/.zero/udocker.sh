@@ -252,9 +252,29 @@ cmd=bash
 
 EOF
 }
+ 
 
+_docker_todo() { # usage: _docker_todo action section
+    [ $# -ne 2 ] && return 1
+    local action="$1" sec="$2" img opt env cmd str
+    if [ "$action" = "run" ]; then
+        img=$(mapget "$sec" "img")
+        if [ "$img" = "" ]; then
+            _printx @y "[WARN] " && _printx "No such section: $sec\n"
+            return 1
+        fi
+        opt=$(mapget "$sec" "opt")
+        env=$(mapget "$sec" "env")
+        cmd=$(mapget "$sec" "cmd")
+        str="docker run $opt --name=\"$sec\" $env $img $cmd"
+    else
+        str="docker $action $sec"
+    fi
+    _printx @green "[INFO] " && _printx "cmd => $str\n" 
+    eval $str
+}
 _docker_ctrl() {
-    local todo="" image=""
+    local todo="" image="" action=""
     local fname="$HOME/.docker/dkctrl.ini"
 
     local opts="hcli:a:"
@@ -272,7 +292,6 @@ _docker_ctrl() {
             --) shift; break;;
         esac
     done
-
     [ "$todo" = "" ] && __help_docker_ctrl && return 1
 
     _ini_parse "$fname"
@@ -283,33 +302,43 @@ _docker_ctrl() {
 
     if [ "$todo" = "list" ]; then
         local secs=`_ini_secs "$fname"` || return 1
-        _printx ${secs//' '/'\n'} "\n\n"
+        local sec imgs groups desc idx1=0 idx2=0
+        for sec in $secs; do
+            sec=$(_trim $sec)
+            if [ ${sec:0:1} = "@" ]; then
+                desc=$(_mapget "$sec" "items")
+                groups="$groups  [$idx2] ${sec}:    ${desc}\n"
+                idx2=$((idx2+1))
+            else
+                imgs="$imgs  [$idx1] ${sec}\n"
+                idx1=$((idx1+1))
+            fi
+        done
+        _printx @g "[*] containers:\n" && _printx "$imgs\n"
+        _printx @g "[*] groups:\n" && _printx "$groups\n"
     elif [ "$todo" = "info" ]; then
         _info_image "$image"
     elif [ "$todo" = "todo" ]; then
         [ $# -le 0 -o "$action" = "" ] && __help_docker_ctrl && return 1
 
-        local str opt env img cmd
+        local sec
         for sec in $*; do
-            if [ "$action" = "run" ]; then
-                img=$(mapget "$sec" "img")
-                if [ "$img" = "" ]; then
-                    _printx @y "[WARN] " && _printx "No such section: $sec\n"
-                    continue
-                fi
-                opt=$(mapget "$sec" "opt")
-                env=$(mapget "$sec" "env")
-                cmd=$(mapget "$sec" "cmd")
-                str="docker run $opt --name=\"$sec\" $env $img $cmd"
+            if [ ${sec:0:1} = "@" ]; then
+                local items=$(_mapget "$sec" "items")
+                for sec in $items; do
+                    if [[ "$sec" != *[!0-9]* ]]; then
+                        sleep $sec 2>/dev/null
+                    else
+                        _docker_todo  "$action" "$sec" || return 1
+                    fi
+                done
+                echo
             else
-                str="docker $action $sec"
+                _docker_todo  "$action" "$sec" || return 1
             fi
-            _printx @green "[INFO] " && _printx "$str\n" 
-            eval $str
         done
         echo
     fi
-    return 0
 }
 
 

@@ -23,6 +23,17 @@ _make_rname() {
     [ $# -eq 1 ] && _escape "${1}" || return 1
 }
 
+## trim left/right spaces
+_trim() {
+    [ $# -eq 1 ] && echo "$1" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'
+}
+_triml() {
+    [ $# -eq 1 ] && echo "$1" | sed 's/^[ \t]*//'
+}
+_trimr() {
+    [ $# -eq 1 ] && echo "$1" | sed 's/[ \t]*$//'
+}
+
 
 ## ------------------------------------
 ## For bash tab tips: _tablist key opts
