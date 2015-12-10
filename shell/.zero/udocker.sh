@@ -84,7 +84,7 @@ _docker_stopall() {
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
 
-    local ctnames=($(_docker_ps -f status=created -f status=exited --format "{{.Names}}"|grep -v "_data"))
+    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"|grep -v "data$"))
     local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No exited containers\n\n" && return 0
 
@@ -258,6 +258,13 @@ _docker_todo() { # usage: _docker_todo action section
     [ $# -ne 2 ] && return 1
     local action="$1" sec="$2" img opt env cmd str
     if [ "$action" = "run" ]; then
+        _docker_ps -a --format "{{.Names}}" | grep "^$sec$" >/dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            docker start "$sec"
+            _printx @y "[WARN] <$sec> has been existed!\n\n"
+            return;
+        fi
+
         img=$(mapget "$sec" "img")
         if [ "$img" = "" ]; then
             _printx @y "[WARN] " && _printx "No such section: $sec\n"
@@ -268,7 +275,10 @@ _docker_todo() { # usage: _docker_todo action section
         cmd=$(mapget "$sec" "cmd")
         str="docker run $opt --name=\"$sec\" $env $img $cmd"
     else
-        str="docker $action $sec"
+        case "$action" in
+            rm) str="docker stop $sec >/dev/null 2>&1; docker rm $sec >/dev/null 2>&1";;
+            *) str="docker $action $sec";;
+        esac
     fi
     _printx @green "[INFO] " && _printx "cmd => $str\n" 
     eval $str
