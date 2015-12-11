@@ -203,7 +203,11 @@ _ini_parse() {
         key=`echo "$key" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         val=`echo "$val" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         [ "$sec" != "" ] && secs=(${secs[@]} $sec) && _mapunkey "$sec"
-        [ "$key" != "" -a "$val" != "" ] && _mapset "${secs[-1]}" "$key" "$val"
+        if [ "$key" != "" -a "$val" != "" ]; then
+            _mapset "${secs[-1]}" "$key" "$val"
+        elif [ "$key" != "" ]; then
+            _mapdel "${secs[-1]}" "$key"
+        fi
     done < $ini
 
     local vsecs=`_make_vname "${ini}_secs"` || return 1
