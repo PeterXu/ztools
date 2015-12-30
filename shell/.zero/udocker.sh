@@ -69,8 +69,11 @@ _docker_stopall() {
     local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No running containers\n\n" && return 0
 
+    _printx @yellow "[*] Running containers: \n"
+    echo "   " ${ctnames[@]}
+
     local ch
-    _printx @yellow "[*] Stop all running containers (y/n)? " && read ch 
+    _printx @yellow "[*] Stop all (y/n)? " && read ch 
     [ "$ch" != "y" ] && return 0
 
     local idx=0
