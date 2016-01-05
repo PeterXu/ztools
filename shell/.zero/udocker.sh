@@ -354,6 +354,24 @@ _docker_ctrl() {
     fi
 }
 
+_docker_build() {
+    [ $# -ne 1 ] && echo "usage: docker-build tag" && return 0
+    local tag="$1"
+    local name=$(basename $(pwd))
+    [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
+    echo "[INFO] To build lark.io/$name:$tag ..." && read
+    docker build -t lark.io/$name:$tag .
+}
+
+_docker_push() {
+    [ $# -ne 1 ] && echo "usage: docker-push tag" && return 0
+    local tag="$1"
+    local name=$(basename $(pwd))
+    [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
+    echo "[INFO] To push lark.io/$name:$tag ..." && read
+    docker push lark.io/$name:$tag
+}
+
 
 ### -----------
 ### init docker
@@ -382,7 +400,11 @@ __init_docker() {
     # for mingw
     alias docker-mingw="_docker_mingw"
 
-    mkdir -p "$HOME/.docker" >/dev/null 2>&1
+    # for docker build/push
+    alias docker-build="_docker_build"
+    alias docker-push="_docker_push"
+
+    #mkdir -p "$HOME/.docker" >/dev/null 2>&1
 }
 
 __help_docker_ctrl() {
