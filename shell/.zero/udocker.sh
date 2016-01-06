@@ -354,8 +354,8 @@ _docker_ctrl() {
     fi
 }
 
-_docker_build() {
-    [ $# -ne 1 ] && echo "usage: docker-build tag" && return 0
+_docker_buildx() {
+    [ $# -ne 1 ] && echo "usage: docker-buildx tag" && return 0
     local tag="$1"
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
@@ -363,8 +363,8 @@ _docker_build() {
     docker build -t lark.io/$name:$tag .
 }
 
-_docker_push() {
-    [ $# -ne 1 ] && echo "usage: docker-push tag" && return 0
+_docker_pushx() {
+    [ $# -ne 1 ] && echo "usage: docker-pushx tag" && return 0
     local tag="$1"
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
@@ -401,8 +401,8 @@ __init_docker() {
     alias docker-mingw="_docker_mingw"
 
     # for docker build/push
-    alias docker-build="_docker_build"
-    alias docker-push="_docker_push"
+    alias docker-buildx="_docker_buildx"
+    alias docker-pushx="_docker_pushx"
 
     #mkdir -p "$HOME/.docker" >/dev/null 2>&1
 }
@@ -429,6 +429,8 @@ __help_docker() {
     printf "$fmt\n" "$prefix docker-ls"             "Like docker images"
     printf "$fmt\n" "$prefix docker-untagged"       "List untagged docker images"
     printf "$fmt\n" "$prefix docker-ctrl"           "Control to run docker image by config"
+    printf "$fmt\n" "$prefix docker-buildx"         "Auto build from current directory"
+    printf "$fmt\n" "$prefix docker-pushx"          "Auto push according to docker-buildx"
 
     printf "$fmt\n" "$prefix docker-psa"    "Like docker ps -a"
     printf "$fmt\n" "$prefix docker-pgrep"  "Like docker ps -a | grep .."
