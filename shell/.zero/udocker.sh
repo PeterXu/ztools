@@ -359,7 +359,10 @@ _docker_buildx() {
     local tag="$1"
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
-    echo "[INFO] To build lark.io/$name:$tag ..." && read
+    echo "[INFO] To build lark.io/$name:$tag ..."
+    local ch
+    printf "[INFO] continue (y/n)? " && read ch
+    [ "$ch" != "y" ] && return 0
     docker build -t lark.io/$name:$tag .
 }
 
@@ -368,7 +371,10 @@ _docker_pushx() {
     local tag="$1"
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
-    echo "[INFO] To push lark.io/$name:$tag ..." && read
+    echo "[INFO] To push lark.io/$name:$tag ..."
+    local ch
+    printf "[INFO] continue (y/n)? " && read ch
+    [ "$ch" != "y" ] && return 0
     docker push lark.io/$name:$tag
 }
 
