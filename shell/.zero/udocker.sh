@@ -362,6 +362,7 @@ _docker_buildx() {
     echo "[INFO] To build lark.io/$name:$tag ..."
     local ch
     _printx @green "[INFO] continue (y/n)? " && read ch
+    echo
     [ "$ch" != "y" ] && return 0
     docker build -t lark.io/$name:$tag .
 }
@@ -374,6 +375,7 @@ _docker_pushx() {
     echo "[INFO] To push lark.io/$name:$tag ..."
     local ch
     _printx @green "[INFO] continue (y/n)? " && read ch
+    echo
     [ "$ch" != "y" ] && return 0
     docker push lark.io/$name:$tag
 }
