@@ -60,24 +60,27 @@ _ssh() {
 ## ---------------------
 ## for python virtualenv
 __help_venv() {
-    echo "usage: venv init|quit|renew"
+    echo "usage: venv init|quit|renew [path]"
     echo "       renew  => create env if not exist, extra options by setting VENV_OPTS"
     echo "       init => enter python virtual env"
     echo "       quit => quit python virtual env"
+    echo "       [path] => if none use ~/.vv, else path/.vv"
     echo
     return 0
 }
 _venv() {
-    [ $# -ne 1 ] && __help_venv && return 1
+    [ $# -ne 1 -a $# -ne 2 ] && __help_venv && return 1
     which virtualenv 2>/dev/null 1>&2 || return 1
+    local action="$1" path="$2"
 
-    local vv=$HOME/.vv
+    local vv="$HOME/.vv"
+    [ "$path" != "" ] && vv="$path/.vv"
     local todo=$vv/bin/activate
-    case "$1" in
+    case "$action" in
         renew)  rm -rf $vv
                 virtualenv $VENV_OPTS $vv
                 ;;
-        init)   [ -f $todo ] && source $todo;;
+        init)   [ -f $todo ] && . $todo;;
         quit)   deactivate 2>/dev/null;;
         *)      __help_venv && return 1;;
     esac
