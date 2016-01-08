@@ -87,7 +87,7 @@ _docker_stopall() {
 _docker_rmall() {
     [ $# -gt 0 ] && return 1
 
-    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"|grep -v "data$"))
+    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"|grep -v "data$\|data_"))
     local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No exited containers\n\n" && return 0
 
