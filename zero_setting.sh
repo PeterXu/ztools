@@ -152,6 +152,9 @@ for k in \$_zshs; do
     [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done
 
+# For python virtualenv
+venv init
+
 EOF
 }
 
