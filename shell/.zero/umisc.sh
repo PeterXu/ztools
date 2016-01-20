@@ -80,7 +80,8 @@ _venv() {
         renew)  rm -rf $vv
                 virtualenv $VENV_OPTS $vv
                 ;;
-        init)   [ -f $todo ] && . $todo;;
+        init)   deactivate 2>/dev/null
+                [ -f $todo ] && . $todo;;
         quit)   deactivate 2>/dev/null;;
         *)      __help_venv && return 1;;
     esac
