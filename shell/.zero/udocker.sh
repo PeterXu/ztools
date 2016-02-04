@@ -84,10 +84,14 @@ _docker_stopall() {
     done
     echo
 }
-_docker_rmall() {
-    [ $# -gt 0 ] && return 1
+_docker_rm() {
+    [ $# -le 0 ] && return 1
+    local opts
+    for opt in $*; do
+        opts="$opts -f status=$opt"
+    done
 
-    local ctnames=($(_docker_ps -f status=exited --format "{{.Names}}"|grep -v "data$\|data_"))
+    local ctnames=($(_docker_ps $opts --format "{{.Names}}"|grep -v "data$\|data_"))
     local ctlen=${#ctnames[@]}
     [ $ctlen -le 0 ] && _printx "[*] No exited containers\n\n" && return 0
 
@@ -105,6 +109,12 @@ _docker_rmall() {
         idx=$((idx+1))
     done
     echo
+}
+_docker_rma() {
+    _docker_rm "exited"
+}
+_docker_rmf() {
+    _docker_rm "exited" "created"
 }
 _docker_sh() {
     [ $# -lt 1 ] && echo "usage: docker-sh [opt] IMAGE" && return 1
@@ -386,7 +396,8 @@ _docker_pushx() {
 __init_docker() {
     # for image
     alias docker-ls="docker images"
-    alias docker-untagged="docker images --filter 'dangling=true'"
+    alias docker-untagged="docker images --filter dangling=true"
+    alias docker-untagged-id="docker images -q -f dangling=true"
     alias docker-sh="_docker_sh"
     complete -F _docker_sh_tips docker-sh
     alias docker-bash="_docker_bash"
@@ -397,7 +408,8 @@ __init_docker() {
     alias docker-psa="_docker_ps -a"
     alias docker-pgrep="_docker_pgrep"
     alias docker-stopa="_docker_stopall"
-    alias docker-rma="_docker_rmall"
+    alias docker-rma="_docker_rma"
+    alias docker-rmf="_docker_rmf"
     alias docker-enter="_docker_enter"
     complete -F _docker_enter_tips docker-enter
     alias docker-pid="docker inspect --format '{{.State.Pid}}'"
