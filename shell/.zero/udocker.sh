@@ -365,27 +365,40 @@ _docker_ctrl() {
 }
 
 _docker_buildx() {
-    [ $# -ne 1 ] && echo "usage: docker-buildx tag" && return 0
-    local tag="$1"
+    local opt="" tag=""
+    if [ $# -eq 1 ]; then
+        opt="-n" && tag="$1"
+    elif [ $# -eq 2 ]; then
+        opt="$1" && tag="$2"
+    fi
+    [ "$opt" != "-y" -a "$opt" != "-n" ] && echo "usage: docker-buildx [-y] tag" && return 0
+
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
     echo "[INFO] To build lark.io/$name:$tag ..."
-    local ch
-    _printx @green "[INFO] continue (y/n)? " && read ch
+    local ch="y"
+    [ "$opt" != "-y" ] && _printx @green "[INFO] continue (y/n)? " && read ch
     echo
     [ "$ch" != "y" ] && return 0
     docker build -t lark.io/$name:$tag .
 }
 
 _docker_pushx() {
-    [ $# -ne 1 ] && echo "usage: docker-pushx tag" && return 0
-    local tag="$1"
+    local opt="" tag=""
+    if [ $# -eq 1 ]; then
+        opt="-n" && tag="$1"
+    elif [ $# -eq 2 ]; then
+        opt="$1" && tag="$2"
+    fi
+    [ "$opt" != "-y" -a "$opt" != "-n" ] && echo "usage: docker-pushx [-y] tag" && return 0
+
     local name=$(basename $(pwd))
     [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
     echo "[INFO] To push lark.io/$name:$tag ..."
-    local ch
-    _printx @green "[INFO] continue (y/n)? " && read ch
+    local ch="y"
+    [ "$opt" != "-y" ] && _printx @green "[INFO] continue (y/n)? " && read ch
     echo
+
     [ "$ch" != "y" ] && return 0
     docker push lark.io/$name:$tag
 }
