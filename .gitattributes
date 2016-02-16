@@ -1,0 +1,6 @@
+*.txt       text
+*.bat       eol=crlf
+*.sh        eol=lf
+*.jpg       -text
+*.jpeg      -text
+*.doc       diff=word
