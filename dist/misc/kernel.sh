@@ -54,11 +54,11 @@ set_net_ipv4() {
 set_net_ipv4_tcp() {
     options="#net.ipv4.tcp_sack=1"
     options="$options #net.ipv4.tcp_window_scaling=1"
-    options="$options #net.ipv4.tcp_rmem=4096 87380 4194304"
-    options="$options #net.ipv4.tcp_wmem=4096 16384 4194304"
-    options="$options #net.ipv4.tcp_max_orphans=3276800"
+    options="$options #net.ipv4.tcp_rmem=4096 87380 16777216"
+    options="$options #net.ipv4.tcp_wmem=4096 65536 16777216"
+    options="$options #net.ipv4.tcp_max_orphans=262144"
     options="$options #net.ipv4.tcp_timestamps=0"
-    options="$options #net.ipv4.tcp_mem=94500000 915000000 927000000"
+    options="$options #net.ipv4.tcp_mem=1543458 2057947 3086916"
 
     # the time of FIN_WAIT_2 if socket is closed by local, default 60
     options="$options #net.ipv4.tcp_fin_timeout=10"
@@ -78,8 +78,8 @@ set_net_ipv4_tcp() {
     options="$options #net.ipv4.tcp_tw_reuse=1"
     # enable fast recycle of TIME_WAIT socket
     options="$options #net.ipv4.tcp_tw_recycle=1"
-    # the max number of TIME_WAIT, cleared if larger than this. default 8192
-    options="$options #net.ipv4.tcp_max_tw_buckets=8192"
+    # the max number of TIME_WAIT, cleared if larger than this.
+    options="$options #net.ipv4.tcp_max_tw_buckets=262144"
 }
 
 do_sysctl() {
@@ -112,7 +112,7 @@ do_sysctl() {
             printf "[%2d] %-50s  =>  %s\n" "$idx" "$old" "$new"
         else
             idx=$((idx+1))
-            printf "[%2d] %-50s\n" "$idx" "$old"
+            printf "[%2d] %-50s => %s\n" "$idx" "$old" "$val"
         fi
     done 
     IFS="$OFS"
