@@ -13,9 +13,9 @@ set_kernel() {
     options="$options #kernel.msgmax=65536"
 
     # max seg size (kbytes), 64T
-    options="$options #kernel.shmmax=68719476736"
+    #options="$options #kernel.shmmax=68719476736"
     # max total shared memory (kbytes), 4T
-    options="$options #kernel.shmall=4294967296"
+    #options="$options #kernel.shmall=4294967296"
     # max number of segments
     #options="$options #kernel.shnmni=4096"
 
