@@ -36,7 +36,7 @@ set_net_core() {
     # default 1000
     options="$options #net.core.netdev_max_backlog=262144"
     # default 128
-    options="$options #net.core.somaxconn=262144"
+    options="$options #net.core.somaxconn=65535"
 }
 
 set_net_ipv4() {
@@ -129,6 +129,14 @@ main() {
 }
 
 
-[ "$update" = "" ] && update="no"
-main
+if [ "$config_etc" = "yes" ]; then
+    echo "set ulimit & sysctl in /etc/security/limits.d, /etc/sysctl.d"
+    cp -f limits.d/nofile.conf /etc/security/limits.d/
+    cp -f sysctl.d/60-perf.conf /etc/sysctl.d/
+else
+    [ "$update" = "" ] && update="no"
+    main
+fi
+echo
+
 exit 0
