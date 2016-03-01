@@ -1,7 +1,6 @@
 #!/bin/sh
 
 options=""
-update="yes"
 
 set_kernel() {
     # ipcs -l | ipcs -u
@@ -61,9 +60,9 @@ set_net_ipv4_tcp() {
     options="$options #net.ipv4.tcp_mem=1543458 2057947 3086916"
 
     # the time of FIN_WAIT_2 if socket is closed by local, default 60
-    options="$options #net.ipv4.tcp_fin_timeout=10"
+    options="$options #net.ipv4.tcp_fin_timeout=15"
     # time of keepalive: seconds, default 7200
-    options="$options #net.ipv4.tcp_keepalive_time=60"
+    options="$options #net.ipv4.tcp_keepalive_time=300"
 
     ## for SYN
     # when SYN overflow, use cookies
@@ -130,6 +129,6 @@ main() {
 }
 
 
-update="no"
+[ "$update" = "" ] && update="no"
 main
 exit 0
