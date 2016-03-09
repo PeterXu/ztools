@@ -374,7 +374,7 @@ _docker_buildx() {
     [ "$opt" != "-y" -a "$opt" != "-n" ] && echo "usage: docker-buildx [-y] tag" && return 0
 
     local name=$(basename $(pwd))
-    [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
+    [ ${#name} -lt 3 ] && echo "[WARN] ${name} is too short!" && return 1
     echo "[INFO] To build lark.io/$name:$tag ..."
     local ch="y"
     [ "$opt" != "-y" ] && _printx @green "[INFO] continue (y/n)? " && read ch
