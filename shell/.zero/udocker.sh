@@ -393,7 +393,7 @@ _docker_pushx() {
     [ "$opt" != "-y" -a "$opt" != "-n" ] && echo "usage: docker-pushx [-y] tag" && return 0
 
     local name=$(basename $(pwd))
-    [ ${#name} -lt 4 ] && echo "[WARN] ${name} is too short!" && return 1
+    [ ${#name} -lt 3 ] && echo "[WARN] ${name} is too short!" && return 1
     echo "[INFO] To push lark.io/$name:$tag ..."
     local ch="y"
     [ "$opt" != "-y" ] && _printx @green "[INFO] continue (y/n)? " && read ch
