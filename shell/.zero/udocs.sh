@@ -182,7 +182,7 @@ __help_regex() {
 __init_docs() {
     _HELP_PREFIX="__help_"
 
-    alias zpm="_zero_pm"
+    alias zero-pm="_zero_pm"
     alias zero-update="_zero_update"
     alias zero-set="_zero_set"
     alias Help="_zero_help"
