@@ -10,12 +10,12 @@
 ## global init scripts: 
 ##      To call functions with prefix of "__init_xxx".
 _g_init_init() {
-    export _INIT_PREFIX="__init_"
-    export _SH_LIST="ubase.sh umisc.sh umark.sh udocker.sh udocs.sh srcin.sh"
+    _INIT_PREFIX="__init_"
+    _SH_LIST="ubase.sh umisc.sh umark.sh udocker.sh udocs.sh srcin.sh"
 
     local kUname=$(uname)
     [[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
-    export _UNAME="$kUname"
+    _UNAME="$kUname"
 
     local item funcs
     for item in $_SH_LIST; do

@@ -180,7 +180,7 @@ __help_regex() {
 
 ### init docs
 __init_docs() {
-    export _HELP_PREFIX="__help_"
+    _HELP_PREFIX="__help_"
 
     alias zpm="_zero_pm"
     alias zero-update="_zero_update"

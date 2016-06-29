@@ -98,7 +98,7 @@ _unmark_tips() {
 
 ### init mark
 __init_mark() {
-    export _MARKPATH="$HOME/.marks"
+    _MARKPATH="$HOME/.marks"
 
     alias jump="_jump"
     alias mark="_mark"
