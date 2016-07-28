@@ -17,6 +17,8 @@ _g_init_init() {
     [[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
     _UNAME="$kUname"
 
+    [ "$_UNAME" = "MINGW" ] && _SH_LIST="ubase.sh umark.sh"
+
     local item funcs
     for item in $_SH_LIST; do
         item="$HOME/.zero/$item"

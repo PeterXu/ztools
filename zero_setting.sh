@@ -153,7 +153,7 @@ for k in \$_zshs; do
 done
 
 # For python virtualenv
-venv init
+venv init 2>/dev/null 1>&2
 
 EOF
 }
