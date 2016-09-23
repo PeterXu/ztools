@@ -4,3 +4,5 @@
 *.jpg       -text
 *.jpeg      -text
 *.doc       diff=word
+dist/*          linguist-documentation
+shell/.vim/*    linguist-documentation
