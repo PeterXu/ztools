@@ -24,15 +24,13 @@ _gen_cs() {
     csfile="cscope.files"
     echo "" > $csfile
 
-    echo "[INFO] To proc <$src> by $(basename $cs) ..."
-
     # for cscope
+    echo "[INFO] To proc <$src> by $(basename $cs) ..."
     exts="h c cc cpp java m mm"
-    for e in $exts; do
-        [ "$opts" = "" ] && opts="-name *.$e" || opts="$opts -o -name *.$e"
-    done
     for s in $src; do
-        find $s -type f $opts >> $csfile
+        for e in $exts; do
+            find $s -type f -name \*.$e >>$csfile
+        done
     done
     $cs -bkq -i $csfile 2>/dev/null
 
