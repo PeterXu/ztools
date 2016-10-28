@@ -132,12 +132,12 @@ set_env()
 
     cat >> $kRoot/shell/envall.sh << EOF
 # For general alias
-[ \`uname\` != "Darwin" ] && alias cp='cp -i'
+#[ \`uname\` != "Darwin" ] && alias cp='cp -i'
 [ \`uname\` = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
 alias ll='ls -l'
-alias mv='mv -i'
-alias rm='rm -i'
+#alias mv='mv -i'
+#alias rm='rm -i'
 alias cls='clear'
 alias grep='grep --color=auto'
 
