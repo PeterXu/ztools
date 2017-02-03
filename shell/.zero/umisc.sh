@@ -176,7 +176,7 @@ _ini_parse() {
     local ini=$1
     [ ! -f "$ini" ] && return 1
 
-    local line secs xtype sec key val quit idx
+    local line secs xtype sec key val quit idx len
     while read line
     do
         xtype="none"; sec=""; key=""; val=""; quit=0
@@ -206,10 +206,14 @@ _ini_parse() {
         key=`echo "$key" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         val=`echo "$val" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//'`
         [ "$sec" != "" ] && secs=(${secs[@]} $sec) && _mapunkey "$sec"
+
+        len=${#secs[@]}
+        [ $len -eq 0 ] && continue
+
         if [ "$key" != "" -a "$val" != "" ]; then
-            _mapset "${secs[-1]}" "$key" "$val"
+            _mapset "${secs[len-1]}" "$key" "$val"
         elif [ "$key" != "" ]; then
-            _mapdel "${secs[-1]}" "$key"
+            _mapdel "${secs[len-1]}" "$key"
         fi
     done < $ini
 
@@ -233,46 +237,84 @@ _ycm_config() {
     local vimdir=$HOME/.vim
     local workdir=$vimdir/bundle
     local ycmconf=$workdir/config.vim
-    if [ "$todo" = "install" ]; then
-        # check vimrc whether it is from ztools?
-        [ ! -f $vimdir/vimrc.vim ] && return 1
-    elif [ "$todo" = "clean" ]; then
+    if [ "$todo" = "clean" ]; then
         rm -f $ycmconf
         return 0
-    else
-        __help_ycm config
-        return 1
     fi
 
+    local valid=0
+    local steps=""
+    local actions="vundle ycm clang install"
+    for item in $actions; do
+        [ "$item" = "$todo" ] && valid=1
+        steps="$steps -> $item"
+    done
+
+    [ $valid -ne 1 ] && __help_ycm config && return 1
+
+    _printx @green "[INFO] Process <$todo> [$steps] ...\n"
+
     # check vundle
-    local vundle=$workdir/Vundle.vim
-    if [ ! -d $vundle ]; then
-        mkdir -p $workdir || return 1
-        local uri="https://github.com/VundleVim/Vundle.vim.git"
-        git clone $uri $vundle || return 1
+    if [ "$todo" = "vundle" ]; then
+        local vundle=$workdir/Vundle.vim
+        mkdir -p $workdir
+        if [ ! -d $vundle ]; then
+            local uri="https://github.com/VundleVim/Vundle.vim.git"
+            git clone $uri $vundle
+        fi
+
+        if [ ! -d $vundle ]; then
+          _printx @red "[ERROR] Fail to clone <$uri>\n"
+          return 1
+        fi
+        return 0
     fi
 
     # check ycm
-    local ycmdir=$workdir/YouCompleteMe
-    if [ ! -d $ycmdir ]; then
-        local tmpdir=${ycmdir}.tmp
-        local uri="https://github.com/Valloric/YouCompleteMe.git"
+    if [ "$todo" = "ycm" ]; then
+        local ycmdir=$workdir/YouCompleteMe
+        mkdir -p $workdir
+        if [ ! -d $ycmdir ]; then
+            local tmpdir=${ycmdir}.tmp
+            local uri="https://github.com/Valloric/YouCompleteMe.git"
+            (
+            [ ! -d $tmpdir ] && git clone --recursive $uri $tmpdir
+            cd $tmpdir || exit 1 
+            git submodule update --init --recursive || exit 1
+            )
+            [ -d $tmpdir ] && mv $tmpdir $ycmdir
+        fi
+
+        if [ ! -d $ycmdir ]; then
+          _printx @red "[ERROR] Fail to clone $uri\n"
+          return 1
+        fi
+        return 0
+    fi
+
+    if [ "$todo" = "clang" ]; then
+        local ycmdir=$workdir/YouCompleteMe
+        if [ ! -d $ycmdir ]; then 
+          _printx @yellow "[WARN] No repo <YouCompleteMe> and pls run <ycm-config ycm> at first\n"
+          return 1
+        fi
+
         (
-        [ ! -d ${tmpdir} ] && git clone --recursive $uri ${tmpdir}
-        cd $tmpdir || exit 1 
-        git pull || exit 1
-        git submodule update --init --recursive || exit 1
+        cd $ycmdir || exit 1 
         chmod +x install.sh
         ./install.sh --clang-completer || exit 1
         ) || return 1
-
-        mv $tmpdir $ycmdir || return 1
+        return 0
     fi
 
     # config ycm
-    rm -f $ycmconf
-    local ycm="\$HOME/.vim/misc/.ycm_extra_conf.py"
-    cat > $ycmconf << EOF
+    if [ "$todo" = "install" ]; then
+        # check vimrc whether it is from ztools?
+        [ ! -f $vimdir/vimrc.vim ] && return 1
+
+        rm -f $ycmconf
+        local ycm="\$HOME/.vim/misc/.ycm_extra_conf.py"
+        cat > $ycmconf << EOF
 func! YcmInit()
     set nocompatible              " be iMproved, required
     filetype off                  " required
@@ -321,6 +363,7 @@ command! -nargs=* Ycm call YcmRun('<args>')
 call YcmInit()
 
 EOF
+    fi
 }
 _ycm_here() {
     [ $# -ne 1 ] && __help_ycm here && return 1
@@ -345,7 +388,7 @@ __help_ycm() {
     local opt="config,here"
     [ $# -gt 0 ] && opt="$*"
     echo "usage:"
-    [[ "$opt" =~ "config" ]]    && echo "       ycm-config install|clean"
+    [[ "$opt" =~ "config" ]]    && echo "       ycm-config vundle|ycm|clang|install|clean"
     [[ "$opt" =~ "here" ]]      && echo "       ycm-here cpp|c99|clean"
     echo
 }
