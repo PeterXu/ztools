@@ -61,4 +61,32 @@ _tablist() {
     #_printx @red "\n=>$pre2,$pre,$key: $tips<=\n"
     COMPREPLY=($(compgen -W "$tips" -- "$cur"))
 }
+_tablist2() {
+    [ $# -ne 2 ] && return
+
+    local cur opts tips
+    opts="$*" && shift
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    [ "$cur" = ":" ] && cur=""
+    tips="$opts"
+
+    COMPREPLY=($(compgen -W "$tips" -- "$cur"))
+}
+_tablist3() {
+    [ $# -ne 3 ] && return
+
+    local key cur opts copts
+    key="$1" && shift
+    opts="$1" && shift
+    copts="$*" && shift
+
+    cur=${COMP_WORDS[COMP_CWORD]}
+    if [ "${cur:0:2}" = "./" ]; then
+        _tablist2 "$key" "$copts"
+    else
+        _tablist2 "$key" "$opts"
+    fi
+}
 

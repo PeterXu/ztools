@@ -55,6 +55,14 @@ _ssh() {
     local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     _tablist "ssh" "$opts"
 }
+_scp() {
+    local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
+    local copts
+    for i in `ls .`; do
+        copts="$copts ./$i"
+    done
+    _tablist3 "scp" "$opts" "$copts"
+}
 
 
 ## ---------------------
@@ -435,5 +443,6 @@ __init_misc() {
     alias set-pip="_set_pip"
 
     complete -F _ssh ssh
+    complete -F _scp scp
 }
 
