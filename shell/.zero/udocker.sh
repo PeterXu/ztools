@@ -407,36 +407,36 @@ _docker_pushx() {
 ### -----------
 ### init docker
 __init_docker() {
+    #return 
+
     # for image
     alias docker-ls="docker images"
     alias docker-untagged="docker images --filter dangling=true"
-    alias docker-untagged-id="docker images -q -f dangling=true"
-    alias docker-sh="_docker_sh"
-    complete -F _docker_sh_tips docker-sh
+    #alias docker-untagged-id="docker images -q -f dangling=true"
+    #alias docker-sh="_docker_sh"
+    #complete -F _docker_sh_tips docker-sh
     alias docker-bash="_docker_bash"
     complete -F _docker_bash_tips docker-bash
-    alias docker-ctrl="_docker_ctrl"
 
     # for container
-    alias docker-psa="_docker_ps -a"
-    alias docker-pgrep="_docker_pgrep"
+    #alias docker-psa="_docker_ps -a"
+    #alias docker-pgrep="_docker_pgrep"
     alias docker-stopa="_docker_stopall"
     alias docker-rma="_docker_rma"
-    alias docker-rmf="_docker_rmf"
+    #alias docker-rmf="_docker_rmf"
     alias docker-enter="_docker_enter"
     complete -F _docker_enter_tips docker-enter
-    alias docker-pid="docker inspect --format '{{.State.Pid}}'"
-    complete -F _docker_pid_tips docker-pid
+    #alias docker-pid="docker inspect --format '{{.State.Pid}}'"
+    #complete -F _docker_pid_tips docker-pid
     alias docker-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
     complete -F _docker_ip_tips docker-ip
-
-    # for mingw
-    alias docker-mingw="_docker_mingw"
 
     # for docker build/push
     alias docker-buildx="_docker_buildx"
     alias docker-pushx="_docker_pushx"
 
+    alias docker-mingw="_docker_mingw"
+    #alias docker-ctrl="_docker_ctrl"
     #mkdir -p "$HOME/.docker" >/dev/null 2>&1
 }
 

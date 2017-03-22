@@ -109,6 +109,10 @@ set_prepare()
 {
     prepare_zpm || return 1
 
+    if [ "$kUname" = "Darwin" ]; then
+        zpm_install -b bash-completion -f || return 1
+    fi
+
     zpm_install -b ctags -f || return 1
     zpm_install -b cscope || return 1
     zpm_install -b cmake || return 1
@@ -132,8 +136,9 @@ set_env()
 
     cat >> $kRoot/shell/envall.sh << EOF
 # For general alias
-#[ \`uname\` != "Darwin" ] && alias cp='cp -i'
-[ \`uname\` = "Darwin" ] && alias ls='ls -G'
+__osname=\`uname\`
+#[ "\$__osname" != "Darwin" ] && alias cp='cp -i'
+[ "\$__osname" = "Darwin" ] && alias ls='ls -G'
 which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
 alias ll='ls -l'
 #alias mv='mv -i'
@@ -146,8 +151,11 @@ alias grep='grep --color=auto'
 _ZPATH="/usr/local/bin:/usr/local/sbin"
 _ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
 
+# for macos completion
+[ "\$__osname" = "Darwin" -a -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+
 # For shell extending
-_zshs="uinit.sh git-completion.bash"
+_zshs="uinit.sh git-completion.bash docker.bash-completion docker-compose.bash-completion"
 for k in \$_zshs; do
     [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done
