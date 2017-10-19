@@ -401,6 +401,43 @@ __help_ycm() {
     echo
 }
 
+##-------------
+## for vim-go and gocode
+_govim_config() {
+    [ $# -ne 1 ] && __help_govim && return 1
+    local todo="$1"
+    local label="govim begin"
+    local label_end="govim end"
+
+    local goconf=$workdir/config.vim
+    [ -f "$goconf" ] && sed -in /"$label"/,/"$label_end"/d "$goconf"
+    if [ "$todo" = "clean" ]; then
+        return 0
+    fi
+
+    which go 2>/dev/null 1>&2 || return 1
+    go get -u github.com/nsf/gocode
+
+    cat >> $goconf << EOF
+" $label
+func! GoInit()
+    call vundle#begin()
+    set rtp+=\$HOME/.vim/bundle/vim-go
+    Plugin 'fatih/vim-go'
+    " go get -u github.com/nsf/gocode
+    Plugin 'nsf/gocode'
+    call vundle#end()            " required
+    filetype plugin indent on    " required
+endfunc
+call GoInit()
+" $label_end
+EOF
+}
+__help_govim() {
+    echo "usage: govim config|clean"
+    echo
+}
+
 
 ##--------------
 ## For pip

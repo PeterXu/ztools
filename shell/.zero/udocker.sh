@@ -421,8 +421,8 @@ __init_docker() {
     # for container
     #alias docker-psa="_docker_ps -a"
     #alias docker-pgrep="_docker_pgrep"
-    alias docker-stopa="_docker_stopall"
-    alias docker-rma="_docker_rma"
+    #alias docker-stopa="_docker_stopall"
+    #alias docker-rma="_docker_rma"
     #alias docker-rmf="_docker_rmf"
     alias docker-enter="_docker_enter"
     complete -F _docker_enter_tips docker-enter
