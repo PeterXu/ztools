@@ -51,11 +51,11 @@ _mapunkey() {
 
 ## -------------
 ## ssh with tips
-_ssh() {
+_sshx() {
     local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     _tablist "ssh" "$opts"
 }
-_scp() {
+_scpx() {
     local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
     local copts
     for i in `ls .`; do
@@ -479,7 +479,7 @@ __init_misc() {
     alias ycm-here="_ycm_here"
     alias set-pip="_set_pip"
 
-    complete -F _ssh ssh
-    complete -F _scp scp
+    complete -F _sshx ssh
+    #complete -F _scpx scp
 }
 
