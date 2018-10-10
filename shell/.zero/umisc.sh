@@ -409,6 +409,8 @@ _govim_config() {
     local label="govim begin"
     local label_end="govim end"
 
+    local vimdir=$HOME/.vim
+    local workdir=$vimdir/bundle
     local goconf=$workdir/config.vim
     [ -f "$goconf" ] && sed -in /"$label"/,/"$label_end"/d "$goconf"
     if [ "$todo" = "clean" ]; then
@@ -417,6 +419,13 @@ _govim_config() {
 
     which go 2>/dev/null 1>&2 || return 1
     go get -u github.com/nsf/gocode
+
+    local vimgo=$workdir/vim-go
+    mkdir -p $workdir
+    if [ ! -d $vimgo ]; then
+        local uri="https://github.com/fatih/vim-go.git"
+        git clone $uri $vimgo
+    fi
 
     cat >> $goconf << EOF
 " $label
@@ -478,6 +487,7 @@ __init_misc() {
     alias ycm-config="_ycm_config"
     alias ycm-here="_ycm_here"
     alias set-pip="_set_pip"
+    alias govim="_govim_config"
 
     complete -F _sshx ssh
     #complete -F _scpx scp
