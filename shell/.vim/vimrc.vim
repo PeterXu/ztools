@@ -65,6 +65,13 @@ if filereadable(glob("$HOME/.vim/bundle/config.vim"))
 endif
 
 
+"-------------------
+" load plug plugins, and install by :PlugInstall
+call plug#begin()
+Plug 'dart-lang/dart-vim-plugin'
+call plug#end()
+
+
 " ----------------
 " licenses setting
 map <leader>mit :0r ~/.vim/licenses/mit.txt
