@@ -66,9 +66,10 @@ endif
 
 
 "-------------------
-" load plug plugins, and install by :PlugInstall
+" load plug plugins, and install by :PlugInstall/PlugUpdate/PlugUpgrade
 call plug#begin()
 Plug 'dart-lang/dart-vim-plugin'
+Plug 'fatih/vim-go'
 call plug#end()
 
 
