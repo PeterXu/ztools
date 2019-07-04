@@ -462,6 +462,34 @@ EOF
 }
 
 
+##-------------
+## For linux FIN_WAIT1
+_clear_fin_wait1() {
+    if [ "$(uname)" != "Linux" ]; then
+        echo "It is only supported in Linux!"
+        return
+    fi
+
+    if [ "$(whoami)" != "root" ]; then
+        echo "Please switch from $(whoami) to root at frist!"
+        return
+    fi
+
+    # Note: /proc/sys/net/ipv4/tcp_fin_timeout is for FIN-WAIT-2.
+    local oldval=$(cat /proc/sys/net/ipv4/tcp_max_orphans)
+
+    # set the tcp_max_orphans to 0 temporarily
+    echo 0 > /proc/sys/net/ipv4/tcp_max_orphans
+
+    # watch /var/log/messages
+    # it will split out "kernel: TCP: too many of orphaned sockets"
+    # it won't take long for the connections to be killed
+
+    # restore the value of tcp_max_orphans whatever it was before. 
+    echo $oldval > /proc/sys/net/ipv4/tcp_max_orphans
+}
+
+
 
 ### init misc shell
 __init_misc() {
@@ -486,8 +514,9 @@ __init_misc() {
 
     alias ycm-config="_ycm_config"
     alias ycm-here="_ycm_here"
-    alias set-pip="_set_pip"
     alias govim="_govim_config"
+    alias set-pip="_set_pip"
+    alias clear-fin-wait1="_clear_fin_wait1"
 
     complete -F _sshx ssh
     #complete -F _scpx scp
