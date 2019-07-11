@@ -464,7 +464,7 @@ EOF
 
 ##-------------
 ## For linux FIN_WAIT1
-_clear_fin_wait1() {
+_reset_fin_wait1() {
     if [ "$(uname)" != "Linux" ]; then
         echo "It is only supported in Linux!"
         return
@@ -516,7 +516,7 @@ __init_misc() {
     alias ycm-here="_ycm_here"
     alias govim="_govim_config"
     alias set-pip="_set_pip"
-    alias clear-fin-wait1="_clear_fin_wait1"
+    alias reset-fin-wait1="_reset_fin_wait1"
 
     complete -F _sshx ssh
     #complete -F _scpx scp
