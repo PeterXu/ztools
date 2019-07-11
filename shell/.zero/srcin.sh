@@ -15,6 +15,7 @@
 
 
 # For the usage of cscope: _gen_cs dst src
+# @param src may contains multi-paths
 _gen_cs() {
     local cs dst src csfile exts opts files
     cs=`which cscope 2>/dev/null` || return 1
@@ -46,6 +47,7 @@ _gen_cs() {
 
 
 # For the usage of tags & cppcomplete: _gen_ct dst src [opt]
+# @param src may contains multi-paths
 _gen_ct() {
     local ct dst src opt opts
     ct=`which ctags 2>/dev/null` || return 1
@@ -80,7 +82,7 @@ _gen_clean() {
 
 __help_srcin() {
     local prog="srcin"
-    echo "usage: $prog [-h -c -t tool -s -a -e pats -l langs] srcpath"
+    echo "usage: $prog [-h -c -t tool -s -a -e pats -l langs] srcpath1 [srcpath2]"
     echo "      -h: print help"
     echo "      -c: clean previous tags/cscope files"
     echo "      -t: use which tool, default both ctags & cscope"
@@ -175,6 +177,7 @@ srcin() {
         if [ "$spath" = "." ]; then
             cs_root=. && ct_root=..
         else
+            # support multi-paths
             for f in $spath; do
                 [ ! -d "$f" ] && echo "[WARN] not found: $f" && return 1
                 cs_root="$cs_root $f"
