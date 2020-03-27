@@ -489,7 +489,42 @@ _reset_fin_wait1() {
     echo $oldval > /proc/sys/net/ipv4/tcp_max_orphans
 }
 
+##-----------------
+## For linux coredump
+_set_coredump() {
+    if [ "$(id -u)" != "0" ]; then
+        echo "Please run as root or sudo!"
+        exit -1
+    fi
 
+    echo "[Old Settings]:"
+    echo "  pattern:" $(cat /proc/sys/kernel/core_pattern)
+    echo "  core_uses_pid:" $(cat /proc/sys/kernel/core_uses_pid)
+    echo
+
+    echo "[New Settings]:"
+    #set the path of core file with permission
+    # %s: which signal, %t: time
+    echo "/tmp/core-%s-%t" > /proc/sys/kernel/core_pattern
+    echo "  pattern:" $(cat /proc/sys/kernel/core_pattern)
+    #set suffix of the core file name
+    echo "1" > /proc/sys/kernel/core_uses_pid
+    echo "  core_uses_pid:" $(cat /proc/sys/kernel/core_uses_pid)
+    echo
+}
+
+##-------------
+## For linux user/group
+_show_user_group() {
+    echo "The Operations Of User and Group:"
+    echo "  User Tools:                 useradd(adduser)|usermod|userdel"
+    echo "  Group Tools:                groupadd|groupmod|groupdel"
+    echo "  Add USER to GROUP:          gpasswd -a user group"
+    echo "  Remove USER from GROUP:     gpasswd -d user group"
+    echo "  Append GROUP to USER:       usermod -aG group user"
+    echo "  Reset GROUPs to USER:       usermod -G group1[,group2..] user"
+    echo
+}
 
 ### init misc shell
 __init_misc() {
@@ -517,6 +552,8 @@ __init_misc() {
     alias govim="_govim_config"
     alias set-pip="_set_pip"
     alias reset-fin-wait1="_reset_fin_wait1"
+    alias set-coredump="_set_coredump"
+    alias show-user-group="_show_user_group"
 
     complete -F _sshx ssh
     #complete -F _scpx scp
