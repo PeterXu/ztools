@@ -492,6 +492,11 @@ _reset_fin_wait1() {
 ##-----------------
 ## For linux coredump
 _set_coredump() {
+    if [ "$(uname)" != "Linux" ]; then
+        echo "It is only supported in Linux!"
+        return
+    fi
+
     if [ "$(id -u)" != "0" ]; then
         echo "Please run as root or sudo!"
         exit -1
@@ -510,6 +515,28 @@ _set_coredump() {
     #set suffix of the core file name
     echo "1" > /proc/sys/kernel/core_uses_pid
     echo "  core_uses_pid:" $(cat /proc/sys/kernel/core_uses_pid)
+    echo
+}
+
+##-------------
+## For linux 
+_show_tcp_qos() {
+    if [ "$(uname)" != "Linux" ]; then
+        echo "It is only supported in Linux!"
+        return
+    fi
+
+    echo "Default TCP QoS:"
+    echo "  net.core.default_qdisc = pfifo_fast"
+    echo "  net.ipv4.tcp_congestion_control = cubic"
+    echo
+    echo "Current TCP QoS:"
+    echo "  $(sysctl net.core.default_qdisc)"
+    echo "  $(sysctl net.ipv4.tcp_congestion_control)"
+    echo
+    echo "Set BBR TCP QoS (/etc/sysctl.conf, kernel may need to upgrade!):"
+    echo "  net.core.default_qdisc = fq"
+    echo "  net.ipv4.tcp_congestion_control = bbr"
     echo
 }
 
@@ -554,6 +581,7 @@ __init_misc() {
     alias reset-fin-wait1="_reset_fin_wait1"
     alias set-coredump="_set_coredump"
     alias show-user-group="_show_user_group"
+    alias show-tcp-qos="_show_tcp_qos"
 
     complete -F _sshx ssh
     #complete -F _scpx scp
