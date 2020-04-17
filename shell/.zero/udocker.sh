@@ -419,7 +419,7 @@ __init_docker() {
     complete -F _docker_bash_tips docker-bash
 
     # for container
-    #alias docker-psa="_docker_ps -a"
+    alias docker-psa="_docker_ps -a"
     #alias docker-pgrep="_docker_pgrep"
     #alias docker-stopa="_docker_stopall"
     #alias docker-rma="_docker_rma"
