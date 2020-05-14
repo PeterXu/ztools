@@ -155,7 +155,7 @@ _ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
 [ "\$__osname" = "Darwin" -a -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
 # For shell extending
-_zshs="uinit.sh git-completion.bash docker.bash-completion docker-compose.bash-completion"
+_zshs="uinit.sh git-completion.bash git-prompt.sh docker.bash-completion docker-compose.bash-completion"
 for k in \$_zshs; do
     [ -f "\$HOME/.zero/\$k" ] && source "\$HOME/.zero/\$k"
 done
