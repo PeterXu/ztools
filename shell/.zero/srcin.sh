@@ -90,7 +90,8 @@ __help_srcin() {
     echo "           - cscope: only cscope"
     echo "      -s: generate system tags(default /usr/include)"
     echo "      -a: append mode, default disabled"
-    echo "      -e pats: exclude path for ctags, 'path1,path2'. default 'third_party,out'"
+    echo "      -e pats: set ctags exclude: 'path1,path2', replace default 'third_party,out,..'"
+    echo "      -x pats: add ctags exclude: 'path1,path2', append after default"
     echo "      -l langs: default 'c++,c,java'"
     echo
 }
@@ -101,9 +102,9 @@ srcin() {
     local opts=""
     local cbin="ctags,cscope"
     local langs="c++,c,java"
-    local ntags="--exclude=third_party --exclude=out"
+    local ntags="--exclude=third_party --exclude=out --exclude=build --exclude=*unittest*"
 
-    local args=`getopt hct:sae:l: $*`
+    local args=`getopt hct:sae:x:l: $*`
     if [ $? != 0 ]; then
         __help_srcin
         return 1
@@ -126,13 +127,19 @@ srcin() {
                 cbin="ctags"
                 shift;;
             -a) opts="$opts -a"; shift;;
-            -e) 
+            -e)
                 local OLD_IFS="$IFS" && IFS=","
                 local excludes=($2) && IFS="$OLD_IFS"
-
                 ntags=""
                 for pat in ${excludes[@]}; do 
-                    [ "$pat" != "" ] && ntags="$ntags --exclude=\"$pat\""
+                    [ "$pat" != "" ] && ntags="$ntags --exclude=$pat"
+                done
+                shift; shift;;
+            -x)
+                local OLD_IFS="$IFS" && IFS=","
+                local excludes=($2) && IFS="$OLD_IFS"
+                for pat in ${excludes[@]}; do
+                    [ "$pat" != "" ] && ntags="$ntags --exclude=$pat"
                 done
                 shift; shift;;
             -l) 
