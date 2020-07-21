@@ -8,7 +8,6 @@
 
 #the implementation refs from https://github.com/jpetazzo/nsenter/blob/master/docker-enter
 _docker_enter() {
-    #if [ -e $(dirname "$0")/nsenter ]; then
     #Change for centos bash running
     if [ -e $(dirname '$0')/nsenter ]; then
         # with boot2docker, nsenter is not in the PATH but it is in the same folder
@@ -16,16 +15,14 @@ _docker_enter() {
     else
         # if nsenter has already been installed with path notified, here will be clarified
         NSENTER=$(which nsenter)
-        #NSENTER=nsenter
     fi
-    [ -z "$NSENTER" ] && echo "WARN Cannot find nsenter" && return
 
     if [ -z "$1" ]; then
         echo "Usage: `basename "$0"` CONTAINER [COMMAND [ARG]...]"
         echo ""
         echo "Enters the Docker CONTAINER and executes the specified COMMAND."
         echo "If COMMAND is not specified, runs an interactive shell in CONTAINER."
-    else
+    elif [ ! -z "$NSENTER" ]; then
         PID=$(docker inspect --format "{{.State.Pid}}" "$1")
         if [ -z "$PID" ]; then
             echo "WARN Cannot find the given container"
@@ -47,6 +44,9 @@ _docker_enter() {
             # Use env to clear all host environment variables.
             $kSudo $NSENTER --target $PID --mount --uts --ipc --net --pid env -i $@
         fi
+    else
+        $kSudo docker start $@
+        $kSudo docker attach $@
     fi
 }
 
