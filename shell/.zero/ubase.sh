@@ -90,3 +90,22 @@ _tablist3() {
     fi
 }
 
+_isbash() {
+    if [ "$_SHNAME" = "bash" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+_completex() {
+    if [ "$_SHNAME" = "bash" ]; then
+        complete -F $1 $2
+    elif [ "$_SHNAME" = "zsh" ]; then
+        echo=1
+    fi
+}
+
+__init_base() {
+    alias completex="_completex"
+}

@@ -108,8 +108,8 @@ __init_mark() {
     alias unmark-all="_unmark_all"
     alias unmark-broken="_unmark_broken"
 
-    complete -F _jump_tips jump
-    complete -F _unmark_tips unmark
+    completex _jump_tips jump
+    completex _unmark_tips unmark
 }
 
 

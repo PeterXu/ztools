@@ -414,9 +414,9 @@ __init_docker() {
     alias docker-untagged="docker images --filter dangling=true"
     #alias docker-untagged-id="docker images -q -f dangling=true"
     #alias docker-sh="_docker_sh"
-    #complete -F _docker_sh_tips docker-sh
+    #completex _docker_sh_tips docker-sh
     alias docker-bash="_docker_bash"
-    complete -F _docker_bash_tips docker-bash
+    completex _docker_bash_tips docker-bash
 
     # for container
     alias docker-psa="_docker_ps -a"
@@ -425,11 +425,11 @@ __init_docker() {
     #alias docker-rma="_docker_rma"
     #alias docker-rmf="_docker_rmf"
     alias docker-enter="_docker_enter"
-    complete -F _docker_enter_tips docker-enter
+    completex _docker_enter_tips docker-enter
     #alias docker-pid="docker inspect --format '{{.State.Pid}}'"
-    #complete -F _docker_pid_tips docker-pid
+    #completex _docker_pid_tips docker-pid
     alias docker-ip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
-    complete -F _docker_ip_tips docker-ip
+    completex _docker_ip_tips docker-ip
 
     # for docker build/push
     alias docker-buildx="_docker_buildx"
