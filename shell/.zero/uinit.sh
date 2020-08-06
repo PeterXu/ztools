@@ -14,9 +14,13 @@ _g_init_init() {
     local shname=$(ps -p $$ -o comm | grep -iv comm)
     if [[ "$shname" =~ "zsh" ]]; then
         kShName="zsh"
-        if type emulate >/dev/null 2>/dev/null; then emulate bash; fi
-        #autoload -U compinit && compinit
-        #alias complete=compdef
+        setopt shwordsplit
+        #if type emulate >/dev/null 2>/dev/null; then emulate bash; fi
+        tmp="/usr/local/share/zsh"
+        if [ -f "$tmp" ]; then
+            chmod -R 755 $tmp || echo "[FAILED]: chmod -R 755 $tmp"
+        fi
+        autoload -U +X compinit && compinit
     elif [[ "$shname" =~ "bash" ]]; then
         kShName="bash"
     fi
@@ -38,9 +42,8 @@ _g_init_init() {
         [ ! -f "$item" ] && continue
         source $item
         local func_list=$(cat $item | grep "^${_INIT_PREFIX}[a-z_]\+() " | awk -F"(" '{print $1}')
-        local initf
-        for initf in $func_list; do
-            eval "$initf"
+        for fn in $func_list; do
+            eval $fn
         done
     done
 }
