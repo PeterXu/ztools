@@ -3,81 +3,83 @@
 #
 
 ## build config
-ROOT=`pwd`/..
+ROOT=`pwd`
 HOST=`uname`
 
-echox() { 
-    [ $# -gt 1 ] && b="\033[${1}m" && e="\033[00m" && shift
-    [ $HOST = "Darwin" ] && echo=echo || echo="echo -e"
-    $echo "${b}$*${e}" 
-}
-echor() { echox 31 "$*"; }
-echog() { echox 32 "$*"; }
-echoy() { echox 33 "$*"; }
-echob() { echox 34 "$*"; }
 check_err() {
-    [ $? != 0 ] && echor "[*] Error and exit!!!, reason=$1" && exit 1
+    [ $? != 0 ] && echo "[*] Error and exit!!!, reason=$1" && exit 1
 }
 
+
 make_archive () {
-    target=$1
-    echog "[-] Generating archive lib$target.a ..."
-    if [ $TARGET = "UNIX" ] || [ $TARGET = "ANDROID" ]; then
-        rm -rf tmpobj; mkdir -p tmpobj; cd tmpobj
-        for lib in $thelibs; do
-            lib=../$lib
+    osname="$1"
+    target="$2"
+    thelibs="$3"
+    echo "[-] Generating archive $target by $AR ..."
+    if [ $osname = "UNIX" ] || [ $osname = "ANDROID" ]; then
+        TMP="$ROOT/.tmpobj"
+        rm -rf $TMP
+        mkdir -p $TMP
+        cd $TMP
+        for item in $thelibs; do
+            lib=../$item
             if [ ! -e $lib ]; then
-                echor "Can not find $lib!"; continue
+                echo "Can not find $lib!"; continue
+            else
+                #echo "Processing $lib ..."
+                $AR x $lib
             fi
-            #echo "Processing $lib ..."
-            $AR t $lib | xargs $AR qc lib$target.a
         done
+        ls *.o | xargs $AR qc $target
         echo "Adding symbol table to archive."
-        $AR sv lib$target.a
-        mv lib$target.a ../
-        cd -
-        rm -rf tmpobj
-    elif [ $TARGET = "IOS" ]; then
+        $AR sv $target
+        mv $target $ROOT
+        cd $ROOT
+        rm -rf $TMP
+    elif [ $osname = "IOS" ]; then
         libtool -static -arch_only armv7 -o lib$target.a ${thelibs[@]:0}
-    elif [ $TARGET = "IOS-SIM" ]; then
+    elif [ $osname = "IOS-SIM" ]; then
         libtool -static -arch_only i386 -o lib$target.a ${thelibs[@]:0}
-    elif [ $TARGET = "MAC" ]; then
+    elif [ $osname = "MAC" ]; then
         libtool -static -arch_only x86_64 -o lib$target.a ${thelibs[@]:0}
+    else
+        usage
     fi
 }
 
 
 make_so () {
-    target=$1
-    echog "[-] Generate shared lib$target.so ..."
-    if [ $TARGET = "UNIX" ] || [ $TARGET = "ANDROID" ]; then
-        $CC -shared -o lib$target.so -Wl,-whole-archive $thelibs -Wl,-no-whole-archive $ldflags
-    elif [ $TARGET = "MAC" ]; then
-        libtool -dynamic -arch_only x86_64 -o lib$target.so ${thelibs[@]:0} $ldflags
+    osname="$1"
+    target="$2"
+    thelibs="$3"
+    echo "[-] Generate shared $target ..."
+    if [ $osname = "UNIX" ] || [ $osname = "ANDROID" ]; then
+        $CC -shared -o $target -Wl,-whole-archive $thelibs -Wl,-no-whole-archive $ldflags
+    elif [ $osname = "MAC" ]; then
+        libtool -dynamic -arch_only x86_64 -o $target ${thelibs[@]:0} $ldflags
     fi
 }
 
 usage() {
-    echor "usage: $0 IOS|IOS-SIM|ANDROID target libdir1 [libdir2 ...]"
+    echo "usage: $0 IOS|IOS-SIM|ANDROID target libpath1 [libpath2 ...]"
 }
 
 main() {
     [ $# -le 2 ] && usage && return
 
-    TARGET=$1 && shift
-    [ "$TARGET" != "IOS" -a "$TARGET" != "IOS-SIM" -a "$TARGET" != "ANDROID" -a "$TARGET" != "UNIX" ] && usage && return
+    targetos=$1 && shift
+    targetlib="lib$1.a" && shift
 
-    target=$1 && shift
-    thelibs=""
-    for dir in $*; do
-        thelibs="$thelibs `find $dir -name "lib*.a" -print`"
+    sublibs=""
+    for path in $*; do
+        sublibs="$sublibs `find $path -name "lib*.a" -print`"
     done
+    #echo $sublibs
 
     # for static lib
-    rm -f lib$target.a
-    make_archive $target 2>/dev/null
-    check_err "fail to gen archive .a"
-    cp -f lib$target.a /tmp/
+    rm -f $targetlib
+    make_archive "$targetos" "$targetlib" "$sublibs" 2>/dev/null
+    check_err "fail to gen archive $targetlib"
 }
 
 main $*
