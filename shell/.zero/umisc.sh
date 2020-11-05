@@ -583,7 +583,7 @@ __init_misc() {
     alias show-user-group="_show_user_group"
     alias show-tcp-qos="_show_tcp_qos"
 
-    completex _sshx ssh
-    #completex _scpx scp
+    _completex _sshx ssh
+    #_completex _scpx scp
 }
 

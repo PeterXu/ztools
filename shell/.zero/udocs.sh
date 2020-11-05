@@ -187,6 +187,6 @@ __init_docs() {
     alias zero-set="_zero_set"
     alias Help="_zero_help"
 
-    completex _Help Help
+    _completex _Help Help
 }
 
