@@ -19,7 +19,7 @@ __init_common() {
     fi
 
     # For shell extending
-    local items="git-completion.bash git-prompt.sh docker.bash-completion docker-compose.bash-completion"
+    local items="git-completion.bash git-prompt.sh"
     for k in $items; do
         item="$HOME/.zero/$item"
         [ -f "$item" ] && source $item
