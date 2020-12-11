@@ -19,10 +19,17 @@ __init_common() {
     fi
 
     # For shell extending
-    local items="git-completion.bash git-prompt.sh"
-    for k in $items; do
-        item="$HOME/.zero/$item"
-        [ -f "$item" ] && source $item
-    done
+    local ret=1
+    which git 2>/dev/null 1>&2 && ret=0
+    if [ $ret -eq 0 ]; then
+        ver0=$(git --version | awk '{print $3}' | awk -F"." '{print $1}')
+        #ver1=$(git --version | awk '{print $3}' | awk -F"." '{print $2}')
+        local items="git-completion.bash git-prompt.sh"
+        [ $ver0 -lt 2 ] && items="git-completion-v18.bash git-prompt-v18.sh"
+        for k in $items; do
+            item="$HOME/.zero/$k"
+            [ -f "$item" ] && source $item
+        done
+    fi
 }
 
