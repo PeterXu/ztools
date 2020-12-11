@@ -407,7 +407,7 @@ _docker_pushx() {
 ### -----------
 ### init docker
 __init_docker() {
-    #return 
+    which docker 2>/dev/null 1>&2 || return
 
     # for image
     alias docker-ls="docker images"
