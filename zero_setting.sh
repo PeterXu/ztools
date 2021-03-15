@@ -117,8 +117,8 @@ set_prepare()
 
     zpm_install -b ctags -f || return 1
     zpm_install -b cscope || return 1
-    zpm_install -b cmake || return 1
-    zpm_install -b ant || return 1
+    #zpm_install -b cmake || return 1
+    #zpm_install -b ant || return 1
     zpm_install -b vim -f || return 1
     return 0
 }
@@ -140,13 +140,13 @@ set_env()
 # For ENV variables
 [ "\$HOME" = "" ] && export HOME=~
 _ZPATH="/usr/local/bin:/usr/local/sbin"
-_ZPATH="\$_ZPATH:\$HOME/bin:\$HOME/.local/bin"
+_ZPATH="\$_ZPATH:\$HOME/.local/bin"
 
 # For shell extending
 [ -f "\$HOME/.zero/uinit.sh" ] && source "\$HOME/.zero/uinit.sh"
 
 # For python virtualenv
-venv init 2>/dev/null 1>&2
+#venv init 2>/dev/null 1>&2
 
 EOF
 }
@@ -162,6 +162,9 @@ set_vim()
         ln -sf $kRoot/shell/$rc $vim
     done
     
+    local ret=`which dos2unix 2>/dev/null`
+    [ "$ret" = "" ] && return
+
     if [ "$kUname" = "MINGW" ]; then
         dos2unix -f $HOME/.vimrc
         rm -f $HOME/.vim/plugin/taglist.vim
