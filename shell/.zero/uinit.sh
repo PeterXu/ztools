@@ -35,6 +35,7 @@ _g_init_init() {
     _UNAME="$kUname"
 
     [ "$_UNAME" = "MINGW" ] && _SH_LIST="ucommon.sh ubase.sh umark.sh"
+    [ "$_UNAME" = "Darwin" ] && _SH_LIST="$_SH_LIST mac_network.sh" 
 
     local item
     for item in $_SH_LIST; do
