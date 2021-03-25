@@ -4,8 +4,11 @@
 __init_common() {
     # For general alias
     #[ "$_UNAME" != "Darwin" ] && alias cp='cp -i'
-    [ "$_UNAME" = "Darwin" ] && alias ls='ls -G'
-    which gls 2>/dev/null 1>&2 && alias ls='gls --color=auto'
+    local ls0='ls'
+    [ "$_UNAME" = "Darwin" ] && ls0='ls -G'
+    which gls 2>/dev/null 1>&2 && ls0='gls --color=auto'
+
+    alias ls="$ls0"
     alias ll='ls -l'
     #alias mv='mv -i'
     #alias rm='rm -i'

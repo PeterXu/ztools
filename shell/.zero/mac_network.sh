@@ -3,8 +3,8 @@
 
 __help_mac_netctl() {
     local modes=("100% Loss" 3G DSL Edge LTE "Very Bad Network" "Wi-Fi" "Wi-Fi 802.11ac")
-    local prog="mac_netctl"
-    echo "usage: $prog start <mode>|stop, supported modes:"
+    local prog="mac-netctl"
+    echo "usage: $prog start <mode_name>|stop, supported modes:"
     idx=0
     for m in "${modes[@]}"; do
         echo "  $idx: \"$m\""
@@ -12,7 +12,7 @@ __help_mac_netctl() {
     done
 }
 
-function __mac_netctl_stop() {
+function _mac_netctl_stop() {
     echo "Resetting network conditioning..."
     (
     set -e
@@ -23,7 +23,7 @@ function __mac_netctl_stop() {
     return 0
 }
 
-function __mac_netctl_start() {
+function _mac_netctl_start() {
     local mode="$1"
     local down_bandwidth, down_packets_dropped, down_delay
     local up_bandwidth, up_packets_dropped, up_delay
@@ -107,19 +107,22 @@ function __mac_netctl_start() {
     return 0
 }
 
-function mac_netctl() {
+function _mac_netctl() {
     local start_stop="$1"
     local mode="$2"
     if [ "$start_stop" = "stop" ]; then
         if [ "N$mode" != "N" ]; then
             __help_mac_netctl
         else
-            __mac_netctl_stop
+            _mac_netctl_stop
         fi
     elif [ "$start_stop" = "start" ]; then
-        __mac_netctl_start "$mode"
+        _mac_netctl_start "$mode"
     else
         __help_mac_netctl
     fi
 }
 
+__init_mac_netctl() {
+    alias mac-netctl="_mac_netctl"
+}
