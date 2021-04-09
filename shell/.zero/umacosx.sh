@@ -123,17 +123,18 @@ __help_mac_netcfg() {
 }
 
 function _mac_netcfg() {
-    # 0: out, 1: in, 2: both
-    local direction=2             # default both
-    local bandwidth="900Mbit/s"   # default max
-    local lossrate="0.0"          # [0.0-1.0]
-    local delay="0"               # ms
-    local proto="proto ip from any to any" # default all
+    local direction=-1            # 0:out, 1:in, 2:both
+    local bandwidth="900Mbit/s"   # default wifi
+    local lossrate="0.0"          # default no loss, [0.0-1.0]
+    local delay="0"               # default no delay(0 ms)
+    local proto="proto ip from any to any" # default allow ip all
 
     if [ $# -lt 3 ]; then
         __help_mac_netcfg
         return 0
     fi
+
+    # parse direction
     local value="$1"; shift
     case "$value" in
         in)
@@ -146,17 +147,20 @@ function _mac_netcfg() {
             direction=2
             ;;
         *)
-            echo "[ERROR] invalid direction, should be in|out|both."
-            return 1
             ;;
     esac
+    if [ $direction -lt 0 ]; then
+        echo "[ERROR] invalid direction, should be in|out|both."
+        return 1
+    fi
 
-    local have_proto=0
+    # parse keyword
+    local keyword=""
     while [ $# -ge 1 ]; do
         local value="$1"; shift
         case "$value" in
             bw)
-                have_proto=0
+                keyword="$value"
                 bandwidth="$1"; shift
                 local b1=${bandwidth%Mbit/s}
                 local b2=${bandwidth%Kbit/s}
@@ -166,7 +170,7 @@ function _mac_netcfg() {
                 fi
                 ;;
             plr)
-                have_proto=0
+                keyword="$value"
                 lossrate="$1"; shift
                 local ival=$(echo $lossrate | awk '{if ($1 < 0 || $1 > 1.0) print -1; else print 1;}')
                 if [ $ival -lt 0 ]; then
@@ -175,18 +179,18 @@ function _mac_netcfg() {
                 fi
                 ;;
             delay)
-                have_proto=0
+                keyword="$value"
                 delay="$1"; shift
                 ;;
             proto)
-                have_proto=1
+                keyword="$value"
                 proto="proto $1"
                 ;;
             *)
-                if [ $have_proto -eq 1 ]; then
+                if [ "$keyword" = "proto" ]; then
                     proto="$proto $1"
                 else
-                    echo "[ERROR] invalid proto, see help"
+                    echo "[ERROR] invalid props for <$keyword>, see help"
                     return 1
                 fi
                 ;;
@@ -215,7 +219,7 @@ function _mac_netcfg() {
         sudo dnctl pipe 2 config bw "$bandwidth" plr "$lossrate" delay "$delay"
     fi
 
-    # load pipe by anchor
+    # 3. load pipe by anchor
     #   quick: this is last rule and skip related subsequent rules.
     if [ $direction -eq 0 -o $direction -eq 2 ]; then
         echo "dummynet out quick $proto pipe 1" | sudo pfctl -a conditioning -f -
