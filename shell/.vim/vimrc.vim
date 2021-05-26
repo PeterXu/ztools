@@ -13,6 +13,9 @@ set softtabstop=4
 set shiftwidth=4
 set expandtab " use spaces to expandtab, else <set noexpandtab>
 
+" ----------------
+" Keep dead-lock in typescript files.
+set re=2
 
 " ---------------------------
 " Linebreak on 500 characters
@@ -67,8 +70,9 @@ endif
 
 "-------------------
 " load plug plugins, and install by :PlugInstall/PlugUpdate/PlugUpgrade
+let g:go_gopls_enabled=0
 call plug#begin()
-Plug 'dart-lang/dart-vim-plugin'
+"Plug 'dart-lang/dart-vim-plugin'
 Plug 'fatih/vim-go'
 call plug#end()
 
