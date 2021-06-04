@@ -7,9 +7,12 @@ __init_common() {
     local ls0='ls'
     [ "$_UNAME" = "Darwin" ] && ls0='ls -G'
     which gls 2>/dev/null 1>&2 && ls0='gls --color=auto'
+    local date0='date'
+    which gdate 2>/dev/null 1>&2 && date0='gdate'
 
     alias ls="$ls0"
     alias ll='ls -l'
+    alias date="$date0"
     #alias mv='mv -i'
     #alias rm='rm -i'
     alias cls='clear'

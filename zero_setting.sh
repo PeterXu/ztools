@@ -113,6 +113,7 @@ set_prepare()
     if [ "$kUname" = "Darwin" ]; then
         zpm_install -b bash-completion -f || return 1
         zpm_install -b coreutils -f # gls
+        zpm_install -b dateutils -f # gdate
     fi
 
     zpm_install -b ctags -f || return 1

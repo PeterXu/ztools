@@ -72,7 +72,7 @@ endif
 " load plug plugins, and install by :PlugInstall/PlugUpdate/PlugUpgrade
 let g:go_gopls_enabled=0
 call plug#begin()
-"Plug 'dart-lang/dart-vim-plugin'
+Plug 'dart-lang/dart-vim-plugin'
 Plug 'fatih/vim-go'
 call plug#end()
 

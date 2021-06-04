@@ -584,6 +584,6 @@ __init_misc() {
     alias show-tcp-qos="_show_tcp_qos"
 
     _completex _sshx ssh
-    #_completex _scpx scp
+    _completex _scpx scp
 }
 
