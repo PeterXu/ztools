@@ -4,7 +4,7 @@
 __init_common() {
     # For general alias
     #[ "$_UNAME" != "Darwin" ] && alias cp='cp -i'
-    local ls0='ls'
+    local ls0='ls --color=auto'
     [ "$_UNAME" = "Darwin" ] && ls0='ls -G'
     which gls 2>/dev/null 1>&2 && ls0='gls --color=auto'
     local date0='date'
