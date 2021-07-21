@@ -234,9 +234,41 @@ function _mac_netcfg() {
     return 0
 }
 
+function _chrome_update() {
+    local update0="/Library/Google/GoogleSoftwareUpdate"
+    if [ -d "$update0" ]; then
+        echo "remove system $update0"
+        sudo rm -rf "$update0"
+    fi
 
-__init_mac_net() {
+    local update="$HOME/$update0"
+    if [ ! -d "$update" ]; then
+        echo "$update not exist"
+        return 0
+    fi
+
+    local action="$1"
+    if [ "$action" = "on" ]; then
+        local owner=$(whoami)
+        sudo chown $owner:staff $update
+        sudo chmod 755 $update
+        return 0;
+    fi
+
+    if [ "$action" = "off" ]; then
+        sudo chown root:staff $update
+        sudo chmod 400 $update
+        return 0;
+    fi
+
+    echo "usage: chrome-update on|off"
+    return 1
+}
+
+
+__init_macosx() {
     alias mac-netctl="_mac_netctl"
     alias mac-netcfg="_mac_netcfg"
+    alias chrome-update="_chrome_update"
 }
 
