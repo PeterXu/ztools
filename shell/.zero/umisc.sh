@@ -60,6 +60,7 @@ _scpx() {
     local copts
     for i in `ls .`; do
         copts="$copts ./$i"
+        opts="$i $opts"
     done
     _tablist3 "scp" "$opts" "$copts"
 }
