@@ -28,7 +28,7 @@ _g_init_init() {
 
 
     _INIT_PREFIX="__init_"
-    _SH_LIST="ucommon.sh ubase.sh umisc.sh umark.sh udocker.sh udocs.sh srcin.sh"
+    _SH_LIST="ucommon.sh ubase.sh umisc.sh umark.sh udocker.sh ugit.sh udocs.sh srcin.sh"
 
     local kUname=$(uname)
     [[ "$kUname" =~ "MINGW" || "$kUname" =~ "mingw" ]] && kUname="MINGW"
