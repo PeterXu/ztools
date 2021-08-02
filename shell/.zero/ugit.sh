@@ -147,44 +147,48 @@ _gitx_rm() {
 }
 
 ## gitx
-gitx_show() {
+_gitx_show() {
     _gitx_all_branches
 }
-gitx_stash() {
+_gitx_stash() {
     local opts
 }
-gitx_status() {
+_gitx_status() {
     local opts
 }
-gitx_submodule() {
+_gitx_submodule() {
     local opts
 }
-gitx_switch() {
+_gitx_switch() {
     _gitx_all_branches
 }
-gitx_tag() {
+_gitx_tag() {
     local opts
 }
 
 ## gitx
-gitx_config() {
-    local opts
+_gitx_config() {
+    local opts="add branch checkout commit core diff difftool format gc log"
+    _tablist2 "" "$opts"
 }
-gitx_reflog() {
-    local opts
+_gitx_reflog() {
+    local opts="show expire delete exists"
+    _tablist2 "" "$opts"
 }
-gitx_remote() {
-    local opts
-}
-
-gitx_fsck() {
-    local opts
-}
-gitx_help() {
-    local opts
+_gitx_remote() {
+    local opts="add rename remove set-head set-branches get-url set-url show prune update"
+    _tablist2 "" "$opts"
 }
 
-gitx_apply() {
+_gitx_fsck() {
+    local opts
+}
+_gitx_help() {
+    local opts="$_git_opts_"
+    _tablist2 "" "$opts"
+}
+
+_gitx_apply() {
     local opts
 }
 
