@@ -70,10 +70,13 @@ endif
 
 "-------------------
 " load plug plugins, and install by :PlugInstall/PlugUpdate/PlugUpgrade
-let g:go_gopls_enabled=0
+let g:go_gopls_enabled=1
+"let g:lsc_auto_map = v:true
 call plug#begin()
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'fatih/vim-go'
+"Plug 'natebosch/vim-lsc'
+"Plug 'natebosch/vim-lsc-dart'
 call plug#end()
 
 
