@@ -239,6 +239,7 @@ EOF
 set_bashrc()
 {
     [ ! -f $kProfile ] && return 1
+    [ "$kUname" == "Linux" ] && return 1
 
     # if exists ".bash_profile", bash will not load ".profile"
     local profile="$HOME/.bash_profile"
