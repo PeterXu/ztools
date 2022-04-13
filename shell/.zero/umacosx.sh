@@ -265,10 +265,23 @@ function _chrome_update() {
     return 1
 }
 
+_mdns_broadcast() {
+    local name="$1"
+    if [ "#$name" = "#" ]; then
+        echo "usage: mdns name.local"
+    else
+        ext=${name##*.}
+        [ "$ext" != "local" ] && name="${name}.local"
+        echo "> dns-sd proxy: $name .."
+        dns-sd -P mdns _http._tcp "" 80 $name $(ifconfig en0 | grep "inet " | awk '{print $2}')
+    fi
+}
+
 
 __init_macosx() {
     alias mac-netctl="_mac_netctl"
     alias mac-netcfg="_mac_netcfg"
     alias chrome-update="_chrome_update"
+    alias mac-mdns="_mdns_broadcast"
 }
 
