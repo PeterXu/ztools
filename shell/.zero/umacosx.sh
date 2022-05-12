@@ -273,15 +273,20 @@ _mdns_broadcast() {
         ext=${name##*.}
         [ "$ext" != "local" ] && name="${name}.local"
         echo "> dns-sd proxy: $name .."
-        dns-sd -P mdns _http._tcp "" 80 $name $(ifconfig en0 | grep "inet " | awk '{print $2}')
+        ip=$(ifconfig en0 | grep "inet " | awk '{print $2}')
+        nohup dns-sd -P mdns _http._tcp "" 80 $name $ip >/dev/null 2>&1 &
     fi
 }
 
+_mdns_stop() {
+    pkill -f "dns-sd -P mdns _http._tcp"
+}
 
 __init_macosx() {
     alias mac-netctl="_mac_netctl"
     alias mac-netcfg="_mac_netcfg"
     alias chrome-update="_chrome_update"
-    alias mac-mdns="_mdns_broadcast"
+    alias mdns-start="_mdns_broadcast"
+    alias mdns-stop="_mdns_stop"
 }
 
