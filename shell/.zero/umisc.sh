@@ -56,13 +56,24 @@ _sshx() {
     _tablist "ssh" "$opts"
 }
 _scpx() {
-    local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
-    local copts
-    for i in `ls .`; do
-        copts="$copts ./$i"
-        opts="$i $opts"
-    done
-    _tablist3 "scp" "$opts" "$copts"
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    if [ "${cur:0:2}" = "./" ]; then
+        local opts
+        if [ "${cur:(-1):1}" = "/" ]; then
+            for i in `ls "${cur}"`; do
+                opts="$opts $cur$i"
+            done
+        else
+            cur=`dirname "$cur"`
+            for i in `ls "${cur}"`; do
+                opts="$opts $cur/$i"
+            done
+        fi
+        _tablist2 "scp" "$opts"
+    else
+        local opts=`cat $HOME/.ssh/config 2>/dev/null  | grep "Host " | awk '{print $2}'`
+        _tablist2 "scp" "$opts"
+    fi
 }
 
 
