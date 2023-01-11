@@ -74,6 +74,19 @@ _scpx() {
         _tablist2 "scp" "$opts"
     fi
 }
+_rsyncx() {
+    [ $# -ne 2 ] && return
+    local src="$1"
+    local dst="$2"
+    local port="${REMOTE_SSH_PORT}"
+    if [ "#$port" = "#" ]; then
+        echo "Connecting to remote :22"
+        rsync -avP ${src} ${dst}
+    else
+        echo "Connecting to remote :$port"
+        rsync -avP -e "ssh -p $port" "${src}" "${dst}"
+    fi
+}
 
 
 ## ---------------------
@@ -594,6 +607,7 @@ __init_misc() {
     alias show-user-group="_show_user_group"
     alias show-tcp-qos="_show_tcp_qos"
 
+    alias rsyncx="_rsyncx"
     _completex _sshx ssh
     _completex _scpx scp
 }
