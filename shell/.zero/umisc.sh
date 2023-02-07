@@ -75,7 +75,7 @@ _scpx() {
     fi
 }
 _rsyncx() {
-    [ $# -ne 2 ] && return
+    [ $# -ne 2 ] && echo "usage: REMOTE_SSH_PORT=22 rsyncx src dst" && return
     local src="$1"
     local dst="$2"
     local port="${REMOTE_SSH_PORT}"
