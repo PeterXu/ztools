@@ -74,17 +74,38 @@ _scpx() {
         _tablist2 "scp" "$opts"
     fi
 }
+
+_rsyncx_backup() {
+    [ $# -ne 2 ] && echo "usage: REMOTE_RSYNC="/usr/bin/rsync" REMOTE_SSH_PORT=22 rsyncx_backup src dst" && return
+    local src="$1"
+    local dst="$2"
+    local port="${REMOTE_SSH_PORT}"
+    local rrsync="${REMOTE_RSYNC}"
+    [ "#$rrsync" = "#" ] && rrsync="rsync"
+    #TODO: some version may not support these arguments, then should specify which version.
+    local opts="-aNHAXx --protect-args --fileflags --force-change"
+    if [ "#$port" = "#" ]; then
+        echo "Connecting to remote :22"
+        rsync $opts --rsync-path="$rrsync" "$src" "$dst"
+    else
+        echo "Connecting to remote :$port"
+        rsync $opts --rsync-path="$rrsync" -e "ssh -p $port" "$src" "$dst"
+    fi
+}
+
 _rsyncx() {
     [ $# -ne 2 ] && echo "usage: REMOTE_SSH_PORT=22 rsyncx src dst" && return
     local src="$1"
     local dst="$2"
     local port="${REMOTE_SSH_PORT}"
+
+    local opts="-avP"
     if [ "#$port" = "#" ]; then
         echo "Connecting to remote :22"
-        rsync -avP ${src} ${dst}
+        rsync $opts ${src} ${dst}
     else
         echo "Connecting to remote :$port"
-        rsync -avP -e "ssh -p $port" "${src}" "${dst}"
+        rsync $opts -e "ssh -p $port" "${src}" "${dst}"
     fi
 }
 
@@ -608,6 +629,7 @@ __init_misc() {
     alias show-tcp-qos="_show_tcp_qos"
 
     alias rsyncx="_rsyncx"
+    alias rsyncx-backup="_rsyncx_backup"
     _completex _sshx ssh
     _completex _scpx scp
 }
