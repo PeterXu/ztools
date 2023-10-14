@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ## ------------
 ## for bash map
@@ -107,6 +108,11 @@ _rsyncx() {
         echo "Connecting to remote :$port"
         rsync $opts -e "ssh -p $port" "${src}" "${dst}"
     fi
+}
+
+_verify2fa() {
+    cd ${DIR}/../../dist/common/
+    python3 py2fa.py $*
 }
 
 
@@ -632,5 +638,7 @@ __init_misc() {
     alias rsyncx-backup="_rsyncx_backup"
     _completex _sshx ssh
     _completex _scpx scp
+
+    alias verify2fa="_verify2fa"
 }
 
