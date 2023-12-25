@@ -95,18 +95,19 @@ _rsyncx_backup() {
 }
 
 _rsyncx() {
-    [ $# -ne 2 ] && echo "usage: REMOTE_SSH_PORT=22 rsyncx src dst" && return
+    [ $# -ne 2 ] && echo "usage: SSH_PORT=22 SSH_OPTS= rsyncx src dst" && return
     local src="$1"
     local dst="$2"
-    local port="${REMOTE_SSH_PORT}"
+    local sport="${SSH_PORT}"
+    local sopts="${SSH_OPTS}"
 
-    local opts="-avP"
-    if [ "#$port" = "#" ]; then
-        echo "Connecting to remote :22"
+    local opts="-avP$sopts"
+    if [ "Z$sport" = "Z" -o "Z$sport" = "Z22" ]; then
+        echo "Connecting to remote :22, $opts"
         rsync $opts ${src} ${dst}
     else
-        echo "Connecting to remote :$port"
-        rsync $opts -e "ssh -p $port" "${src}" "${dst}"
+        echo "Connecting to remote :$sport, $opts"
+        rsync $opts -e "ssh -p $sport" "${src}" "${dst}"
     fi
 }
 
