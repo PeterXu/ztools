@@ -111,16 +111,16 @@ set_prepare()
     prepare_zpm || return 1
 
     if [ "$kUname" = "Darwin" ]; then
-        zpm_install -b bash-completion -f || return 1
-        zpm_install -b coreutils -f # gls
-        zpm_install -b dateutils -f # gdate
+        (zpm_install -b bash-completion -f)
+        (zpm_install -b coreutils -f) # gls
+        (zpm_install -b dateutils -f) # gdate
     fi
 
-    zpm_install -b ctags -f || return 1
-    zpm_install -b cscope || return 1
-    #zpm_install -b cmake || return 1
-    #zpm_install -b ant || return 1
-    zpm_install -b vim -f || return 1
+    (zpm_install -b ctags -f)
+    (zpm_install -b cscope)
+    #(zpm_install -b cmake)
+    #(zpm_install -b ant)
+    (zpm_install -b vim -f)
     return 0
 }
 
