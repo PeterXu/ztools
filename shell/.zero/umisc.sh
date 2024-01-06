@@ -112,8 +112,7 @@ _rsyncx() {
 }
 
 _verify2fa() {
-    cd ${DIR}/../../dist/common/
-    python3 py2fa.py $*
+    python3 ${DIR}/../../dist/common/py2fa.py $*
 }
 
 
