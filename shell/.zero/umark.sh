@@ -28,6 +28,21 @@ _mark() {
     mkdir -p "$_MARKPATH"
     [ "$_UNAME" = "MINGW" ] && echo "$(pwd)" > "$iname" || ln -s "$(pwd)" "$iname"
 }
+_pmark() {
+    local dname
+    [ $# -ge 1 ] && __help_mark unmark && return
+    dname="$(pwd)"
+    if [ "$_UNAME" = "MINGW" ]; then
+        local inames=`ls --color=never "$_MARKPATH" 2>/dev/null || ls "$_MARKPATH" 2>/dev/null`
+        for iname in $inames; do
+            local rname=$(cat "$_MARKPATH/$iname")
+            [ "$dname" = "$rname" ] && echo "$iname -> $rname"
+        done
+    else
+        ls -l "$_MARKPATH" 2>/dev/null | sed 's/  */ /g' 2>/dev/null | cut -d' ' -f9- 2>/dev/null | grep "> $dname$"
+    fi
+    echo
+}
 _unmark() {
     local iname
     [ $# -gt 1 ] && __help_mark unmark && return
@@ -102,6 +117,7 @@ __init_mark() {
 
     alias jump="_jump"
     alias mark="_mark"
+    alias pmark="_pmark"
     alias unmark="_unmark"
     alias marks="_marks"
     alias marks-broken="_marks_broken"
