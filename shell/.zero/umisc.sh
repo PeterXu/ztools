@@ -636,8 +636,8 @@ __init_misc() {
 
     alias rsyncx="_rsyncx"
     alias rsyncx-backup="_rsyncx_backup"
-    _completex _sshx ssh
-    _completex _scpx scp
+    #_completex _sshx ssh
+    #_completex _scpx scp
 
     alias verify2fa="_verify2fa"
 }

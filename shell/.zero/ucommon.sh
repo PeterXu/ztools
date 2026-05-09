@@ -64,8 +64,8 @@ __init_common() {
         [ -f "$item" ] && source $item
     fi
 
-    _git_prepare >/dev/null 2>&1 &
-    _git_init
-    _docker_init
+    #_git_prepare >/dev/null 2>&1 &
+    #_git_init
+    #_docker_init
 }
 
