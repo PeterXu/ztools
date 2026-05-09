@@ -43,23 +43,44 @@ _tablist() {
     local key pre2 pre cur rcur opts tips
     key="$1" && shift
     opts="$*" && shift
-    COMPREPLY=()
-    pre=${COMP_WORDS[COMP_CWORD-1]}
-    cur=${COMP_WORDS[COMP_CWORD]}
-    if [ "$pre" = "$key" ]; then
+
+    if [ "$_SHNAME" = "bash" ]; then
+      COMPREPLY=()
+      pre=${COMP_WORDS[COMP_CWORD-1]}
+      cur=${COMP_WORDS[COMP_CWORD]}
+      if [ "$pre" = "$key" ]; then
         tips="$opts"
-    else
+      else
         pre2=${COMP_WORDS[COMP_CWORD-2]}
         [ "$pre2" = "$key" ] && rcur="$pre$cur" || rcur="$pre2$pre$cur"
         [ "$cur" = ":" ] && cur=""
         
         for opt in $opts; do
-            tip=${opt/$rcur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip "
-            #_printx @green "\n=>$opt, $rcur, $tip<=\n"
+          tip=${opt/$rcur/} && [ "$tip" != "$opt" ] && tips+="$cur$tip "
+          #_printx @green "\n=>$opt, $rcur, $tip<=\n"
         done
+      fi
+      #_printx @red "\n=>$pre2,$pre,$key: $tips<=\n"
+      COMPREPLY=($(compgen -W "$tips" -- "$cur"))
+    elif [ "$_SHNAME" = "zsh" ]; then
+      pre="${words[CURRENT-1]}"
+      cur="${words[CURRENT]}"
+      if [[ "$pre" == "$key" ]]; then
+        tips=("${opts[@]}")
+      else
+        pre2="${words[CURRENT-2]}"
+        [[ "$pre2" == "$key" ]] && rcur="$pre$cur" || rcur="$pre2$pre$cur"
+        [[ "$cur" == ":" ]] && cur=""
+
+        for opt in $opts; do
+          tip=${opt/$rcur/} && [[ "$tip" != "$opt" ]] && tips+="$cur$tip "
+        done
+      fi
+
+      local -a arr
+      arr=(${=tips})
+      compadd -- "${arr[@]}"
     fi
-    #_printx @red "\n=>$pre2,$pre,$key: $tips<=\n"
-    COMPREPLY=($(compgen -W "$tips" -- "$cur"))
 }
 _tablist2() {
     [ $# -ne 2 ] && return
@@ -67,12 +88,24 @@ _tablist2() {
     local cur opts tips
     opts="$*" && shift
 
-    COMPREPLY=()
-    cur=${COMP_WORDS[COMP_CWORD]}
-    [ "$cur" = ":" ] && cur=""
-    tips="$opts"
+    if [ "$_SHNAME" = "bash" ]; then
+      COMPREPLY=()
+      cur=${COMP_WORDS[COMP_CWORD]}
+      [ "$cur" = ":" ] && cur=""
+      tips="$opts"
 
-    COMPREPLY=($(compgen -W "$tips" -- "$cur"))
+      COMPREPLY=($(compgen -W "$tips" -- "$cur"))
+    elif [ "$_SHNAME" = "zsh" ]; then
+      cur=${words[CURRENT]}
+      [ "$cur" = ":" ] && cur=""
+      tips="$opts"
+
+      local -a arr
+      arr=(${=tips})
+      compadd -- "${arr[@]}"
+    else
+      return
+    fi
 }
 _tablist3() {
     [ $# -ne 3 ] && return
@@ -82,7 +115,14 @@ _tablist3() {
     opts="$1" && shift
     copts="$*" && shift
 
-    cur=${COMP_WORDS[COMP_CWORD]}
+    if [ "$_SHNAME" = "bash" ]; then
+      cur=${COMP_WORDS[COMP_CWORD]}
+    elif [ "$_SHNAME" = "zsh" ]; then
+      cur=${words[CURRENT]}
+    else
+      return
+    fi
+
     if [ "${cur:0:2}" = "./" ]; then
         _tablist2 "$key" "$copts"
     else
@@ -102,7 +142,8 @@ _completex() {
     if [ "$_SHNAME" = "bash" ]; then
         complete -F $1 $2
     elif [ "$_SHNAME" = "zsh" ]; then
-        echo=1
+        #echo=1
+        compdef "$1" "$2"
     fi
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-_jump() { 
+jump() { 
     local r=0 dname
     if [ $# -eq 0 ]; then
         cd 2>/dev/null && r=1
@@ -43,7 +43,7 @@ _pmark() {
     fi
     echo
 }
-_unmark() {
+unmark() {
     local iname
     [ $# -gt 1 ] && __help_mark unmark && return
     [ $# -eq 0 ] && iname="$_MARKPATH/`basename $(pwd)`"
@@ -115,10 +115,10 @@ _unmark_tips() {
 __init_mark() {
     _MARKPATH="$HOME/.marks"
 
-    alias jump="_jump"
+    #alias jump="_jump"
     alias mark="_mark"
     alias pmark="_pmark"
-    alias unmark="_unmark"
+    #alias unmark="_unmark"
     alias marks="_marks"
     alias marks-broken="_marks_broken"
     alias unmark-all="_unmark_all"
