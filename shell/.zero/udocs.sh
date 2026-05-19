@@ -162,8 +162,8 @@ __help_regex() {
     _regex_pnx  "\${str/%cde/x}"  "=>"  "${str/%cde/x}" "the right end: 'cde'"
     _regex_pnx
     _regex_pnx  "  3. compare - logic true"
-    _regex_pnx  "     [[ "$str" == "a*" ]]"
-    _regex_pnx  "     [[ "$str" =~ .*\.abcde ]]"
+    _regex_pnx  "     [[ \"$str\" == \"a*\" ]]"
+    _regex_pnx  "     [[ \"$str\" =~ \".*\.abcde\" ]]"
     _regex_pnx  "     [[ \"11\" < \"2\" ]]"
     _regex_pnx
 

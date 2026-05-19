@@ -15,6 +15,7 @@ _g_init_init() {
     if [[ "$shname" =~ "zsh" ]]; then
         kShName="zsh"
         setopt shwordsplit
+        setopt interactivecomments
         #if type emulate >/dev/null 2>/dev/null; then emulate bash; fi
         tmp="/usr/local/share/zsh"
         if [ -f "$tmp" ]; then
